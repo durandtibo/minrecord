@@ -208,13 +208,13 @@ files = [
 
 [[package]]
 name = "coola"
-version = "0.6.2"
+version = "0.7.0"
 description = "A library to check if two complex/nested objects are equal or not"
 optional = false
 python-versions = "<3.13,>=3.9"
 files = [
-    {file = "coola-0.6.2-py3-none-any.whl", hash = "sha256:2d56a65b7934d463718fde712f2cc4261d0a161c9d34c9f1d1775fe3e171c1d2"},
-    {file = "coola-0.6.2.tar.gz", hash = "sha256:cabd73f4ff7151850f81a045bfc8794e7070dfb85ab668deb54b9aeae91bf088"},
+    {file = "coola-0.7.0-py3-none-any.whl", hash = "sha256:63705899c02a3db02aee849f44003ae8298f27d49eb174108afded81ea9cb972"},
+    {file = "coola-0.7.0.tar.gz", hash = "sha256:a7cf7baac088cd2ebfbf0b72929543dc4bb6c1a5f5c7a2207f677aba1260d618"},
 ]
 
 [package.extras]
@@ -366,13 +366,13 @@ dev = ["flake8", "markdown", "twine", "wheel"]
 
 [[package]]
 name = "griffe"
-version = "0.45.2"
+version = "0.45.3"
 description = "Signatures for entire Python programs. Extract the structure, the frame, the skeleton of your project, to generate API documentation or find breaking changes in your API."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "griffe-0.45.2-py3-none-any.whl", hash = "sha256:297ec8530d0c68e5b98ff86fb588ebc3aa3559bb5dc21f3caea8d9542a350133"},
-    {file = "griffe-0.45.2.tar.gz", hash = "sha256:83ce7dcaafd8cb7f43cbf1a455155015a1eb624b1ffd93249e5e1c4a22b2fdb2"},
+    {file = "griffe-0.45.3-py3-none-any.whl", hash = "sha256:ed1481a680ae3e28f91a06e0d8a51a5c9b97555aa2527abc2664447cc22337d6"},
+    {file = "griffe-0.45.3.tar.gz", hash = "sha256:02ee71cc1a5035864b97bd0dbfff65c33f6f2c8854d3bd48a791905c2b8a44b9"},
 ]
 
 [package.dependencies]
@@ -1347,4 +1347,4 @@ all = []
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.13"
-content-hash = "f776eaa8ef316320ace6e2cc8702d30fcc16fa3d509691884e1bc88ec70aed16"
+content-hash = "2381efb3deca8c2acd64e56dd6d94513fe7da555f9be6f515ac645eac5861e26"
