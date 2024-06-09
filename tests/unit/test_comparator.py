@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from typing import TYPE_CHECKING
 
 import pytest
 from coola import objects_are_allclose, objects_are_equal
@@ -10,7 +11,6 @@ from coola.equality.testers import EqualityTester
 from minrecord import MaxScalarComparator, MinScalarComparator
 from minrecord.comparator import ComparatorEqualityComparator
 from tests.unit.helpers import ExamplePair
-from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from collections.abc import Callable
