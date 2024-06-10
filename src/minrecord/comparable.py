@@ -45,7 +45,7 @@ class ComparableRecord(Record[T]):
     >>> record.add_value(42.0)
     >>> record.get_last_value()
     42.0
-    >>> record.get_recent_record()
+    >>> record.get_most_recent()
     ((None, 64.0), (None, 42.0))
     >>> record.get_best_value()
     64.0
@@ -164,7 +164,7 @@ class MaxScalarRecord(ComparableRecord[Number]):
     >>> record = MaxScalarRecord("value")
     >>> record.add_value(64.0)
     >>> record.add_value(42.0)
-    >>> record.get_recent_record()
+    >>> record.get_most_recent()
     ((None, 64.0), (None, 42.0))
     >>> record.get_last_value()
     42.0
@@ -214,7 +214,7 @@ class MaxScalarRecord(ComparableRecord[Number]):
 
         >>> from minrecord import MaxScalarRecord
         >>> record = MaxScalarRecord.from_elements("value", ((None, 64.0), (None, 42.0)))
-        >>> record.get_recent_record()
+        >>> record.get_most_recent()
         ((None, 64.0), (None, 42.0))
         >>> record.get_last_value()
         42.0
@@ -252,7 +252,7 @@ class MinScalarRecord(ComparableRecord[Number]):
     >>> record = MinScalarRecord("value")
     >>> record.add_value(64.0)
     >>> record.add_value(42.0)
-    >>> record.get_recent_record()
+    >>> record.get_most_recent()
     ((None, 64.0), (None, 42.0))
     >>> record.get_last_value()
     42.0
@@ -302,7 +302,7 @@ class MinScalarRecord(ComparableRecord[Number]):
 
         >>> from minrecord import MaxScalarRecord
         >>> record = MaxScalarRecord.from_elements("value", ((None, 64.0), (None, 42.0)))
-        >>> record.get_recent_record()
+        >>> record.get_most_recent()
         ((None, 64.0), (None, 42.0))
         >>> record.get_last_value()
         42.0

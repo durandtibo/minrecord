@@ -91,17 +91,17 @@ def test_comparable_record_get_best_value_empty() -> None:
         record.get_best_value()
 
 
-def test_comparable_record_get_recent_record() -> None:
+def test_comparable_record_get_most_recent() -> None:
     assert ComparableRecord[Number](
         "accuracy", MaxScalarComparator(), elements=[(1, 123)]
-    ).get_recent_record() == ((1, 123),)
+    ).get_most_recent() == ((1, 123),)
 
 
-def test_comparable_record_get_recent_record_empty() -> None:
-    assert ComparableRecord[Number]("accuracy", MaxScalarComparator()).get_recent_record() == ()
+def test_comparable_record_get_most_recent_empty() -> None:
+    assert ComparableRecord[Number]("accuracy", MaxScalarComparator()).get_most_recent() == ()
 
 
-def test_comparable_record_get_recent_record_max_size_3() -> None:
+def test_comparable_record_get_most_recent_max_size_3() -> None:
     record = ComparableRecord("accuracy", comparator=MaxScalarComparator(), max_size=3)
     for i in range(10):
         record.add_value(100 - i)

@@ -40,7 +40,7 @@ class BaseRecord(Generic[T], ABC, metaclass=AbstractFactory):
 
         - ``add_value``
         - ``get_last_value``
-        - ``get_recent_record``
+        - ``get_most_recent``
         - ``is_comparable``
         - ``is_empty``
         - ``update``
@@ -222,7 +222,7 @@ class BaseRecord(Generic[T], ABC, metaclass=AbstractFactory):
         """
 
     @abstractmethod
-    def get_recent_record(self) -> tuple[tuple[int | None, T], ...]:
+    def get_most_recent(self) -> tuple[tuple[int | None, T], ...]:
         r"""Get the tuple of recent values and their associated steps.
 
         The last value in the tuple is the last value added to the
@@ -241,7 +241,7 @@ class BaseRecord(Generic[T], ABC, metaclass=AbstractFactory):
         >>> record.add_value(value=2)
         >>> record.add_value(value=1.2, step=1)
         >>> record.add_value(value=0.8, step=2)
-        >>> record.get_recent_record()
+        >>> record.get_most_recent()
         ((None, 2), (1, 1.2), (2, 0.8))
 
         ```
