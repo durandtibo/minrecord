@@ -49,7 +49,7 @@ class Record(BaseRecord[T]):
     )
     >>> record.get_last_value()
     42.0
-    >>> record.get_recent_record()
+    >>> record.get_most_recent()
     ((None, 64.0), (None, 42.0))
 
     ```
@@ -74,7 +74,7 @@ class Record(BaseRecord[T]):
     def __repr__(self) -> str:
         args = repr_indent(
             repr_mapping(
-                {"name": self.name, "max_size": self.max_size, "record": self.get_recent_record()}
+                {"name": self.name, "max_size": self.max_size, "record": self.get_most_recent()}
             )
         )
         return f"{self.__class__.__qualname__}(\n  {args}\n)"
@@ -108,7 +108,7 @@ class Record(BaseRecord[T]):
             raise EmptyRecordError(msg)
         return self._record[-1][1]
 
-    def get_recent_record(self) -> tuple[tuple[int | None, T], ...]:
+    def get_most_recent(self) -> tuple[tuple[int | None, T], ...]:
         return tuple(self._record)
 
     def is_comparable(self) -> bool:
@@ -130,4 +130,4 @@ class Record(BaseRecord[T]):
         self._record = deque(state_dict["record"], maxlen=self.max_size)
 
     def state_dict(self) -> dict[str, Any]:
-        return {"record": self.get_recent_record()}
+        return {"record": self.get_most_recent()}

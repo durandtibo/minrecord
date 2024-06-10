@@ -35,7 +35,7 @@ def test_record_init_max_size_incorrect() -> None:
 
 
 def test_record_add_value() -> None:
-    assert Record("loss", elements=((None, "abc"), (1, 123))).get_recent_record() == (
+    assert Record("loss", elements=((None, "abc"), (1, 123))).get_most_recent() == (
         (None, "abc"),
         (1, 123),
     )
@@ -107,21 +107,21 @@ def test_record__get_best_value() -> None:
         record._get_best_value()
 
 
-def test_record_get_recent_record() -> None:
-    assert Record("loss", elements=[(1, 123)]).get_recent_record() == ((1, 123),)
+def test_record_get_most_recent() -> None:
+    assert Record("loss", elements=[(1, 123)]).get_most_recent() == ((1, 123),)
 
 
-def test_record_get_recent_record_empty() -> None:
-    assert Record("loss").get_recent_record() == ()
+def test_record_get_most_recent_empty() -> None:
+    assert Record("loss").get_most_recent() == ()
 
 
-def test_record_get_recent_record_max_size() -> None:
+def test_record_get_most_recent_max_size() -> None:
     assert Record(
         "loss", max_size=3, elements=[(1, 123), (2, 123), (3, 124), (4, 125)]
-    ).get_recent_record() == ((2, 123), (3, 124), (4, 125))
+    ).get_most_recent() == ((2, 123), (3, 124), (4, 125))
 
 
-def test_record_get_recent_record_add_max_size() -> None:
+def test_record_get_most_recent_add_max_size() -> None:
     record = Record("loss", max_size=3)
     for i in range(10):
         record.add_value(i)
@@ -195,7 +195,7 @@ def test_record_config_dict_create_new_record() -> None:
 def test_record_load_state_dict_empty() -> None:
     record = Record("loss")
     record.load_state_dict({"record": ()})
-    assert record.get_recent_record() == ()
+    assert record.get_most_recent() == ()
     assert record.equal(Record("loss"))
 
 
