@@ -383,7 +383,11 @@ class BaseRecord(Generic[T], ABC, metaclass=AbstractFactory):
         >>> config = Record("loss").config_dict()
         >>> record = BaseRecord.factory(**config)  # Note that the state is not copied.
         >>> record
-        Record(name=loss, max_size=10, record=())
+        Record(
+          (name): loss
+          (max_size): 10
+          (record): ()
+        )
 
         ```
         """
@@ -464,7 +468,11 @@ class BaseRecord(Generic[T], ABC, metaclass=AbstractFactory):
         ...     }
         ... )
         >>> record
-        Record(name=loss, max_size=7, record=((0, 1), (1, 5)))
+        Record(
+          (name): loss
+          (max_size): 7
+          (record): ((0, 1), (1, 5))
+        )
 
         ```
         """
@@ -492,7 +500,11 @@ class BaseRecord(Generic[T], ABC, metaclass=AbstractFactory):
         >>> record_dict = Record("loss").to_dict()
         >>> record = BaseRecord.from_dict(record_dict)
         >>> record
-        Record(name=loss, max_size=10, record=())
+        Record(
+          (name): loss
+          (max_size): 10
+          (record): ()
+        )
 
         ```
         """
