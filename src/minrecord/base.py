@@ -10,10 +10,13 @@ __all__ = [
 
 import logging
 from abc import ABC, abstractmethod
-from typing import Any, Generic, TypeVar
+from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
 from objectory import OBJECT_TARGET, AbstractFactory
 from objectory.utils import full_object_name
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 T = TypeVar("T")
 
@@ -39,6 +42,8 @@ class BaseRecord(Generic[T], ABC, metaclass=AbstractFactory):
         - ``get_last_value``
         - ``get_recent_record``
         - ``is_comparable``
+        - ``is_empty``
+        - ``update``
         - ``load_state_dict``
         - ``state_dict``
 
@@ -85,11 +90,16 @@ class BaseRecord(Generic[T], ABC, metaclass=AbstractFactory):
 
         ```pycon
 
-        >>> import torch
         >>> from minrecord import Record
         >>> record = Record("loss")
         >>> record.add_value(value=2)
-        >>> record.add_value(value=torch.zeros(2, 3), step=1)
+        >>> record.add_value(value=42, step=1)
+        >>> record
+        Record(
+          (name): loss
+          (max_size): 10
+          (record): ((None, 2), (1, 42))
+        )
 
         ```
         """
@@ -321,6 +331,32 @@ class BaseRecord(Generic[T], ABC, metaclass=AbstractFactory):
         >>> record = Record("loss")
         >>> record.is_empty()
         True
+
+        ```
+        """
+
+    @abstractmethod
+    def update(self, elements: Iterable[tuple[float | None, T]]) -> None:
+        r"""Update the record by adding the elements.
+
+        Args:
+            elements: The elements to add to the record.  Each tuple
+                has the following structure ``(step, value)``.
+                The step can be ``None`` if there is no step.
+
+        Example usage:
+
+        ```pycon
+
+        >>> from minrecord import Record
+        >>> record = Record("loss")
+        >>> record.update([(0, 42), (1, 45)])
+        >>> record
+        Record(
+          (name): loss
+          (max_size): 10
+          (record): ((0, 42), (1, 45))
+        )
 
         ```
         """

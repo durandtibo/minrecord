@@ -117,6 +117,10 @@ class Record(BaseRecord[T]):
     def is_empty(self) -> bool:
         return not self._record
 
+    def update(self, elements: Iterable[tuple[float | None, T]]) -> None:
+        for step, value in elements:
+            self.add_value(value, step)
+
     def config_dict(self) -> dict[str, Any]:
         config = super().config_dict()
         config["max_size"] = self.max_size
