@@ -166,6 +166,18 @@ def test_record_is_empty_false() -> None:
     assert not Record("loss", elements=((None, 35), (1, 42))).is_empty()
 
 
+def test_record_update() -> None:
+    record = Record("loss")
+    record.update(elements=((None, 35), (1, 42)))
+    assert record.equal(Record("loss", elements=((None, 35), (1, 42))))
+
+
+def test_record_update_empty() -> None:
+    record = Record("loss")
+    record.update(elements=())
+    assert record.equal(Record("loss"))
+
+
 def test_record_config_dict() -> None:
     assert Record("loss").config_dict() == {
         OBJECT_TARGET: "minrecord.generic.Record",
