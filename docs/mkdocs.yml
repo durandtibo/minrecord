@@ -26,6 +26,7 @@ nav:
   - get_started.md
   - Reference:
       - minrecord: refs/root.md
+      - minrecord.comparator: refs/comparator.md
       - minrecord.utils: refs/utils.md
   - GitHub: https://github.com/durandtibo/minrecord
 
