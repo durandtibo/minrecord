@@ -60,9 +60,6 @@ class BaseRecord(Generic[T], ABC, metaclass=AbstractFactory):
 
     You may also need to extend the ``config_dict`` method.
 
-    Args:
-        name (str): Specifies the name of the record.
-
     Example usage:
 
     ```pycon
