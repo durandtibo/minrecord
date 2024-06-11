@@ -5,7 +5,7 @@ from __future__ import annotations
 __all__ = ["ComparableRecord", "MaxScalarRecord", "MinScalarRecord"]
 
 from numbers import Number
-from typing import TYPE_CHECKING, Any, Self, TypeVar
+from typing import TYPE_CHECKING, Any, TypeVar
 
 from minrecord.base import EmptyRecordError
 from minrecord.comparator import (
@@ -16,7 +16,13 @@ from minrecord.comparator import (
 from minrecord.generic import Record
 
 if TYPE_CHECKING:
+    import sys
     from collections.abc import Iterable
+
+    if sys.version_info >= (3, 11):
+        from typing import Self
+    else:
+        from typing_extensions import Self
 
 T = TypeVar("T")
 
