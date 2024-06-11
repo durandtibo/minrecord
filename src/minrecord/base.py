@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 
 
 class BaseRecord(Generic[T], ABC, metaclass=AbstractFactory):
-    r"""Definition of a base class to record values.
+    r"""Define the base class to implement a record.
 
     The record tracks the value added as well as the step
     when the value is added. The goal of this class is to track the
@@ -78,7 +78,7 @@ class BaseRecord(Generic[T], ABC, metaclass=AbstractFactory):
         r"""The name of the record."""
 
     @abstractmethod
-    def add_value(self, value: T, step: int | None = None) -> None:
+    def add_value(self, value: T, step: float | None = None) -> None:
         r"""Add a new value to the record.
 
         Args:
@@ -222,7 +222,7 @@ class BaseRecord(Generic[T], ABC, metaclass=AbstractFactory):
         """
 
     @abstractmethod
-    def get_most_recent(self) -> tuple[tuple[int | None, T], ...]:
+    def get_most_recent(self) -> tuple[tuple[float | None, T], ...]:
         r"""Get the tuple of recent values and their associated steps.
 
         The last value in the tuple is the last value added to the
@@ -230,7 +230,7 @@ class BaseRecord(Generic[T], ABC, metaclass=AbstractFactory):
         concrete implementation.
 
         Returns:
-            A tuple of the recent record.
+            A tuple of the recent values in the record.
 
         Example usage:
 
