@@ -13,6 +13,8 @@ __all__ = [
     "MinScalarRecord",
     "NotAComparableRecordError",
     "Record",
+    "get_best_values",
+    "get_last_values",
     "get_max_size",
     "set_max_size",
 ]
@@ -25,4 +27,5 @@ from minrecord.comparator import (
     MaxScalarComparator,
     MinScalarComparator,
 )
+from minrecord.functional import get_best_values, get_last_values
 from minrecord.generic import Record
