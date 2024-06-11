@@ -22,10 +22,10 @@
         <img alt="Codecov" src="https://codecov.io/gh/durandtibo/minrecord/branch/main/graph/badge.svg">
     </a>
     <a href="https://codeclimate.com/github/durandtibo/minrecord/maintainability">
-        <img src="https://api.codeclimate.com/v1/badges/8581d9c3cf10cf05b7ce/maintainability" />
+        <img src="https://api.codeclimate.com/v1/badges/d6e3047eedfd2e1e0d86/maintainability" />
     </a>
     <a href="https://codeclimate.com/github/durandtibo/minrecord/test_coverage">
-        <img src="https://api.codeclimate.com/v1/badges/8581d9c3cf10cf05b7ce/test_coverage" />
+        <img src="https://api.codeclimate.com/v1/badges/d6e3047eedfd2e1e0d86/test_coverage" />
     </a>
     <br/>
     <a href="https://github.com/psf/black">
