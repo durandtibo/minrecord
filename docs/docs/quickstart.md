@@ -4,6 +4,8 @@
 The motivation of the library is explained [here](index.md#motivation).
 You should read this page if you want to learn how to use the records.
 This page does not explain the internal behavior of the records.
+While `minrecord` was designed to work in a ML workflow, you can use it in other contexts if it fits
+your need.
 
 **Prerequisites:** You’ll need to know a bit of Python.
 For a refresher, see the [Python tutorial](https://docs.python.org/tutorial/).

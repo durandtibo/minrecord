@@ -60,8 +60,66 @@
     <br/>
 </p>
 
+## Overview
 
-Minimalist library to record values in a ML workflow
+`minrecord` is a minimalist Python library to record values in a ML workflow.
+In particular, it provides functionalities to track the best value, or the most recent values by
+storing a limiting number of values.
+It is possible to customize the library e.g. it is possible to define a new logic to track the best
+value.
+Below is an example to show how to track the best scalar value when the best value is the maximum
+value and when the best value is the minimum value.
+
+```pycon
+
+>>> from minrecord import MaxScalarRecord, MinScalarRecord
+>>> record_max = MaxScalarRecord("accuracy")
+>>> record_max.update([(0, 42), (None, 45), (2, 46)])
+>>> record_max.add_value(40)
+>>> record_max.get_best_value()
+46
+>>> record_min = MinScalarRecord("loss")
+>>> record_min.update([(0, 42), (None, 45), (2, 46)])
+>>> record_min.add_value(50)
+>>> record_min.get_best_value()
+42
+
+```
+
+## Documentation
+
+- [latest (stable)](https://durandtibo.github.io/minrecord/): documentation from the latest stable
+  release.
+- [main (unstable)](https://durandtibo.github.io/minrecord/main/): documentation associated to the
+  main branch of the repo. This documentation may contain a lot of work-in-progress/outdated/missing
+  parts.
+
+## Installation
+
+We highly recommend installing
+a [virtual environment](https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/).
+`minrecord` can be installed from pip using the following command:
+
+```shell
+pip install minrecord
+```
+
+To make the package as slim as possible, only the minimal packages required to use `minrecord` are
+installed.
+To include all the dependencies, you can use the following command:
+
+```shell
+pip install minrecord[all]
+```
+
+Please check the [get started page](https://durandtibo.github.io/minrecord/get_started) to see how
+to
+install only some specific dependencies or other alternatives to install the library.
+The following is the corresponding `minrecord` versions and tested dependencies.
+
+| `minrecord` | `coola`      | `objectory`  | `python`      |
+|-------------|--------------|--------------|---------------|
+| `main`      | `>=0.7,<1.0` | `>=0.1,<1.0` | `>=3.9,<3.13` |
 
 ## Contributing
 
