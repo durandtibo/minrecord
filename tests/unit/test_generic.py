@@ -4,7 +4,13 @@ import pytest
 from coola import objects_are_equal
 from objectory import OBJECT_TARGET
 
-from minrecord import BaseRecord, EmptyRecordError, NotAComparableRecordError, Record
+from minrecord import (
+    BaseRecord,
+    EmptyRecordError,
+    MinScalarRecord,
+    NotAComparableRecordError,
+    Record,
+)
 
 ############################
 #     Tests for Record     #
@@ -91,8 +97,8 @@ def test_record_equal_false_different_types() -> None:
     assert not Record("loss").equal(1)
 
 
-# def test_record_equal_false_different_types_record() -> None:
-#     assert not Record("loss").equal(MinScalarRecord("loss"))
+def test_record_equal_false_different_types_record() -> None:
+    assert not Record("loss").equal(MinScalarRecord("loss"))
 
 
 def test_record_get_best_value() -> None:
