@@ -62,11 +62,29 @@
 
 ## Overview
 
-TODO
+`minrecord` is a minimalist Python library to record values in a ML workflow.
+In particular, it provides functionalities to track the best value, or the most recent values by
+storing a limiting number of values.
+It is possible to customize the library e.g. it is possible to define a new logic to track the best
+value.
+Below is an example to show how to track the best scalar value when the best value is the maximum
+value and when the best value is the minimum value.
 
-## Motivation
+```pycon
 
-TODO
+>>> from minrecord import MaxScalarRecord, MinScalarRecord
+>>> record_max = MaxScalarRecord("accuracy")
+>>> record_max.update([(0, 42), (None, 45), (2, 46)])
+>>> record_max.add_value(40)
+>>> record_max.get_best_value()
+46
+>>> record_min = MinScalarRecord("loss")
+>>> record_min.update([(0, 42), (None, 45), (2, 46)])
+>>> record_min.add_value(50)
+>>> record_min.get_best_value()
+42
+
+```
 
 ## API stability
 

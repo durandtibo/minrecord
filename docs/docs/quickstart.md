@@ -1,7 +1,6 @@
 # Quickstart
 
 :book: This page gives a quick overview on how to use the `minrecord`.
-The motivation of the library is explained [here](index.md#motivation).
 You should read this page if you want to learn how to use the records.
 This page does not explain the internal behavior of the records.
 While `minrecord` was designed to work in a ML workflow, you can use it in other contexts if it fits
