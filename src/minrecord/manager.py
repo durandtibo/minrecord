@@ -35,17 +35,9 @@ class RecordManager:
     >>> manager = RecordManager()
     >>> manager.add_record(MinScalarRecord("loss"))
     >>> manager.get_record("loss")
-    MinScalarRecord(
-      (name): loss
-      (max_size): 10
-      (record): ()
-    )
+    MinScalarRecord(name=loss, max_size=10, size=0)
     >>> manager.get_record("new_record")
-    Record(
-      (name): new_record
-      (max_size): 10
-      (record): ()
-    )
+    Record(name=new_record, max_size=10, size=0)
 
     ```
     """
@@ -94,25 +86,13 @@ class RecordManager:
         >>> manager.add_record(MinScalarRecord("loss"))
         >>> manager
         RecordManager(
-          (loss): MinScalarRecord(
-              (name): loss
-              (max_size): 10
-              (record): ()
-            )
+          (loss): MinScalarRecord(name=loss, max_size=10, size=0)
         )
         >>> manager.add_record(MinScalarRecord("loss"), "my key")
         >>> manager
         RecordManager(
-          (loss): MinScalarRecord(
-              (name): loss
-              (max_size): 10
-              (record): ()
-            )
-          (my key): MinScalarRecord(
-              (name): loss
-              (max_size): 10
-              (record): ()
-            )
+          (loss): MinScalarRecord(name=loss, max_size=10, size=0)
+          (my key): MinScalarRecord(name=loss, max_size=10, size=0)
         )
 
         ```
@@ -121,7 +101,7 @@ class RecordManager:
             key = record.name
         if key in self._records and not exist_ok:
             msg = (
-                f"A record ({self._records[key]}) is already registered for the key "
+                f"A record ({self._records[key]!r}) is already registered for the key "
                 f"{key}. Please use `exist_ok=True` if you want to overwrite the "
                 "record for this key"
             )
@@ -187,17 +167,9 @@ class RecordManager:
         >>> manager = RecordManager()
         >>> manager.add_record(MinScalarRecord("loss"))
         >>> manager.get_record("loss")
-        MinScalarRecord(
-          (name): loss
-          (max_size): 10
-          (record): ()
-        )
+        MinScalarRecord(name=loss, max_size=10, size=0)
         >>> manager.get_record("new_record")
-        Record(
-          (name): new_record
-          (max_size): 10
-          (record): ()
-        )
+        Record(name=new_record, max_size=10, size=0)
 
         ```
         """
@@ -219,11 +191,7 @@ class RecordManager:
         >>> manager = RecordManager()
         >>> manager.add_record(MinScalarRecord("loss"))
         >>> manager.get_records()
-        {'loss': MinScalarRecord(
-          (name): loss
-          (max_size): 10
-          (record): ()
-        )}
+        {'loss': MinScalarRecord(name=loss, max_size=10, size=0)}
 
         ```
         """

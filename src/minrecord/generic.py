@@ -8,7 +8,7 @@ from collections import deque
 from typing import TYPE_CHECKING, Any, TypeVar
 
 from coola import objects_are_equal
-from coola.utils import repr_indent, repr_mapping
+from coola.utils import str_indent, str_mapping
 
 from minrecord._config import get_max_size
 from minrecord.base import BaseRecord, EmptyRecordError
@@ -42,11 +42,7 @@ class Record(BaseRecord[T]):
     >>> from minrecord import Record
     >>> record = Record(name="value", elements=((None, 64.0), (None, 42.0)))
     >>> record
-    Record(
-      (name): value
-      (max_size): 10
-      (record): ((None, 64.0), (None, 42.0))
-    )
+    Record(name=value, max_size=10, size=2)
     >>> record.get_last_value()
     42.0
     >>> record.get_most_recent()
@@ -72,18 +68,18 @@ class Record(BaseRecord[T]):
         return len(self._record)
 
     def __repr__(self) -> str:
-        args = repr_indent(
-            repr_mapping(
-                {"name": self.name, "max_size": self.max_size, "record": self.get_most_recent()}
-            )
-        )
-        return f"{self.__class__.__qualname__}(\n  {args}\n)"
-
-    def __str__(self) -> str:
         return (
             f"{self.__class__.__qualname__}(name={self.name}, "
             f"max_size={self.max_size:,}, size={len(self):,})"
         )
+
+    def __str__(self) -> str:
+        args = str_indent(
+            str_mapping(
+                {"name": self.name, "max_size": self.max_size, "record": self.get_most_recent()}
+            )
+        )
+        return f"{self.__class__.__qualname__}(\n  {args}\n)"
 
     @property
     def name(self) -> str:
