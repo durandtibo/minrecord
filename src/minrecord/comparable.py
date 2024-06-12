@@ -7,6 +7,8 @@ __all__ = ["ComparableRecord", "MaxScalarRecord", "MinScalarRecord"]
 from numbers import Number
 from typing import TYPE_CHECKING, Any, TypeVar
 
+from coola.utils import str_indent, str_mapping
+
 from minrecord.base import EmptyRecordError
 from minrecord.comparator import (
     BaseComparator,
@@ -72,6 +74,21 @@ class ComparableRecord(Record[T]):
         self._comparator = comparator
         self._best_value = best_value or self._comparator.get_initial_best_value()
         self._improved = bool(improved)
+
+    def __str__(self) -> str:
+        args = str_indent(
+            str_mapping(
+                {
+                    "name": self.name,
+                    "max_size": self.max_size,
+                    "comparator": self._comparator,
+                    "best_value": self._best_value,
+                    "improved": self._improved,
+                    "record": self.get_most_recent(),
+                }
+            )
+        )
+        return f"{self.__class__.__qualname__}(\n  {args}\n)"
 
     def add_value(self, value: T, step: int | None = None) -> None:
         self._improved = self.is_better(new_value=value, old_value=self._best_value)
@@ -306,14 +323,14 @@ class MinScalarRecord(ComparableRecord[Number]):
 
         ```pycon
 
-        >>> from minrecord import MaxScalarRecord
-        >>> record = MaxScalarRecord.from_elements("value", ((None, 64.0), (None, 42.0)))
+        >>> from minrecord import MinScalarRecord
+        >>> record = MinScalarRecord.from_elements("value", ((None, 64.0), (None, 42.0)))
         >>> record.get_most_recent()
         ((None, 64.0), (None, 42.0))
         >>> record.get_last_value()
         42.0
         >>> record.get_best_value()
-        64.0
+        42.0
 
         ```
         """
