@@ -14,10 +14,6 @@ For a refresher, see the [Python tutorial](https://docs.python.org/tutorial/).
 record object.
 `minrecord` provides the `Record` class, which is a generic implementation of a record.
 Each `Record` object has a name and tracks the last values.
-By default, the `Record` objects only track the last 10 values, but it is possible to control this
-number by setting the `max_size` argument.
-
-To reduce memory consumption, only the last values are store
 
 ```pycon
 
@@ -25,8 +21,21 @@ To reduce memory consumption, only the last values are store
 >>> record = Record("loss")
 >>> record
 Record(name=loss, max_size=10, size=0)
->>> record_small = Record("my_record", max_size=5)
->>> record_small
+>>> record.name
+'loss'
+
+```
+
+Usually, it is useful to keep only the last values, but it also possible to track a large number of
+values, but it can consume a lot of memory of the values to track take significant amount of memory.
+By default, the `Record` objects only track the last 10 values, but it is possible to control the
+memory consumption by setting carefully the `max_size` argument.
+
+```pycon
+
+>>> from minrecord import Record
+>>> record = Record("my_record", max_size=5)
+>>> record
 Record(name=my_record, max_size=5, size=0)
 
 ```
@@ -38,8 +47,6 @@ The following example shows how to add the value `4.2` to the record.
 
 >>> from minrecord import Record
 >>> record = Record("loss")
->>> record
-Record(name=loss, max_size=10, size=0)
 >>> record.add_value(4.2)
 >>> record
 Record(name=loss, max_size=10, size=1)
@@ -132,6 +139,20 @@ method.
 
 ```
 
+It is possible to check if two `Record` objects are equal by calling the `equal` method.
+
+```pycon
+
+>>> from minrecord import Record
+>>> record1 = Record("loss")
+>>> record2 = Record("loss", elements=[(0, 42), (None, 45), (2, 46)])
+>>> record3 = Record("loss", elements=[(0, 42), (None, 45), (2, 46)])
+>>> record1.equal(record2)
+False
+>>> record3.equal(record2)
+True
+
+```
 
 ## Comparable Record
 
@@ -140,21 +161,135 @@ There is a generic `ComparableRecord` class where the user just needs to impleme
 object that is used to find the nest value.
 There are `MaxScalarRecord` and `MinScalarRecord` that are specialized implementations
 of `ComparableRecord` for scalars (e.g. `float` or `int`).
-These records support all the `Record` functionalities, and additional functionalities.
+It is possible to know if a record is comparable by calling the `is_comparable` methods.
 
+```pycon
+
+>>> from minrecord import MaxScalarRecord, MinScalarRecord, Record
+>>> record = Record("my_value")
+>>> record.is_comparable()
+False
+>>> record_max = MaxScalarRecord("accuracy")
+>>> record_max.is_comparable()
+True
+>>> record_min = MinScalarRecord("loss")
+>>> record_min.is_comparable()
+True
+
+```
+
+These records support the `Record` functionalities, and additional functionalities.
 It is possible to use the `get_best_value` method to get the best value.
 
 ```pycon
 
 >>> from minrecord import MaxScalarRecord, MinScalarRecord
->>> record_max = MaxScalarRecord("accuracy", elements=[(0, 42), (None, 45), (2, 46)])
+>>> record_max = MaxScalarRecord("accuracy")
+>>> record_max.update([(0, 42), (None, 45), (2, 46)])
 >>> record_max.add_value(40)
->>> str(record_max)
 >>> record_max.get_best_value()
 46
->>> record_min = MinScalarRecord("loss", elements=[(0, 42), (None, 45), (2, 46)])
+>>> record_min = MinScalarRecord("loss")
+>>> record_min.update([(0, 42), (None, 45), (2, 46)])
 >>> record_min.add_value(50)
 >>> record_min.get_best_value()
+42
+
+```
+
+The record tracks the best value even if the best value is not store in the record.
+Below is an example where the record's maximum size is set to 3.
+
+```pycon
+
+>>> from minrecord import MinScalarRecord
+>>> record = MinScalarRecord("loss", max_size=3)
+>>> record.update([(0, 42), (None, 45), (2, 46)])
+>>> record.add_value(50)
+>>> record.add_value(60)
+>>> record.get_most_recent()
+((2, 46), (None, 50), (None, 60))
+>>> record.get_best_value()
+42
+
+```
+
+Calling `get_best_value` on an empty record raises an `EmptyRecordError` exception.
+It is possible to know if the last value added improved the best value or not by calling the
+`has_improved` method.
+
+```pycon
+
+>>> from minrecord import MinScalarRecord
+>>> record = MinScalarRecord("loss")
+>>> record.add_value(50)
+>>> record.has_improved()
+True
+>>> record.add_value(60)
+>>> record.has_improved()
+False
+>>> record.add_value(42)
+>>> record.has_improved()
+True
+>>> record.add_value(43)
+>>> record.has_improved()
+False
+
+```
+
+By definition, `has_improved` will return `True` if the last value is equal to the best value as
+shown in the example below.
+
+```pycon
+
+>>> from minrecord import MinScalarRecord
+>>> record = MinScalarRecord("loss")
+>>> record.add_value(42)
+>>> record.has_improved()
+True
+>>> record.add_value(42)
+>>> record.has_improved()
+True
+
+
+```
+
+:warning: Calling `has_improved` or `get_best_value` on non-comparable record raises
+a `NotAComparableRecord` exception.
+
+**:warning: Note about constructors:** the constructor of `ComparableRecord` works slightly
+differently from `Record`.
+If you pass some elements to the constructor, you also need to pass the `best_value` and `improved`
+arguments to have the correct behavior.
+It is not a mistake but the expected behavior as the best value can be outside of the values store
+in the record.
+
+```pycon
+
+>>> from minrecord import MinScalarRecord
+>>> # Incorrect behavior
+>>> record = MinScalarRecord("loss", elements=[(0, 42), (None, 45), (2, 46)])
+>>> record.add_value(50)
+>>> record.get_best_value()
+50
+>>> # Correct behavior
+>>> record = MinScalarRecord("loss")
+>>> record.update([(0, 42), (None, 45), (2, 46)])
+>>> record.add_value(50)
+>>> record.get_best_value()
+42
+
+```
+
+To automatically instantiate the record based on the input elements, you can use the `from_elements`
+class method.
+
+```pycon
+
+>>> from minrecord import MinScalarRecord
+>>> record = MinScalarRecord.from_elements("loss", elements=[(0, 42), (None, 45), (2, 46)])
+>>> record.add_value(50)
+>>> record.get_best_value()
 42
 
 ```
