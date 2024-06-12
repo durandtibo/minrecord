@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from numbers import Number
-
 import pytest
 from coola import objects_are_equal
 from objectory import OBJECT_TARGET
@@ -20,22 +18,28 @@ from minrecord import (
 ######################################
 
 
-def test_comparable_record_str() -> None:
+def test_comparable_record_repr() -> None:
     assert (
-        str(ComparableRecord[Number]("accuracy", comparator=MaxScalarComparator()))
+        repr(ComparableRecord[float]("accuracy", comparator=MaxScalarComparator()))
         == "ComparableRecord(name=accuracy, max_size=10, size=0)"
+    )
+
+
+def test_comparable_record_str() -> None:
+    assert str(ComparableRecord[float]("accuracy", comparator=MaxScalarComparator())).startswith(
+        "ComparableRecord("
     )
 
 
 @pytest.mark.parametrize("name", ["name", "accuracy", ""])
 def test_comparable_record_name(name: str) -> None:
-    assert ComparableRecord[Number](name, comparator=MaxScalarComparator()).name == name
+    assert ComparableRecord[float](name, comparator=MaxScalarComparator()).name == name
 
 
 @pytest.mark.parametrize("max_size", [1, 5])
 def test_comparable_record_max_size(max_size: int) -> None:
     assert (
-        ComparableRecord[Number](
+        ComparableRecord[float](
             "accuracy", comparator=MaxScalarComparator(), max_size=max_size
         ).max_size
         == max_size
@@ -44,15 +48,15 @@ def test_comparable_record_max_size(max_size: int) -> None:
 
 def test_comparable_record_max_size_incorrect() -> None:
     with pytest.raises(ValueError, match="Record size must be greater than 0"):
-        ComparableRecord[Number]("accuracy", MaxScalarComparator(), max_size=0)
+        ComparableRecord[float]("accuracy", MaxScalarComparator(), max_size=0)
 
 
 def test_comparable_record_add_value() -> None:
-    record = ComparableRecord[Number]("accuracy", MaxScalarComparator())
+    record = ComparableRecord[float]("accuracy", MaxScalarComparator())
     record.add_value(2)
     record.add_value(4, step=1)
     assert record.equal(
-        ComparableRecord[Number](
+        ComparableRecord[float](
             "accuracy",
             MaxScalarComparator(),
             elements=((None, 2), (1, 4)),
@@ -64,7 +68,7 @@ def test_comparable_record_add_value() -> None:
 
 def test_comparable_record_get_best_value() -> None:
     assert (
-        ComparableRecord[Number](
+        ComparableRecord[float](
             "accuracy", comparator=MaxScalarComparator(), elements=[(0, 1)], best_value=4
         ).get_best_value()
         == 4
@@ -72,33 +76,33 @@ def test_comparable_record_get_best_value() -> None:
 
 
 def test_comparable_record_get_best_value_last_is_best() -> None:
-    record = ComparableRecord[Number]("accuracy", comparator=MaxScalarComparator())
+    record = ComparableRecord[float]("accuracy", comparator=MaxScalarComparator())
     record.add_value(2, step=0)
     record.add_value(4, step=1)
     assert record.get_best_value() == 4
 
 
 def test_comparable_record_get_best_value_last_is_not_best() -> None:
-    record = ComparableRecord[Number]("accuracy", comparator=MaxScalarComparator())
+    record = ComparableRecord[float]("accuracy", comparator=MaxScalarComparator())
     record.add_value(2, step=0)
     record.add_value(1, step=1)
     assert record.get_best_value() == 2
 
 
 def test_comparable_record_get_best_value_empty() -> None:
-    record = ComparableRecord[Number]("accuracy", MaxScalarComparator())
+    record = ComparableRecord[float]("accuracy", MaxScalarComparator())
     with pytest.raises(EmptyRecordError, match="The record is empty."):
         record.get_best_value()
 
 
 def test_comparable_record_get_most_recent() -> None:
-    assert ComparableRecord[Number](
+    assert ComparableRecord[float](
         "accuracy", MaxScalarComparator(), elements=[(1, 123)]
     ).get_most_recent() == ((1, 123),)
 
 
 def test_comparable_record_get_most_recent_empty() -> None:
-    assert ComparableRecord[Number]("accuracy", MaxScalarComparator()).get_most_recent() == ()
+    assert ComparableRecord[float]("accuracy", MaxScalarComparator()).get_most_recent() == ()
 
 
 def test_comparable_record_get_most_recent_max_size_3() -> None:
@@ -136,14 +140,14 @@ def test_comparable_record_get_last_value_empty() -> None:
 
 
 def test_comparable_record_has_improved_true() -> None:
-    record = ComparableRecord[Number]("accuracy", comparator=MaxScalarComparator())
+    record = ComparableRecord[float]("accuracy", comparator=MaxScalarComparator())
     record.add_value(2, step=0)
     record.add_value(4, step=1)
     assert record.has_improved()
 
 
 def test_comparable_record_has_improved_false() -> None:
-    record = ComparableRecord[Number]("accuracy", comparator=MaxScalarComparator())
+    record = ComparableRecord[float]("accuracy", comparator=MaxScalarComparator())
     record.add_value(2, step=0)
     record.add_value(1, step=1)
     assert not record.has_improved()

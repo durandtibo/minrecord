@@ -12,11 +12,11 @@ from minrecord import BaseRecord, EmptyRecordError, NotAComparableRecordError, R
 
 
 def test_record_repr() -> None:
-    assert repr(Record("loss")).startswith("Record(")
+    assert repr(Record("loss")) == "Record(name=loss, max_size=10, size=0)"
 
 
 def test_record_str() -> None:
-    assert str(Record("loss")) == "Record(name=loss, max_size=10, size=0)"
+    assert str(Record("loss")).startswith("Record(")
 
 
 @pytest.mark.parametrize("name", ["name", "accuracy", ""])
