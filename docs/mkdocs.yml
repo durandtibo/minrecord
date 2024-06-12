@@ -24,6 +24,7 @@ theme:
 nav:
   - Home: index.md
   - get_started.md
+  - quickstart.md
   - Reference:
       - minrecord: refs/root.md
       - minrecord.comparator: refs/comparator.md
