@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "minrecord"
-version = "0.0.1a0"
+version = "0.0.1a1"
 description = "Minimalist library to record values in a ML workflow"
 readme = "README.md"
 authors = ["Thibaut Durand <durand.tibo+gh@gmail.com>"]
