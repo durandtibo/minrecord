@@ -1,0 +1,5008 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://durandtibo.github.io/minrecord/main/refs/root/">
+      
+      
+        <link rel="prev" href="../../quickstart/">
+      
+      
+        <link rel="next" href="../comparator/">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.27">
+    
+    
+      
+        <title>minrecord - minrecord</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.6543a935.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#minrecord" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+          <aside class="md-banner md-banner--warning">
+            <div class="md-banner__inner md-grid md-typeset">
+              
+  You're not viewing the latest version.
+  <a href="../../..">
+    <strong>Click here to go to latest.</strong>
+  </a>
+
+            </div>
+            <script>var el=document.querySelector("[data-md-component=outdated]"),outdated=__md_get("__outdated",sessionStorage);!0===outdated&&el&&(el.hidden=!1)</script>
+          </aside>
+        
+      </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="minrecord" class="md-header__button md-logo" aria-label="minrecord" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            minrecord
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              minrecord
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 6H7c-3.31 0-6 2.69-6 6s2.69 6 6 6h10c3.31 0 6-2.69 6-6s-2.69-6-6-6zm0 10H7c-2.21 0-4-1.79-4-4s1.79-4 4-4h10c2.21 0 4 1.79 4 4s-1.79 4-4 4zM7 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3Z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/durandtibo/minrecord" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    durandtibo/minrecord
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../get_started/" class="md-tabs__link">
+        
+  
+    
+  
+  Get Started
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../quickstart/" class="md-tabs__link">
+        
+  
+    
+  
+  Quickstart
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
+          
+  
+  Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="https://github.com/durandtibo/minrecord" class="md-tabs__link">
+        
+  
+    
+  
+  GitHub
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="minrecord" class="md-nav__button md-logo" aria-label="minrecord" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54Z"/></svg>
+
+    </a>
+    minrecord
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/durandtibo/minrecord" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    durandtibo/minrecord
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../get_started/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Get Started
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../quickstart/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Quickstart
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    Reference
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Reference
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    minrecord
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    minrecord
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#minrecord" class="md-nav__link">
+    <span class="md-ellipsis">
+      minrecord
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="minrecord">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.BaseComparator" class="md-nav__link">
+    <span class="md-ellipsis">
+      BaseComparator
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="BaseComparator">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.BaseComparator.equal" class="md-nav__link">
+    <span class="md-ellipsis">
+      equal
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.BaseComparator.get_initial_best_value" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_initial_best_value
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.BaseComparator.is_better" class="md-nav__link">
+    <span class="md-ellipsis">
+      is_better
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.BaseRecord" class="md-nav__link">
+    <span class="md-ellipsis">
+      BaseRecord
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="BaseRecord">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.BaseRecord.name" class="md-nav__link">
+    <span class="md-ellipsis">
+      name
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.BaseRecord.add_value" class="md-nav__link">
+    <span class="md-ellipsis">
+      add_value
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.BaseRecord.clone" class="md-nav__link">
+    <span class="md-ellipsis">
+      clone
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.BaseRecord.config_dict" class="md-nav__link">
+    <span class="md-ellipsis">
+      config_dict
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.BaseRecord.equal" class="md-nav__link">
+    <span class="md-ellipsis">
+      equal
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.BaseRecord.from_dict" class="md-nav__link">
+    <span class="md-ellipsis">
+      from_dict
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.BaseRecord.get_best_value" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_best_value
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.BaseRecord.get_last_value" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_last_value
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.BaseRecord.get_most_recent" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_most_recent
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.BaseRecord.has_improved" class="md-nav__link">
+    <span class="md-ellipsis">
+      has_improved
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.BaseRecord.is_comparable" class="md-nav__link">
+    <span class="md-ellipsis">
+      is_comparable
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.BaseRecord.is_empty" class="md-nav__link">
+    <span class="md-ellipsis">
+      is_empty
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.BaseRecord.load_state_dict" class="md-nav__link">
+    <span class="md-ellipsis">
+      load_state_dict
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.BaseRecord.state_dict" class="md-nav__link">
+    <span class="md-ellipsis">
+      state_dict
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.BaseRecord.to_dict" class="md-nav__link">
+    <span class="md-ellipsis">
+      to_dict
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.BaseRecord.update" class="md-nav__link">
+    <span class="md-ellipsis">
+      update
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.ComparableRecord" class="md-nav__link">
+    <span class="md-ellipsis">
+      ComparableRecord
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ComparableRecord">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.ComparableRecord.is_better" class="md-nav__link">
+    <span class="md-ellipsis">
+      is_better
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.EmptyRecordError" class="md-nav__link">
+    <span class="md-ellipsis">
+      EmptyRecordError
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.MaxScalarComparator" class="md-nav__link">
+    <span class="md-ellipsis">
+      MaxScalarComparator
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.MaxScalarRecord" class="md-nav__link">
+    <span class="md-ellipsis">
+      MaxScalarRecord
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="MaxScalarRecord">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.MaxScalarRecord.from_elements" class="md-nav__link">
+    <span class="md-ellipsis">
+      from_elements
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.MinScalarComparator" class="md-nav__link">
+    <span class="md-ellipsis">
+      MinScalarComparator
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.MinScalarRecord" class="md-nav__link">
+    <span class="md-ellipsis">
+      MinScalarRecord
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="MinScalarRecord">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.MinScalarRecord.from_elements" class="md-nav__link">
+    <span class="md-ellipsis">
+      from_elements
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.NotAComparableRecordError" class="md-nav__link">
+    <span class="md-ellipsis">
+      NotAComparableRecordError
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.Record" class="md-nav__link">
+    <span class="md-ellipsis">
+      Record
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Record">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.Record.max_size" class="md-nav__link">
+    <span class="md-ellipsis">
+      max_size
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.RecordManager" class="md-nav__link">
+    <span class="md-ellipsis">
+      RecordManager
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RecordManager">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.RecordManager.add_record" class="md-nav__link">
+    <span class="md-ellipsis">
+      add_record
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.RecordManager.get_best_values" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_best_values
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.RecordManager.get_record" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_record
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.RecordManager.get_records" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_records
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.RecordManager.has_record" class="md-nav__link">
+    <span class="md-ellipsis">
+      has_record
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.RecordManager.load_state_dict" class="md-nav__link">
+    <span class="md-ellipsis">
+      load_state_dict
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.RecordManager.state_dict" class="md-nav__link">
+    <span class="md-ellipsis">
+      state_dict
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.get_best_values" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_best_values
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.get_last_values" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_last_values
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.get_max_size" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_max_size
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.set_max_size" class="md-nav__link">
+    <span class="md-ellipsis">
+      set_max_size
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../comparator/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    minrecord.comparator
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../utils/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    minrecord.utils
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://github.com/durandtibo/minrecord" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    GitHub
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#minrecord" class="md-nav__link">
+    <span class="md-ellipsis">
+      minrecord
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="minrecord">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.BaseComparator" class="md-nav__link">
+    <span class="md-ellipsis">
+      BaseComparator
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="BaseComparator">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.BaseComparator.equal" class="md-nav__link">
+    <span class="md-ellipsis">
+      equal
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.BaseComparator.get_initial_best_value" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_initial_best_value
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.BaseComparator.is_better" class="md-nav__link">
+    <span class="md-ellipsis">
+      is_better
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.BaseRecord" class="md-nav__link">
+    <span class="md-ellipsis">
+      BaseRecord
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="BaseRecord">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.BaseRecord.name" class="md-nav__link">
+    <span class="md-ellipsis">
+      name
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.BaseRecord.add_value" class="md-nav__link">
+    <span class="md-ellipsis">
+      add_value
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.BaseRecord.clone" class="md-nav__link">
+    <span class="md-ellipsis">
+      clone
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.BaseRecord.config_dict" class="md-nav__link">
+    <span class="md-ellipsis">
+      config_dict
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.BaseRecord.equal" class="md-nav__link">
+    <span class="md-ellipsis">
+      equal
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.BaseRecord.from_dict" class="md-nav__link">
+    <span class="md-ellipsis">
+      from_dict
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.BaseRecord.get_best_value" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_best_value
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.BaseRecord.get_last_value" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_last_value
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.BaseRecord.get_most_recent" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_most_recent
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.BaseRecord.has_improved" class="md-nav__link">
+    <span class="md-ellipsis">
+      has_improved
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.BaseRecord.is_comparable" class="md-nav__link">
+    <span class="md-ellipsis">
+      is_comparable
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.BaseRecord.is_empty" class="md-nav__link">
+    <span class="md-ellipsis">
+      is_empty
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.BaseRecord.load_state_dict" class="md-nav__link">
+    <span class="md-ellipsis">
+      load_state_dict
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.BaseRecord.state_dict" class="md-nav__link">
+    <span class="md-ellipsis">
+      state_dict
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.BaseRecord.to_dict" class="md-nav__link">
+    <span class="md-ellipsis">
+      to_dict
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.BaseRecord.update" class="md-nav__link">
+    <span class="md-ellipsis">
+      update
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.ComparableRecord" class="md-nav__link">
+    <span class="md-ellipsis">
+      ComparableRecord
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ComparableRecord">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.ComparableRecord.is_better" class="md-nav__link">
+    <span class="md-ellipsis">
+      is_better
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.EmptyRecordError" class="md-nav__link">
+    <span class="md-ellipsis">
+      EmptyRecordError
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.MaxScalarComparator" class="md-nav__link">
+    <span class="md-ellipsis">
+      MaxScalarComparator
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.MaxScalarRecord" class="md-nav__link">
+    <span class="md-ellipsis">
+      MaxScalarRecord
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="MaxScalarRecord">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.MaxScalarRecord.from_elements" class="md-nav__link">
+    <span class="md-ellipsis">
+      from_elements
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.MinScalarComparator" class="md-nav__link">
+    <span class="md-ellipsis">
+      MinScalarComparator
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.MinScalarRecord" class="md-nav__link">
+    <span class="md-ellipsis">
+      MinScalarRecord
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="MinScalarRecord">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.MinScalarRecord.from_elements" class="md-nav__link">
+    <span class="md-ellipsis">
+      from_elements
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.NotAComparableRecordError" class="md-nav__link">
+    <span class="md-ellipsis">
+      NotAComparableRecordError
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.Record" class="md-nav__link">
+    <span class="md-ellipsis">
+      Record
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Record">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.Record.max_size" class="md-nav__link">
+    <span class="md-ellipsis">
+      max_size
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.RecordManager" class="md-nav__link">
+    <span class="md-ellipsis">
+      RecordManager
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RecordManager">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.RecordManager.add_record" class="md-nav__link">
+    <span class="md-ellipsis">
+      add_record
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.RecordManager.get_best_values" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_best_values
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.RecordManager.get_record" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_record
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.RecordManager.get_records" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_records
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.RecordManager.has_record" class="md-nav__link">
+    <span class="md-ellipsis">
+      has_record
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.RecordManager.load_state_dict" class="md-nav__link">
+    <span class="md-ellipsis">
+      load_state_dict
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.RecordManager.state_dict" class="md-nav__link">
+    <span class="md-ellipsis">
+      state_dict
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.get_best_values" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_best_values
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.get_last_values" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_last_values
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.get_max_size" class="md-nav__link">
+    <span class="md-ellipsis">
+      get_max_size
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.set_max_size" class="md-nav__link">
+    <span class="md-ellipsis">
+      set_max_size
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+  <h1>minrecord</h1>
+
+<div class="doc doc-object doc-module">
+
+
+
+<h2 id="minrecord" class="doc doc-heading">
+            <span class="doc doc-object-name doc-module-name">minrecord</span>
+
+
+<a href="#minrecord" class="headerlink" title="Permanent link">&para;</a></h2>
+
+    <div class="doc doc-contents first">
+
+      <p>Root package.</p>
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="minrecord.BaseComparator" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">minrecord.BaseComparator</span>
+
+
+<a href="#minrecord.BaseComparator" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="typing.Generic">Generic</span>[<span title="minrecord.comparator.T">T</span>]</code>, <code><span title="abc.ABC">ABC</span></code></p>
+
+
+      <p>Define the base comparator class to implement a comparator.</p>
+<p>Example usage:</p>
+<div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">minrecord</span> <span class="kn">import</span> <span class="n">MinScalarComparator</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">comparator</span> <span class="o">=</span> <span class="n">MinScalarComparator</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">comparator</span><span class="o">.</span><span class="n">is_better</span><span class="p">(</span><span class="n">old_value</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">new_value</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">comparator</span><span class="o">.</span><span class="n">get_initial_best_value</span><span class="p">()</span>
+<span class="go">inf</span>
+</code></pre></div>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="minrecord.BaseComparator.equal" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">minrecord.BaseComparator.equal</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+  </span>
+
+<a href="#minrecord.BaseComparator.equal" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">equal</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n"><span title="typing.Any">Any</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">bool</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Indicate if two comparators are equal or not.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>other</code></td>
+            <td>
+                  <code><span title="typing.Any">Any</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The other object to compare with.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><code>True</code> if the comparators are equal, <code>False</code> otherwise.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+      <p>Example usage:</p>
+<div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">minrecord</span> <span class="kn">import</span> <span class="n">MinScalarComparator</span><span class="p">,</span> <span class="n">MaxScalarComparator</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">comparator</span> <span class="o">=</span> <span class="n">MinScalarComparator</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">comparator</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span><span class="n">MinScalarComparator</span><span class="p">())</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">comparator</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span><span class="n">MaxScalarComparator</span><span class="p">())</span>
+<span class="go">False</span>
+</code></pre></div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="minrecord.BaseComparator.get_initial_best_value" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">minrecord.BaseComparator.get_initial_best_value</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+  </span>
+
+<a href="#minrecord.BaseComparator.get_initial_best_value" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">get_initial_best_value</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n"><span title="minrecord.comparator.T">T</span></span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Get the initial best value.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="minrecord.comparator.T">T</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The initial best value.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+      <p>Example usage:</p>
+<div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">minrecord</span> <span class="kn">import</span> <span class="n">MinScalarComparator</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">comparator</span> <span class="o">=</span> <span class="n">MinScalarComparator</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">comparator</span><span class="o">.</span><span class="n">get_initial_best_value</span><span class="p">()</span>
+<span class="go">inf</span>
+</code></pre></div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="minrecord.BaseComparator.is_better" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">minrecord.BaseComparator.is_better</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+  </span>
+
+<a href="#minrecord.BaseComparator.is_better" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">is_better</span><span class="p">(</span><span class="n">old_value</span><span class="p">:</span> <span class="n"><span title="minrecord.comparator.T">T</span></span><span class="p">,</span> <span class="n">new_value</span><span class="p">:</span> <span class="n"><span title="minrecord.comparator.T">T</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">bool</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Indicate if the new value is better than the old value.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>old_value</code></td>
+            <td>
+                  <code><span title="minrecord.comparator.T">T</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The old value to compare.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>new_value</code></td>
+            <td>
+                  <code><span title="minrecord.comparator.T">T</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The new value to compare.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><code>True</code> if the new value is better than the old value,
+otherwise <code>False</code>.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+      <p>Example usage:</p>
+<div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">minrecord</span> <span class="kn">import</span> <span class="n">MinScalarComparator</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">comparator</span> <span class="o">=</span> <span class="n">MinScalarComparator</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">comparator</span><span class="o">.</span><span class="n">is_better</span><span class="p">(</span><span class="n">old_value</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">new_value</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span>
+<span class="go">False</span>
+</code></pre></div>
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="minrecord.BaseRecord" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">minrecord.BaseRecord</span>
+
+
+<a href="#minrecord.BaseRecord" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="typing.Generic">Generic</span>[<span title="minrecord.base.T">T</span>]</code>, <code><span title="abc.ABC">ABC</span></code></p>
+
+
+      <p>Define the base class to implement a record.</p>
+<p>The record tracks the value added as well as the step
+when the value is added. The goal of this class is to track the
+recent record because the loggers (e.g. MLFlow or Tensorboard)
+do not allow to get the last value or the best value. The record
+keeps in memory a recent record of pairs (step, value)
+where step is the index of the step when the value was added. The
+length of the recent record depends on the concrete
+implementation.</p>
+<p>To implement your own record, you will need to define the
+following methods:</p>
+<div class="highlight"><pre><span></span><code>- ``add_value``
+- ``get_last_value``
+- ``get_most_recent``
+- ``is_comparable``
+- ``is_empty``
+- ``update``
+- ``load_state_dict``
+- ``state_dict``
+</code></pre></div>
+<p>If it is a comparable record, you will need to implement
+the following methods too:</p>
+<div class="highlight"><pre><span></span><code>- ``_get_best_value``
+- ``_has_improved``
+</code></pre></div>
+<p>You may also need to extend the <code>config_dict</code> method.</p>
+<p>Example usage:</p>
+<div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">minrecord</span> <span class="kn">import</span> <span class="n">Record</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span> <span class="o">=</span> <span class="n">Record</span><span class="p">(</span><span class="s2">&quot;loss&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">add_value</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">add_value</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mf">1.2</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">get_last_value</span><span class="p">()</span>
+<span class="go">1.2</span>
+</code></pre></div>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="minrecord.BaseRecord.name" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">minrecord.BaseRecord.name</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+<a href="#minrecord.BaseRecord.name" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">name</span><span class="p">:</span> <span class="n">str</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>The name of the record.</p>
+    </div>
+
+</div>
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="minrecord.BaseRecord.add_value" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">minrecord.BaseRecord.add_value</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+  </span>
+
+<a href="#minrecord.BaseRecord.add_value" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">add_value</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n"><span title="minrecord.base.T">T</span></span><span class="p">,</span> <span class="n">step</span><span class="p">:</span> <span class="n">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Add a new value to the record.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>value</code></td>
+            <td>
+                  <code><span title="minrecord.base.T">T</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The value to add to the record.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>step</code></td>
+            <td>
+                  <code>float | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The step value to record. <code>None</code> means there is no
+step to track.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+      <p>Example usage:</p>
+<div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">minrecord</span> <span class="kn">import</span> <span class="n">Record</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span> <span class="o">=</span> <span class="n">Record</span><span class="p">(</span><span class="s2">&quot;loss&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">add_value</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">add_value</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mi">42</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span>
+<span class="go">Record(name=loss, max_size=10, size=2)</span>
+</code></pre></div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="minrecord.BaseRecord.clone" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">minrecord.BaseRecord.clone</span>
+
+
+<a href="#minrecord.BaseRecord.clone" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">clone</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" title="minrecord.base.BaseRecord" href="#minrecord.BaseRecord">BaseRecord</a></span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Clone the current record.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="minrecord.base.BaseRecord" href="#minrecord.BaseRecord">BaseRecord</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A copy of the current record.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+      <p>Example usage:</p>
+<div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">minrecord</span> <span class="kn">import</span> <span class="n">Record</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span> <span class="o">=</span> <span class="n">Record</span><span class="p">(</span><span class="s2">&quot;epoch&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record_cloned</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span>
+</code></pre></div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="minrecord.BaseRecord.config_dict" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">minrecord.BaseRecord.config_dict</span>
+
+
+<a href="#minrecord.BaseRecord.config_dict" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">config_dict</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">dict</span><span class="p">[</span><span class="n">str</span><span class="p">,</span> <span class="n"><span title="typing.Any">Any</span></span><span class="p">]</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Get the config of the record.</p>
+<p>The config dictionary should contain all the values necessary
+to instantiate a record with the same parameters
+with the  <code>factory</code> method. It is expected to contain values
+like the full name of the class and the arguments of the
+constructor. This dictionary should not contain the state
+values. It is possible to get the state values with the
+<code>state_dict</code> method.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>dict[str, <span title="typing.Any">Any</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The config of the record.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+      <p>Example usage:</p>
+<div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">minrecord</span> <span class="kn">import</span> <span class="n">BaseRecord</span><span class="p">,</span> <span class="n">Record</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">config</span> <span class="o">=</span> <span class="n">Record</span><span class="p">(</span><span class="s2">&quot;loss&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">config_dict</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span> <span class="o">=</span> <span class="n">BaseRecord</span><span class="o">.</span><span class="n">factory</span><span class="p">(</span><span class="o">**</span><span class="n">config</span><span class="p">)</span>  <span class="c1"># Note that the state is not copied.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span>
+<span class="go">Record(name=loss, max_size=10, size=0)</span>
+</code></pre></div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="minrecord.BaseRecord.equal" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">minrecord.BaseRecord.equal</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+  </span>
+
+<a href="#minrecord.BaseRecord.equal" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">equal</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n"><span title="typing.Any">Any</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">bool</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Indicate if two records are equal or not.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>other</code></td>
+            <td>
+                  <code><span title="typing.Any">Any</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The object to compare.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><code>True</code> if the records are equal, <code>False</code> otherwise.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+      <p>Example usage:</p>
+<div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">minrecord</span> <span class="kn">import</span> <span class="n">Record</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record1</span> <span class="o">=</span> <span class="n">Record</span><span class="p">(</span><span class="s2">&quot;loss&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record2</span> <span class="o">=</span> <span class="n">Record</span><span class="p">(</span><span class="s2">&quot;accuracy&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record3</span> <span class="o">=</span> <span class="n">Record</span><span class="p">(</span><span class="s2">&quot;loss&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record1</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span><span class="n">record2</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record1</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span><span class="n">record1</span><span class="p">)</span>
+<span class="go">True</span>
+</code></pre></div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="minrecord.BaseRecord.from_dict" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">minrecord.BaseRecord.from_dict</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+<a href="#minrecord.BaseRecord.from_dict" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">from_dict</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" title="minrecord.base.BaseRecord" href="#minrecord.BaseRecord">BaseRecord</a></span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Instantiate a record from a dictionary.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>data</code></td>
+            <td>
+                  <code>dict</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The dictionary that is used to instantiate the
+record. The dictionary is expected to contain the
+parameters to create instantiate the record and the
+state of the record.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="minrecord.base.BaseRecord" href="#minrecord.BaseRecord">BaseRecord</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The instantiated record.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+      <p>Example usage:</p>
+<div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">minrecord</span> <span class="kn">import</span> <span class="n">BaseRecord</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">objectory</span> <span class="kn">import</span> <span class="n">OBJECT_TARGET</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span> <span class="o">=</span> <span class="n">BaseRecord</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="p">{</span>
+<span class="gp">... </span>        <span class="s2">&quot;config&quot;</span><span class="p">:</span> <span class="p">{</span>
+<span class="gp">... </span>            <span class="n">OBJECT_TARGET</span><span class="p">:</span> <span class="s2">&quot;minrecord.Record&quot;</span><span class="p">,</span>
+<span class="gp">... </span>            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;loss&quot;</span><span class="p">,</span>
+<span class="gp">... </span>            <span class="s2">&quot;max_size&quot;</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span>
+<span class="gp">... </span>        <span class="p">},</span>
+<span class="gp">... </span>        <span class="s2">&quot;state&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;record&quot;</span><span class="p">:</span> <span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">))},</span>
+<span class="gp">... </span>    <span class="p">}</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span>
+<span class="go">Record(name=loss, max_size=7, size=2)</span>
+</code></pre></div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="minrecord.BaseRecord.get_best_value" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">minrecord.BaseRecord.get_best_value</span>
+
+
+<a href="#minrecord.BaseRecord.get_best_value" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">get_best_value</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n"><span title="minrecord.base.T">T</span></span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Get the best value of this record.</p>
+<p>It is possible to get the best value only if it is a
+comparable record i.e. it is possible to compare the
+values in the record.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="minrecord.base.T">T</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The best value of this record.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>NotAComparableRecord</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>if it is not a comparable record.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="minrecord.base.EmptyRecordError" href="#minrecord.EmptyRecordError">EmptyRecordError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>if the record is empty</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+      <p>Example usage:</p>
+<div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">minrecord</span> <span class="kn">import</span> <span class="n">MaxScalarRecord</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span> <span class="o">=</span> <span class="n">MaxScalarRecord</span><span class="p">(</span><span class="s2">&quot;accuracy&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">add_value</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">add_value</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">get_best_value</span><span class="p">()</span>
+<span class="go">4</span>
+</code></pre></div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="minrecord.BaseRecord.get_last_value" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">minrecord.BaseRecord.get_last_value</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+  </span>
+
+<a href="#minrecord.BaseRecord.get_last_value" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">get_last_value</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n"><span title="minrecord.base.T">T</span></span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Get the last value.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="minrecord.base.T">T</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The last value added in the record.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+      <p>Example usage:</p>
+<div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">minrecord</span> <span class="kn">import</span> <span class="n">Record</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span> <span class="o">=</span> <span class="n">Record</span><span class="p">(</span><span class="s2">&quot;loss&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">add_value</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">add_value</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mf">1.2</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">get_last_value</span><span class="p">()</span>
+<span class="go">1.2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">add_value</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">get_last_value</span><span class="p">()</span>
+<span class="go">0.8</span>
+</code></pre></div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="minrecord.BaseRecord.get_most_recent" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">minrecord.BaseRecord.get_most_recent</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+  </span>
+
+<a href="#minrecord.BaseRecord.get_most_recent" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">get_most_recent</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">tuple</span><span class="p">[</span><span class="n">tuple</span><span class="p">[</span><span class="n">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n"><span title="minrecord.base.T">T</span></span><span class="p">],</span> <span class="o">...</span><span class="p">]</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Get the tuple of recent values and their associated steps.</p>
+<p>The last value in the tuple is the last value added to the
+record. The length of the recent record depends on the
+concrete implementation.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>tuple[tuple[float | None, <span title="minrecord.base.T">T</span>], ...]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A tuple of the recent values in the record.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+      <p>Example usage:</p>
+<div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">minrecord</span> <span class="kn">import</span> <span class="n">Record</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span> <span class="o">=</span> <span class="n">Record</span><span class="p">(</span><span class="s2">&quot;loss&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">add_value</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">add_value</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mf">1.2</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">add_value</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">get_most_recent</span><span class="p">()</span>
+<span class="go">((None, 2), (1, 1.2), (2, 0.8))</span>
+</code></pre></div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="minrecord.BaseRecord.has_improved" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">minrecord.BaseRecord.has_improved</span>
+
+
+<a href="#minrecord.BaseRecord.has_improved" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">has_improved</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">bool</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Indicate if the last value is the best value.</p>
+<p>It is possible to use this method only if it is a comparable
+record i.e. it is possible to compare the values in
+the record.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><code>True</code> if the last value is the best value,
+otherwise <code>False</code>.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>NotAComparableRecord</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>if it is not a comparable record.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="minrecord.base.EmptyRecordError" href="#minrecord.EmptyRecordError">EmptyRecordError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>if the record is empty</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+      <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">minrecord</span> <span class="kn">import</span> <span class="n">MaxScalarRecord</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span> <span class="o">=</span> <span class="n">MaxScalarRecord</span><span class="p">(</span><span class="s2">&quot;accuracy&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">add_value</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">add_value</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">has_improved</span><span class="p">()</span>
+<span class="go">True</span>
+</code></pre></div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="minrecord.BaseRecord.is_comparable" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">minrecord.BaseRecord.is_comparable</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+  </span>
+
+<a href="#minrecord.BaseRecord.is_comparable" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">is_comparable</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">bool</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Indicate if it is possible to compare the values in the
+record.</p>
+<p>Note that it is possible to compute the best value only for
+records that are comparable.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><code>True</code> if it is possible to compare the values in
+the record, otherwise <code>False</code>.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+      <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">minrecord</span> <span class="kn">import</span> <span class="n">Record</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span> <span class="o">=</span> <span class="n">Record</span><span class="p">(</span><span class="s2">&quot;loss&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">is_comparable</span><span class="p">()</span>
+<span class="go">False</span>
+</code></pre></div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="minrecord.BaseRecord.is_empty" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">minrecord.BaseRecord.is_empty</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+  </span>
+
+<a href="#minrecord.BaseRecord.is_empty" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">is_empty</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">bool</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Indicate if the record is empty or not.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><code>True</code> if the record is empty, otherwise <code>False</code>.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+      <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">minrecord</span> <span class="kn">import</span> <span class="n">Record</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span> <span class="o">=</span> <span class="n">Record</span><span class="p">(</span><span class="s2">&quot;loss&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">is_empty</span><span class="p">()</span>
+<span class="go">True</span>
+</code></pre></div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="minrecord.BaseRecord.load_state_dict" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">minrecord.BaseRecord.load_state_dict</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+  </span>
+
+<a href="#minrecord.BaseRecord.load_state_dict" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">load_state_dict</span><span class="p">(</span><span class="n">state_dict</span><span class="p">:</span> <span class="n">dict</span><span class="p">[</span><span class="n">str</span><span class="p">,</span> <span class="n"><span title="typing.Any">Any</span></span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Set up the record from a dictionary containing the state
+values.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>state_dict</code></td>
+            <td>
+                  <code>dict[str, <span title="typing.Any">Any</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A dictionary containing state keys with values.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+      <p>Example usage:</p>
+<div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">minrecord</span> <span class="kn">import</span> <span class="n">Record</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span> <span class="o">=</span> <span class="n">Record</span><span class="p">(</span><span class="s2">&quot;loss&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">({</span><span class="s2">&quot;record&quot;</span><span class="p">:</span> <span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mf">42.0</span><span class="p">),)})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">get_last_value</span><span class="p">()</span>
+<span class="go">42.0</span>
+</code></pre></div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="minrecord.BaseRecord.state_dict" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">minrecord.BaseRecord.state_dict</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+  </span>
+
+<a href="#minrecord.BaseRecord.state_dict" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">state_dict</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">dict</span><span class="p">[</span><span class="n">str</span><span class="p">,</span> <span class="n"><span title="typing.Any">Any</span></span><span class="p">]</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Get a dictionary containing the state values of the record.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>dict[str, <span title="typing.Any">Any</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The state values in a dict.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+      <p>Example usage:</p>
+<div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">minrecord</span> <span class="kn">import</span> <span class="n">Record</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span> <span class="o">=</span> <span class="n">Record</span><span class="p">(</span><span class="s2">&quot;loss&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">add_value</span><span class="p">(</span><span class="mf">42.0</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">state</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">state</span>
+<span class="go">{&#39;record&#39;: ((0, 42.0),)}</span>
+</code></pre></div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="minrecord.BaseRecord.to_dict" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">minrecord.BaseRecord.to_dict</span>
+
+
+<a href="#minrecord.BaseRecord.to_dict" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">to_dict</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">dict</span><span class="p">[</span><span class="n">str</span><span class="p">,</span> <span class="n"><span title="typing.Any">Any</span></span><span class="p">]</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Export the current record to a dictionary.</p>
+<p>This method exports all the information to re-create the
+record with the same state. The returned dictionary
+can be used as input of the <code>from_dict</code> method to resume the
+record.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>dict[str, <span title="typing.Any">Any</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A dictionary with the config and the state of the
+record.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+      <p>Example usage:</p>
+<div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">minrecord</span> <span class="kn">import</span> <span class="n">BaseRecord</span><span class="p">,</span> <span class="n">Record</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record_dict</span> <span class="o">=</span> <span class="n">Record</span><span class="p">(</span><span class="s2">&quot;loss&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span> <span class="o">=</span> <span class="n">BaseRecord</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">record_dict</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span>
+<span class="go">Record(name=loss, max_size=10, size=0)</span>
+</code></pre></div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="minrecord.BaseRecord.update" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">minrecord.BaseRecord.update</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+  </span>
+
+<a href="#minrecord.BaseRecord.update" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">update</span><span class="p">(</span><span class="n">elements</span><span class="p">:</span> <span class="n"><span title="collections.abc.Iterable">Iterable</span></span><span class="p">[</span><span class="n">tuple</span><span class="p">[</span><span class="n">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n"><span title="minrecord.base.T">T</span></span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Update the record by adding the elements.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>elements</code></td>
+            <td>
+                  <code><span title="collections.abc.Iterable">Iterable</span>[tuple[float | None, <span title="minrecord.base.T">T</span>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The elements to add to the record.  Each tuple
+has the following structure <code>(step, value)</code>.
+The step can be <code>None</code> if there is no step.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+      <p>Example usage:</p>
+<div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">minrecord</span> <span class="kn">import</span> <span class="n">Record</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span> <span class="o">=</span> <span class="n">Record</span><span class="p">(</span><span class="s2">&quot;loss&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">update</span><span class="p">([(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">42</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">45</span><span class="p">)])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span>
+<span class="go">Record(name=loss, max_size=10, size=2)</span>
+</code></pre></div>
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="minrecord.ComparableRecord" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">minrecord.ComparableRecord</span>
+
+
+<a href="#minrecord.ComparableRecord" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="minrecord.generic.Record" href="#minrecord.Record">Record</a>[<span title="minrecord.comparable.T">T</span>]</code></p>
+
+
+      <p>Implement a record of comparable values.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>name</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The name of the record.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>comparator</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="minrecord.comparator.BaseComparator" href="../comparator/#minrecord.comparator.BaseComparator">BaseComparator</a>[<span title="minrecord.comparable.T">T</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The comparator to use to find the best value.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>elements</code></td>
+            <td>
+                  <code><span title="collections.abc.Iterable">Iterable</span>[tuple[int | None, <span title="minrecord.comparable.T">T</span>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The initial elements. Each element is a tuple with
+the step and its associated value.</p>
+              </div>
+            </td>
+            <td>
+                  <code>()</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>max_size</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The maximum number of elements to store inthe record.</p>
+              </div>
+            </td>
+            <td>
+                  <code>10</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>best_value</code></td>
+            <td>
+                  <code><span title="minrecord.comparable.T">T</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The initial best value. If <code>None</code>, the initial
+best value of the <code>comparator</code> is used.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>improved</code></td>
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Indicate if the last value is the best value or not.</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+      <p>Example usage:</p>
+<div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">minrecord</span> <span class="kn">import</span> <span class="n">ComparableRecord</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">minrecord.comparator</span> <span class="kn">import</span> <span class="n">MaxScalarComparator</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span> <span class="o">=</span> <span class="n">ComparableRecord</span><span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">,</span> <span class="n">MaxScalarComparator</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">add_value</span><span class="p">(</span><span class="mf">64.0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">add_value</span><span class="p">(</span><span class="mf">42.0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">get_last_value</span><span class="p">()</span>
+<span class="go">42.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">get_most_recent</span><span class="p">()</span>
+<span class="go">((None, 64.0), (None, 42.0))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">get_best_value</span><span class="p">()</span>
+<span class="go">64.0</span>
+</code></pre></div>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="minrecord.ComparableRecord.is_better" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">minrecord.ComparableRecord.is_better</span>
+
+
+<a href="#minrecord.ComparableRecord.is_better" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">is_better</span><span class="p">(</span><span class="n">old_value</span><span class="p">:</span> <span class="n"><span title="minrecord.comparable.T">T</span></span><span class="p">,</span> <span class="n">new_value</span><span class="p">:</span> <span class="n"><span title="minrecord.comparable.T">T</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">bool</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Indicate if the new value is better than the old value.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>old_value</code></td>
+            <td>
+                  <code><span title="minrecord.comparable.T">T</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The old value to compare.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>new_value</code></td>
+            <td>
+                  <code><span title="minrecord.comparable.T">T</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The new value to compare.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><code>True</code> if the new value is better than the old value,
+otherwise <code>False</code>.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+      <p>Example usage:</p>
+<div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">minrecord</span> <span class="kn">import</span> <span class="n">ComparableRecord</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">minrecord.comparator</span> <span class="kn">import</span> <span class="n">MaxScalarComparator</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span> <span class="o">=</span> <span class="n">ComparableRecord</span><span class="p">(</span><span class="s2">&quot;accuracy&quot;</span><span class="p">,</span> <span class="n">MaxScalarComparator</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">is_better</span><span class="p">(</span><span class="n">new_value</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">old_value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">is_better</span><span class="p">(</span><span class="n">new_value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">old_value</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="go">False</span>
+</code></pre></div>
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="minrecord.EmptyRecordError" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">minrecord.EmptyRecordError</span>
+
+
+<a href="#minrecord.EmptyRecordError" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code>Exception</code></p>
+
+
+      <p>Raise an error if the record is empty.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="minrecord.MaxScalarComparator" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">minrecord.MaxScalarComparator</span>
+
+
+<a href="#minrecord.MaxScalarComparator" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="minrecord.comparator.BaseComparator" href="../comparator/#minrecord.comparator.BaseComparator">BaseComparator</a>[float]</code></p>
+
+
+      <p>Implement a max comparator for scalar value.</p>
+<p>This comparator can be used to find the maximum value between two
+scalar values.</p>
+<p>Example usage:</p>
+<div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">minrecord</span> <span class="kn">import</span> <span class="n">MaxScalarComparator</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">comparator</span> <span class="o">=</span> <span class="n">MaxScalarComparator</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">comparator</span><span class="o">.</span><span class="n">is_better</span><span class="p">(</span><span class="n">old_value</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">new_value</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">comparator</span><span class="o">.</span><span class="n">get_initial_best_value</span><span class="p">()</span>
+<span class="go">-inf</span>
+</code></pre></div>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="minrecord.MaxScalarRecord" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">minrecord.MaxScalarRecord</span>
+
+
+<a href="#minrecord.MaxScalarRecord" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="minrecord.comparable.ComparableRecord" href="#minrecord.ComparableRecord">ComparableRecord</a>[<span title="numbers.Number">Number</span>]</code></p>
+
+
+      <p>A specific implementation to track the max value of a scalar
+record.</p>
+<p>This record uses the <code>MaxScalarComparator</code> to find the
+best value of the record.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>name</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The name of the record.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>elements</code></td>
+            <td>
+                  <code><span title="collections.abc.Iterable">Iterable</span>[tuple[int | None, <span title="minrecord.comparable.T">T</span>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The initial elements. Each element is a tuple with
+the step and its associated value.</p>
+              </div>
+            </td>
+            <td>
+                  <code>()</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>max_size</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The maximum number of elements to store inthe record.</p>
+              </div>
+            </td>
+            <td>
+                  <code>10</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>best_value</code></td>
+            <td>
+                  <code><span title="minrecord.comparable.T">T</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The initial best value. If <code>None</code>, the initial
+best value of the <code>comparator</code> is used.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>improved</code></td>
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Indicate if the last value is the best value or not.</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+      <p>Example usage:</p>
+<div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">minrecord</span> <span class="kn">import</span> <span class="n">MaxScalarRecord</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span> <span class="o">=</span> <span class="n">MaxScalarRecord</span><span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">add_value</span><span class="p">(</span><span class="mf">64.0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">add_value</span><span class="p">(</span><span class="mf">42.0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">get_most_recent</span><span class="p">()</span>
+<span class="go">((None, 64.0), (None, 42.0))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">get_last_value</span><span class="p">()</span>
+<span class="go">42.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">get_best_value</span><span class="p">()</span>
+<span class="go">64.0</span>
+</code></pre></div>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="minrecord.MaxScalarRecord.from_elements" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">minrecord.MaxScalarRecord.from_elements</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+<a href="#minrecord.MaxScalarRecord.from_elements" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">from_elements</span><span class="p">(</span>
+    <span class="n">name</span><span class="p">:</span> <span class="n">str</span><span class="p">,</span> <span class="n">elements</span><span class="p">:</span> <span class="n"><span title="collections.abc.Iterable">Iterable</span></span><span class="p">[</span><span class="n">tuple</span><span class="p">[</span><span class="n">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n"><span title="minrecord.comparable.T">T</span></span><span class="p">]]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="typing_extensions.Self">Self</span></span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Instantiate a <code>MaxScalarRecord</code> object from the elements.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>name</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The name of the record.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>elements</code></td>
+            <td>
+                  <code><span title="collections.abc.Iterable">Iterable</span>[tuple[float | None, <span title="minrecord.comparable.T">T</span>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The initial elements. Each element is a tuple with
+the step and its associated value.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="typing_extensions.Self">Self</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The instantiated record.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+      <p>Example usage:</p>
+<div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">minrecord</span> <span class="kn">import</span> <span class="n">MaxScalarRecord</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span> <span class="o">=</span> <span class="n">MaxScalarRecord</span><span class="o">.</span><span class="n">from_elements</span><span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">,</span> <span class="p">((</span><span class="kc">None</span><span class="p">,</span> <span class="mf">64.0</span><span class="p">),</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mf">42.0</span><span class="p">)))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">get_most_recent</span><span class="p">()</span>
+<span class="go">((None, 64.0), (None, 42.0))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">get_last_value</span><span class="p">()</span>
+<span class="go">42.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">get_best_value</span><span class="p">()</span>
+<span class="go">64.0</span>
+</code></pre></div>
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="minrecord.MinScalarComparator" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">minrecord.MinScalarComparator</span>
+
+
+<a href="#minrecord.MinScalarComparator" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="minrecord.comparator.BaseComparator" href="../comparator/#minrecord.comparator.BaseComparator">BaseComparator</a>[float]</code></p>
+
+
+      <p>Implementation of a min comparator for scalar value.</p>
+<p>This comparator can be used to find the minimum value between two
+scalar values.</p>
+<p>Example usage:</p>
+<div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">minrecord</span> <span class="kn">import</span> <span class="n">MinScalarComparator</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">comparator</span> <span class="o">=</span> <span class="n">MinScalarComparator</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">comparator</span><span class="o">.</span><span class="n">is_better</span><span class="p">(</span><span class="n">old_value</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">new_value</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">comparator</span><span class="o">.</span><span class="n">get_initial_best_value</span><span class="p">()</span>
+<span class="go">inf</span>
+</code></pre></div>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="minrecord.MinScalarRecord" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">minrecord.MinScalarRecord</span>
+
+
+<a href="#minrecord.MinScalarRecord" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="minrecord.comparable.ComparableRecord" href="#minrecord.ComparableRecord">ComparableRecord</a>[<span title="numbers.Number">Number</span>]</code></p>
+
+
+      <p>A specific implementation to track the min value of a scalar
+record.</p>
+<p>This record uses the <code>MinScalarComparator</code> to find the
+best value of the record.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>name</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The name of the record.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>elements</code></td>
+            <td>
+                  <code><span title="collections.abc.Iterable">Iterable</span>[tuple[int | None, <span title="minrecord.comparable.T">T</span>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The initial elements. Each element is a tuple with
+the step and its associated value.</p>
+              </div>
+            </td>
+            <td>
+                  <code>()</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>max_size</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The maximum number of elements to store inthe record.</p>
+              </div>
+            </td>
+            <td>
+                  <code>10</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>best_value</code></td>
+            <td>
+                  <code><span title="minrecord.comparable.T">T</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The initial best value. If <code>None</code>, the initial
+best  value of the <code>comparator</code> is used.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>improved</code></td>
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Indicate if the last value is the best value or not.</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+      <p>Example usage:</p>
+<div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">minrecord</span> <span class="kn">import</span> <span class="n">MinScalarRecord</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span> <span class="o">=</span> <span class="n">MinScalarRecord</span><span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">add_value</span><span class="p">(</span><span class="mf">64.0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">add_value</span><span class="p">(</span><span class="mf">42.0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">get_most_recent</span><span class="p">()</span>
+<span class="go">((None, 64.0), (None, 42.0))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">get_last_value</span><span class="p">()</span>
+<span class="go">42.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">get_best_value</span><span class="p">()</span>
+<span class="go">42.0</span>
+</code></pre></div>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="minrecord.MinScalarRecord.from_elements" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">minrecord.MinScalarRecord.from_elements</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+<a href="#minrecord.MinScalarRecord.from_elements" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">from_elements</span><span class="p">(</span>
+    <span class="n">name</span><span class="p">:</span> <span class="n">str</span><span class="p">,</span> <span class="n">elements</span><span class="p">:</span> <span class="n"><span title="collections.abc.Iterable">Iterable</span></span><span class="p">[</span><span class="n">tuple</span><span class="p">[</span><span class="n">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n"><span title="minrecord.comparable.T">T</span></span><span class="p">]]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="typing_extensions.Self">Self</span></span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Instantiate a <code>MaxScalarRecord</code> object from the elements.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>name</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The name of the record.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>elements</code></td>
+            <td>
+                  <code><span title="collections.abc.Iterable">Iterable</span>[tuple[float | None, <span title="minrecord.comparable.T">T</span>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The initial elements. Each element is a tuple with
+the step and its associated value.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="typing_extensions.Self">Self</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The instantiated record.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+      <p>Example usage:</p>
+<div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">minrecord</span> <span class="kn">import</span> <span class="n">MinScalarRecord</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span> <span class="o">=</span> <span class="n">MinScalarRecord</span><span class="o">.</span><span class="n">from_elements</span><span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">,</span> <span class="p">((</span><span class="kc">None</span><span class="p">,</span> <span class="mf">64.0</span><span class="p">),</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mf">42.0</span><span class="p">)))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">get_most_recent</span><span class="p">()</span>
+<span class="go">((None, 64.0), (None, 42.0))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">get_last_value</span><span class="p">()</span>
+<span class="go">42.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">get_best_value</span><span class="p">()</span>
+<span class="go">42.0</span>
+</code></pre></div>
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="minrecord.NotAComparableRecordError" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">minrecord.NotAComparableRecordError</span>
+
+
+<a href="#minrecord.NotAComparableRecordError" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code>Exception</code></p>
+
+
+      <p>Raise an error if it is not possible to compare the values in
+the record.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="minrecord.Record" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">minrecord.Record</span>
+
+
+<a href="#minrecord.Record" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="minrecord.base.BaseRecord" href="#minrecord.BaseRecord">BaseRecord</a>[<span title="minrecord.generic.T">T</span>]</code></p>
+
+
+      <p>Implement a generic record to store the recent values.</p>
+<p>Internally, this class uses a <code>deque</code> to keep the most recent
+values added in the record. Note that this class does not allow
+to get the best value because it is not possible to define a
+generic rule to know the best object. Please see
+<code>ScalarRecord</code> that can compute the best value for
+scalars.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>name</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The name of the record.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>elements</code></td>
+            <td>
+                  <code><span title="collections.abc.Iterable">Iterable</span>[tuple[int | None, <span title="minrecord.generic.T">T</span>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The initial elements in the record. Each element is a
+tuple with the step and its associated value.</p>
+              </div>
+            </td>
+            <td>
+                  <code>()</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>max_size</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The maximum size of the record.</p>
+              </div>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="minrecord._config.get_max_size" href="#minrecord.get_max_size">get_max_size</a>()</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+      <p>Example usage:</p>
+<div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">minrecord</span> <span class="kn">import</span> <span class="n">Record</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span> <span class="o">=</span> <span class="n">Record</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;value&quot;</span><span class="p">,</span> <span class="n">elements</span><span class="o">=</span><span class="p">((</span><span class="kc">None</span><span class="p">,</span> <span class="mf">64.0</span><span class="p">),</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mf">42.0</span><span class="p">)))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span>
+<span class="go">Record(name=value, max_size=10, size=2)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">get_last_value</span><span class="p">()</span>
+<span class="go">42.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">get_most_recent</span><span class="p">()</span>
+<span class="go">((None, 64.0), (None, 42.0))</span>
+</code></pre></div>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="minrecord.Record.max_size" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">minrecord.Record.max_size</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+<a href="#minrecord.Record.max_size" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">max_size</span><span class="p">:</span> <span class="n">int</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p><code>int</code>: The maximum size of the record.</p>
+    </div>
+
+</div>
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="minrecord.RecordManager" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">minrecord.RecordManager</span>
+
+
+<a href="#minrecord.RecordManager" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+
+      <p>Implement a simple record manager.</p>
+<p>This class proposes an approach to manage a group of records, but it
+is possible to use other approaches. If this class does not fit your
+needs, feel free to use another approach.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>records</code></td>
+            <td>
+                  <code>dict[str, <a class="autorefs autorefs-internal" title="minrecord.base.BaseRecord" href="#minrecord.BaseRecord">BaseRecord</a>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The initial records to add to the manager.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+      <p>Example usage:</p>
+<div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">minrecord</span> <span class="kn">import</span> <span class="n">RecordManager</span><span class="p">,</span> <span class="n">MinScalarRecord</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">manager</span> <span class="o">=</span> <span class="n">RecordManager</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">manager</span><span class="o">.</span><span class="n">add_record</span><span class="p">(</span><span class="n">MinScalarRecord</span><span class="p">(</span><span class="s2">&quot;loss&quot;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">manager</span><span class="o">.</span><span class="n">get_record</span><span class="p">(</span><span class="s2">&quot;loss&quot;</span><span class="p">)</span>
+<span class="go">MinScalarRecord(name=loss, max_size=10, size=0)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">manager</span><span class="o">.</span><span class="n">get_record</span><span class="p">(</span><span class="s2">&quot;new_record&quot;</span><span class="p">)</span>
+<span class="go">Record(name=new_record, max_size=10, size=0)</span>
+</code></pre></div>
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="minrecord.RecordManager.add_record" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">minrecord.RecordManager.add_record</span>
+
+
+<a href="#minrecord.RecordManager.add_record" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">add_record</span><span class="p">(</span>
+    <span class="n">record</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="minrecord.base.BaseRecord" href="#minrecord.BaseRecord">BaseRecord</a></span><span class="p">,</span>
+    <span class="n">key</span><span class="p">:</span> <span class="n">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">exist_ok</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Add a record to the manager.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>record</code></td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="minrecord.base.BaseRecord" href="#minrecord.BaseRecord">BaseRecord</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The record to add to the manager.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>key</code></td>
+            <td>
+                  <code>str | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The key to store the record. If <code>None</code>, the name
+of the record is used.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>exist_ok</code></td>
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If <code>False</code>, <code>RuntimeError</code> is raised if the
+key already exists. This parameter should be set
+to <code>True</code> to overwrite the record for this key.</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>RuntimeError</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>if a record is already registered for the
+key and <code>exist_ok=False</code>.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+      <p>Example usage:</p>
+<div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">minrecord</span> <span class="kn">import</span> <span class="n">RecordManager</span><span class="p">,</span> <span class="n">MinScalarRecord</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">manager</span> <span class="o">=</span> <span class="n">RecordManager</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">manager</span><span class="o">.</span><span class="n">add_record</span><span class="p">(</span><span class="n">MinScalarRecord</span><span class="p">(</span><span class="s2">&quot;loss&quot;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">manager</span>
+<span class="go">RecordManager(</span>
+<span class="go">  (loss): MinScalarRecord(name=loss, max_size=10, size=0)</span>
+<span class="go">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">manager</span><span class="o">.</span><span class="n">add_record</span><span class="p">(</span><span class="n">MinScalarRecord</span><span class="p">(</span><span class="s2">&quot;loss&quot;</span><span class="p">),</span> <span class="s2">&quot;my key&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">manager</span>
+<span class="go">RecordManager(</span>
+<span class="go">  (loss): MinScalarRecord(name=loss, max_size=10, size=0)</span>
+<span class="go">  (my key): MinScalarRecord(name=loss, max_size=10, size=0)</span>
+<span class="go">)</span>
+</code></pre></div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="minrecord.RecordManager.get_best_values" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">minrecord.RecordManager.get_best_values</span>
+
+
+<a href="#minrecord.RecordManager.get_best_values" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">get_best_values</span><span class="p">(</span>
+    <span class="n">prefix</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">suffix</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">dict</span><span class="p">[</span><span class="n">str</span><span class="p">,</span> <span class="n"><span title="typing.Any">Any</span></span><span class="p">]</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Get the best value of each metric.</p>
+<p>This method ignores the metrics with empty record and the
+non-comparable record.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>prefix</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The prefix used to create the dict of best values.
+The goal of this prefix is to generate a name which is
+different from the metric name to avoid confusion.
+By default, the returned dict uses the same name as the
+metric.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>suffix</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The suffix used to create the dict of best values.
+The goal of this suffix is to generate a name which is
+different from the metric name to avoid confusion.
+By default, the returned dict uses the same name as the
+metric.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;&#39;</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>dict[str, <span title="typing.Any">Any</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The dict with the best value of each metric.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+      <p>Example usage:</p>
+<div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">minrecord</span> <span class="kn">import</span> <span class="n">RecordManager</span><span class="p">,</span> <span class="n">MaxScalarRecord</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">manager</span> <span class="o">=</span> <span class="n">RecordManager</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">manager</span><span class="o">.</span><span class="n">add_record</span><span class="p">(</span><span class="n">MaxScalarRecord</span><span class="p">(</span><span class="s2">&quot;accuracy&quot;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">manager</span><span class="o">.</span><span class="n">get_record</span><span class="p">(</span><span class="s2">&quot;accuracy&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">add_value</span><span class="p">(</span><span class="mf">42.0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">manager</span><span class="o">.</span><span class="n">get_best_values</span><span class="p">()</span>
+<span class="go">{&#39;accuracy&#39;: 42.0}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">manager</span><span class="o">.</span><span class="n">get_best_values</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;best/&quot;</span><span class="p">)</span>
+<span class="go">{&#39;best/accuracy&#39;: 42.0}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">manager</span><span class="o">.</span><span class="n">get_best_values</span><span class="p">(</span><span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;/best&quot;</span><span class="p">)</span>
+<span class="go">{&#39;accuracy/best&#39;: 42.0}</span>
+</code></pre></div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="minrecord.RecordManager.get_record" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">minrecord.RecordManager.get_record</span>
+
+
+<a href="#minrecord.RecordManager.get_record" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">get_record</span><span class="p">(</span><span class="n">key</span><span class="p">:</span> <span class="n">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" title="minrecord.base.BaseRecord" href="#minrecord.BaseRecord">BaseRecord</a></span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Get the record associated to a key.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>key</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The key of the record to retrieve.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="minrecord.base.BaseRecord" href="#minrecord.BaseRecord">BaseRecord</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The record if it exists, otherwise it returns an empty
+record. The created empty record is a <code>Record</code>
+object.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+      <p>Example usage:</p>
+<div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">minrecord</span> <span class="kn">import</span> <span class="n">RecordManager</span><span class="p">,</span> <span class="n">MinScalarRecord</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">manager</span> <span class="o">=</span> <span class="n">RecordManager</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">manager</span><span class="o">.</span><span class="n">add_record</span><span class="p">(</span><span class="n">MinScalarRecord</span><span class="p">(</span><span class="s2">&quot;loss&quot;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">manager</span><span class="o">.</span><span class="n">get_record</span><span class="p">(</span><span class="s2">&quot;loss&quot;</span><span class="p">)</span>
+<span class="go">MinScalarRecord(name=loss, max_size=10, size=0)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">manager</span><span class="o">.</span><span class="n">get_record</span><span class="p">(</span><span class="s2">&quot;new_record&quot;</span><span class="p">)</span>
+<span class="go">Record(name=new_record, max_size=10, size=0)</span>
+</code></pre></div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="minrecord.RecordManager.get_records" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">minrecord.RecordManager.get_records</span>
+
+
+<a href="#minrecord.RecordManager.get_records" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">get_records</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">dict</span><span class="p">[</span><span class="n">str</span><span class="p">,</span> <span class="n"><a class="autorefs autorefs-internal" title="minrecord.base.BaseRecord" href="#minrecord.BaseRecord">BaseRecord</a></span><span class="p">]</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Get all the records.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>dict[str, <a class="autorefs autorefs-internal" title="minrecord.base.BaseRecord" href="#minrecord.BaseRecord">BaseRecord</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The records with their associated keys.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+      <p>Example usage:</p>
+<div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">minrecord</span> <span class="kn">import</span> <span class="n">RecordManager</span><span class="p">,</span> <span class="n">MinScalarRecord</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">manager</span> <span class="o">=</span> <span class="n">RecordManager</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">manager</span><span class="o">.</span><span class="n">add_record</span><span class="p">(</span><span class="n">MinScalarRecord</span><span class="p">(</span><span class="s2">&quot;loss&quot;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">manager</span><span class="o">.</span><span class="n">get_records</span><span class="p">()</span>
+<span class="go">{&#39;loss&#39;: MinScalarRecord(name=loss, max_size=10, size=0)}</span>
+</code></pre></div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="minrecord.RecordManager.has_record" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">minrecord.RecordManager.has_record</span>
+
+
+<a href="#minrecord.RecordManager.has_record" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">has_record</span><span class="p">(</span><span class="n">key</span><span class="p">:</span> <span class="n">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">bool</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Indicate if the engine has a record for the given key.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>key</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The key of the record to check.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><code>True</code> if the record exists, <code>False</code> otherwise</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+      <p>Example usage:</p>
+<div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">minrecord</span> <span class="kn">import</span> <span class="n">RecordManager</span><span class="p">,</span> <span class="n">MinScalarRecord</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">manager</span> <span class="o">=</span> <span class="n">RecordManager</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">manager</span><span class="o">.</span><span class="n">add_record</span><span class="p">(</span><span class="n">MinScalarRecord</span><span class="p">(</span><span class="s2">&quot;loss&quot;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">manager</span><span class="o">.</span><span class="n">has_record</span><span class="p">(</span><span class="s2">&quot;loss&quot;</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">manager</span><span class="o">.</span><span class="n">has_record</span><span class="p">(</span><span class="s2">&quot;missing&quot;</span><span class="p">)</span>
+<span class="go">False</span>
+</code></pre></div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="minrecord.RecordManager.load_state_dict" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">minrecord.RecordManager.load_state_dict</span>
+
+
+<a href="#minrecord.RecordManager.load_state_dict" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">load_state_dict</span><span class="p">(</span><span class="n">state_dict</span><span class="p">:</span> <span class="n">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Load the state values from a dict.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>state_dict</code></td>
+            <td>
+                  <code>dict</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A dict with the new state values.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+      <p>Example usage:</p>
+<div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">minrecord</span> <span class="kn">import</span> <span class="n">RecordManager</span><span class="p">,</span> <span class="n">Record</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">manager</span> <span class="o">=</span> <span class="n">RecordManager</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">manager</span><span class="o">.</span><span class="n">add_record</span><span class="p">(</span><span class="n">Record</span><span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">manager</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">({</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;state&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;record&quot;</span><span class="p">:</span> <span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">))}}})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">manager</span><span class="o">.</span><span class="n">get_record</span><span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get_last_value</span><span class="p">()</span>
+<span class="go">0.25</span>
+</code></pre></div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="minrecord.RecordManager.state_dict" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">minrecord.RecordManager.state_dict</span>
+
+
+<a href="#minrecord.RecordManager.state_dict" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">state_dict</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">dict</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Return a dictionary containing state values of all the
+records.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>dict</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The dictionary containing state values of all the records.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+      <p>Example usage:</p>
+<div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">minrecord</span> <span class="kn">import</span> <span class="n">RecordManager</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">manager</span> <span class="o">=</span> <span class="n">RecordManager</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">manager</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()</span>
+<span class="go">{}</span>
+</code></pre></div>
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="minrecord.get_best_values" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">minrecord.get_best_values</span>
+
+
+<a href="#minrecord.get_best_values" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">get_best_values</span><span class="p">(</span>
+    <span class="n">records</span><span class="p">:</span> <span class="n"><span title="collections.abc.Mapping">Mapping</span></span><span class="p">[</span><span class="n">str</span><span class="p">,</span> <span class="n"><a class="autorefs autorefs-internal" title="minrecord.base.BaseRecord" href="#minrecord.BaseRecord">BaseRecord</a></span><span class="p">],</span>
+    <span class="n">prefix</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">suffix</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">dict</span><span class="p">[</span><span class="n">str</span><span class="p">,</span> <span class="n"><span title="typing.Any">Any</span></span><span class="p">]</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Get the best value of each record.</p>
+<p>This function ignores the empty and non-comparable records.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>records</code></td>
+            <td>
+                  <code><span title="collections.abc.Mapping">Mapping</span>[str, <a class="autorefs autorefs-internal" title="minrecord.base.BaseRecord" href="#minrecord.BaseRecord">BaseRecord</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The records and their associated keys.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>prefix</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The prefix used to create the dict of best values.
+The goal of this prefix is to generate a name which is
+different from the record name to avoid confusion.
+By default, the returned dict uses the same name as the
+record.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>suffix</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The suffix used to create the dict of best values.
+The goal of this suffix is to generate a name which is
+different from the record name to avoid confusion.
+By default, the returned dict uses the same name as the
+record.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;&#39;</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>dict[str, <span title="typing.Any">Any</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The dict with the best value of each record.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+      <p>Example usage:</p>
+<div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">minrecord</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="gp">... </span>    <span class="n">MinScalarRecord</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">MaxScalarRecord</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">get_best_values</span><span class="p">,</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record1</span> <span class="o">=</span> <span class="n">MinScalarRecord</span><span class="o">.</span><span class="n">from_elements</span><span class="p">(</span><span class="s2">&quot;loss&quot;</span><span class="p">,</span> <span class="n">elements</span><span class="o">=</span><span class="p">[(</span><span class="kc">None</span><span class="p">,</span> <span class="mf">1.9</span><span class="p">),</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">)])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record2</span> <span class="o">=</span> <span class="n">MaxScalarRecord</span><span class="o">.</span><span class="n">from_elements</span><span class="p">(</span><span class="s2">&quot;accuracy&quot;</span><span class="p">,</span> <span class="n">elements</span><span class="o">=</span><span class="p">[(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">42</span><span class="p">),</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">35</span><span class="p">)])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">get_best_values</span><span class="p">({</span><span class="s2">&quot;loss&quot;</span><span class="p">:</span> <span class="n">record1</span><span class="p">,</span> <span class="s2">&quot;accuracy&quot;</span><span class="p">:</span> <span class="n">record2</span><span class="p">})</span>
+<span class="go">{&#39;loss&#39;: 1.2, &#39;accuracy&#39;: 42}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">get_best_values</span><span class="p">({</span><span class="s2">&quot;loss&quot;</span><span class="p">:</span> <span class="n">record1</span><span class="p">,</span> <span class="s2">&quot;accuracy&quot;</span><span class="p">:</span> <span class="n">record2</span><span class="p">},</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;best/&quot;</span><span class="p">)</span>
+<span class="go">{&#39;best/loss&#39;: 1.2, &#39;best/accuracy&#39;: 42}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">get_best_values</span><span class="p">({</span><span class="s2">&quot;loss&quot;</span><span class="p">:</span> <span class="n">record1</span><span class="p">,</span> <span class="s2">&quot;accuracy&quot;</span><span class="p">:</span> <span class="n">record2</span><span class="p">},</span> <span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;/best&quot;</span><span class="p">)</span>
+<span class="go">{&#39;loss/best&#39;: 1.2, &#39;accuracy/best&#39;: 42}</span>
+</code></pre></div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="minrecord.get_last_values" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">minrecord.get_last_values</span>
+
+
+<a href="#minrecord.get_last_values" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">get_last_values</span><span class="p">(</span>
+    <span class="n">records</span><span class="p">:</span> <span class="n"><span title="collections.abc.Mapping">Mapping</span></span><span class="p">[</span><span class="n">str</span><span class="p">,</span> <span class="n"><a class="autorefs autorefs-internal" title="minrecord.base.BaseRecord" href="#minrecord.BaseRecord">BaseRecord</a></span><span class="p">],</span>
+    <span class="n">prefix</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">suffix</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">dict</span><span class="p">[</span><span class="n">str</span><span class="p">,</span> <span class="n"><span title="typing.Any">Any</span></span><span class="p">]</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Get the last value of each record.</p>
+<p>This function ignores the empty records.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>records</code></td>
+            <td>
+                  <code><span title="collections.abc.Mapping">Mapping</span>[str, <a class="autorefs autorefs-internal" title="minrecord.base.BaseRecord" href="#minrecord.BaseRecord">BaseRecord</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The records and their associated keys.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>prefix</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The prefix used to create the dict of best values.
+The goal of this prefix is to generate a name which is
+different from the record name to avoid confusion.
+By default, the returned dict uses the same name as the
+record.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>suffix</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The suffix used to create the dict of best values.
+The goal of this suffix is to generate a name which is
+different from the record name to avoid confusion.
+By default, the returned dict uses the same name as the
+record.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;&#39;</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>dict[str, <span title="typing.Any">Any</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The dict with the best value of each record.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+      <p>Example usage:</p>
+<div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">minrecord</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="gp">... </span>    <span class="n">MinScalarRecord</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">MaxScalarRecord</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">get_best_values</span><span class="p">,</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record1</span> <span class="o">=</span> <span class="n">MinScalarRecord</span><span class="o">.</span><span class="n">from_elements</span><span class="p">(</span><span class="s2">&quot;loss&quot;</span><span class="p">,</span> <span class="n">elements</span><span class="o">=</span><span class="p">[(</span><span class="kc">None</span><span class="p">,</span> <span class="mf">1.9</span><span class="p">),</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">)])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record2</span> <span class="o">=</span> <span class="n">MaxScalarRecord</span><span class="o">.</span><span class="n">from_elements</span><span class="p">(</span><span class="s2">&quot;accuracy&quot;</span><span class="p">,</span> <span class="n">elements</span><span class="o">=</span><span class="p">[(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">42</span><span class="p">),</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">35</span><span class="p">)])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">get_best_values</span><span class="p">({</span><span class="s2">&quot;loss&quot;</span><span class="p">:</span> <span class="n">record1</span><span class="p">,</span> <span class="s2">&quot;accuracy&quot;</span><span class="p">:</span> <span class="n">record2</span><span class="p">})</span>
+<span class="go">{&#39;loss&#39;: 1.2, &#39;accuracy&#39;: 42}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">get_best_values</span><span class="p">({</span><span class="s2">&quot;loss&quot;</span><span class="p">:</span> <span class="n">record1</span><span class="p">,</span> <span class="s2">&quot;accuracy&quot;</span><span class="p">:</span> <span class="n">record2</span><span class="p">},</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;best/&quot;</span><span class="p">)</span>
+<span class="go">{&#39;best/loss&#39;: 1.2, &#39;best/accuracy&#39;: 42}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">get_best_values</span><span class="p">({</span><span class="s2">&quot;loss&quot;</span><span class="p">:</span> <span class="n">record1</span><span class="p">,</span> <span class="s2">&quot;accuracy&quot;</span><span class="p">:</span> <span class="n">record2</span><span class="p">},</span> <span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;/best&quot;</span><span class="p">)</span>
+<span class="go">{&#39;loss/best&#39;: 1.2, &#39;accuracy/best&#39;: 42}</span>
+</code></pre></div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="minrecord.get_max_size" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">minrecord.get_max_size</span>
+
+
+<a href="#minrecord.get_max_size" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">get_max_size</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">int</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Get the current default maximum size of values to track in each
+record.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The current default maximum size of values to track in each
+record.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+      <p>This value can be changed by using <code>set_max_size</code>.</p>
+<p>Example usage:</p>
+<div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">minrecord</span> <span class="kn">import</span> <span class="n">get_max_size</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">get_max_size</span><span class="p">()</span>
+<span class="go">10</span>
+</code></pre></div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="minrecord.set_max_size" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">minrecord.set_max_size</span>
+
+
+<a href="#minrecord.set_max_size" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">set_max_size</span><span class="p">(</span><span class="n">max_size</span><span class="p">:</span> <span class="n">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+      <p>Set the default maximum size of values to track in each record.</p>
+<p>This function does not change the maximum size of records that are
+already created. It only changes the maximum size of records that
+will be created after the call of this function.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>max_size</code></td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The new default maximum size of values to track in
+each record.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+      <p>Example usage:</p>
+<div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">minrecord</span> <span class="kn">import</span> <span class="n">get_max_size</span><span class="p">,</span> <span class="n">set_max_size</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">get_max_size</span><span class="p">()</span>
+<span class="go">10</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">set_max_size</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">get_max_size</span><span class="p">()</span>
+<span class="go">5</span>
+</code></pre></div>
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2024 - present Thibaut Durand
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tabs", "navigation.expand", "content.code.copy", "content.code.select", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"method": "mike"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.ad660dcc.min.js"></script>
+      
+    
+  </body>
+</html>
