@@ -3,6 +3,11 @@ default_language_version:
 
 default_stages: [ commit ]
 
+ci:
+  autofix_prs: false
+  autoupdate_commit_msg: "[pre-commit.ci] pre-commit suggestions"
+  autoupdate_schedule: weekly
+
 repos:
   - repo: https://github.com/asottile/pyupgrade
     rev: v3.16.0
