@@ -96,6 +96,16 @@ class ComparableRecord(Record[T]):
             self._best_value = value
         super().add_value(value, step)
 
+    def clone(self) -> ComparableRecord:
+        return self.__class__(
+            name=self.name,
+            elements=self._record,
+            max_size=self.max_size,
+            comparator=self._comparator,
+            best_value=self._best_value,
+            improved=self._improved,
+        )
+
     def is_better(self, old_value: T, new_value: T) -> bool:
         r"""Indicate if the new value is better than the old value.
 

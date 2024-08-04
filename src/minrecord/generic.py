@@ -93,6 +93,9 @@ class Record(BaseRecord[T]):
     def add_value(self, value: T, step: int | None = None) -> None:
         self._record.append((step, value))
 
+    def clone(self) -> Record:
+        return self.__class__(name=self.name, elements=self._record, max_size=self.max_size)
+
     def equal(self, other: Any) -> bool:
         if not isinstance(other, Record):
             return False
