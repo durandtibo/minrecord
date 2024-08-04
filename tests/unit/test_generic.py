@@ -58,7 +58,7 @@ def test_record_add_value_list() -> None:
 
 
 def test_record_clone() -> None:
-    record = Record("loss", elements=((None, 35), (1, 42)))
+    record = Record(name="loss", elements=((None, 35), (1, 42)), max_size=20)
     record_cloned = record.clone()
     assert record is not record_cloned
     assert record.equal(record_cloned)

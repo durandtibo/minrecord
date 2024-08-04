@@ -112,6 +112,7 @@ class BaseRecord(Generic[T], ABC, metaclass=AbstractFactory):
         ```
         """
 
+    @abstractmethod
     def clone(self) -> BaseRecord:
         r"""Clone the current record.
 
@@ -130,7 +131,6 @@ class BaseRecord(Generic[T], ABC, metaclass=AbstractFactory):
 
         ```
         """
-        return self.from_dict(self.to_dict())
 
     @abstractmethod
     def equal(self, other: Any) -> bool:

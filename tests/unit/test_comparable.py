@@ -9,6 +9,7 @@ from minrecord import (
     EmptyRecordError,
     MaxScalarComparator,
     MaxScalarRecord,
+    MinScalarComparator,
     MinScalarRecord,
 )
 from minrecord.testing import objectory_available
@@ -61,13 +62,34 @@ def test_comparable_record_add_value() -> None:
     record.add_value(4, step=1)
     assert record.equal(
         ComparableRecord[float](
-            "accuracy",
-            MaxScalarComparator(),
+            name="accuracy",
+            comparator=MaxScalarComparator(),
             elements=((None, 2), (1, 4)),
             best_value=4,
             improved=True,
         ),
     )
+
+
+def test_comparable_record_clone() -> None:
+    record = ComparableRecord(
+        name="accuracy",
+        comparator=MaxScalarComparator(),
+        elements=((None, 2), (1, 4)),
+        best_value=4,
+        improved=True,
+        max_size=20,
+    )
+    record_cloned = record.clone()
+    assert record is not record_cloned
+    assert record.equal(record_cloned)
+
+
+def test_comparable_record_clone_empty() -> None:
+    record = ComparableRecord[float](name="loss", comparator=MinScalarComparator())
+    record_cloned = record.clone()
+    assert record is not record_cloned
+    assert record.equal(record_cloned)
 
 
 def test_comparable_record_get_best_value() -> None:
