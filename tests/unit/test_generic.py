@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import pytest
 from coola import objects_are_equal
-from objectory import OBJECT_TARGET
 
 from minrecord import (
     BaseRecord,
@@ -11,6 +10,11 @@ from minrecord import (
     NotAComparableRecordError,
     Record,
 )
+from minrecord.testing import objectory_available
+from minrecord.utils.imports import is_objectory_available
+
+if is_objectory_available():
+    from objectory import OBJECT_TARGET
 
 ############################
 #     Tests for Record     #
@@ -184,6 +188,7 @@ def test_record_update_empty() -> None:
     assert record.equal(Record("loss"))
 
 
+@objectory_available
 def test_record_config_dict() -> None:
     assert Record("loss").config_dict() == {
         OBJECT_TARGET: "minrecord.generic.Record",
@@ -192,6 +197,7 @@ def test_record_config_dict() -> None:
     }
 
 
+@objectory_available
 def test_record_config_dict_create_new_record() -> None:
     assert BaseRecord.factory(**Record("loss", max_size=5, elements=[(0, 1)]).config_dict()).equal(
         Record("loss", max_size=5)
@@ -228,6 +234,7 @@ def test_record_state_dict_empty() -> None:
     assert objects_are_equal(Record("loss").state_dict(), {"record": ()})
 
 
+@objectory_available
 def test_record_to_dict() -> None:
     assert objects_are_equal(
         Record("loss", elements=[(0, 5)]).to_dict(),
@@ -238,6 +245,7 @@ def test_record_to_dict() -> None:
     )
 
 
+@objectory_available
 def test_record_to_dict_empty() -> None:
     assert objects_are_equal(
         Record("loss").to_dict(),
@@ -248,6 +256,7 @@ def test_record_to_dict_empty() -> None:
     )
 
 
+@objectory_available
 def test_record_from_dict() -> None:
     assert BaseRecord.from_dict(
         {
@@ -257,6 +266,7 @@ def test_record_from_dict() -> None:
     ).equal(Record("loss", max_size=7, elements=((0, 1), (1, 5))))
 
 
+@objectory_available
 def test_record_from_dict_empty() -> None:
     assert BaseRecord.from_dict(
         {
