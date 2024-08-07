@@ -87,7 +87,7 @@ class Record(BaseRecord[T]):
 
     @property
     def max_size(self) -> int:
-        r"""``int``: The maximum size of the record."""
+        r"""The maximum size of the record."""
         return self._record.maxlen
 
     def add_value(self, value: T, step: int | None = None) -> None:
