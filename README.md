@@ -117,10 +117,12 @@ to
 install only some specific dependencies or other alternatives to install the library.
 The following is the corresponding `minrecord` versions and tested dependencies.
 
-| `minrecord` | `coola`      | `objectory`  | `python`      |
-|-------------|--------------|--------------|---------------|
-| `main`      | `>=0.7,<1.0` | `>=0.1,<1.0` | `>=3.9,<3.13` |
-| `0.0.1`     | `>=0.7,<1.0` | `>=0.1,<1.0` | `>=3.9,<3.13` |
+| `minrecord` | `coola`        | `objectory`              | `python`      |
+|-------------|----------------|--------------------------|---------------|
+| `main`      | `>=0.7.2,<1.0` | `>=0.1,<1.0`<sup>*</sup> | `>=3.9,<3.13` |
+| `0.0.1`     | `>=0.7,<1.0`   | `>=0.1,<1.0`             | `>=3.9,<3.13` |
+
+<sup>*</sup> indicates an optional dependency
 
 ## Contributing
 

@@ -1,7 +1,13 @@
+from __future__ import annotations
+
 import pytest
-from objectory import OBJECT_TARGET
 
 from minrecord import MaxScalarRecord, MinScalarRecord, Record, RecordManager
+from minrecord.testing import objectory_available
+from minrecord.utils.imports import is_objectory_available
+
+if is_objectory_available():
+    from objectory import OBJECT_TARGET
 
 NAMES = ("NAME", "my_record")
 
@@ -173,6 +179,7 @@ def test_record_manager_load_state_dict_with_existing_record() -> None:
     assert record.get_best_value() == 6
 
 
+@objectory_available
 def test_record_manager_load_state_dict_without_record() -> None:
     manager = RecordManager()
     manager.load_state_dict(

@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import pytest
 from coola import objects_are_equal
-from objectory import OBJECT_TARGET
 
 from minrecord import (
     BaseRecord,
@@ -13,6 +12,11 @@ from minrecord import (
     MinScalarComparator,
     MinScalarRecord,
 )
+from minrecord.testing import objectory_available
+from minrecord.utils.imports import is_objectory_available
+
+if is_objectory_available():
+    from objectory import OBJECT_TARGET
 
 ######################################
 #     Tests for ComparableRecord     #
@@ -207,6 +211,7 @@ def test_comparable_record_is_empty_false() -> None:
     ).is_empty()
 
 
+@objectory_available
 def test_comparable_record_config_dict() -> None:
     assert objects_are_equal(
         ComparableRecord("accuracy", comparator=MaxScalarComparator()).config_dict(),
@@ -219,6 +224,7 @@ def test_comparable_record_config_dict() -> None:
     )
 
 
+@objectory_available
 def test_comparable_record_config_dict_create_new_record() -> None:
     assert BaseRecord.factory(
         **ComparableRecord(
@@ -285,6 +291,7 @@ def test_comparable_record_state_dict_empty() -> None:
     }
 
 
+@objectory_available
 def test_comparable_record_to_dict_from_dict() -> None:
     assert BaseRecord.from_dict(
         ComparableRecord(
@@ -377,6 +384,7 @@ def test_max_scalar_record_get_best_value_last_is_not_best() -> None:
     assert record.get_best_value() == 2
 
 
+@objectory_available
 def test_max_scalar_record_to_dict_from_dict() -> None:
     assert BaseRecord.from_dict(
         MaxScalarRecord(
@@ -449,6 +457,7 @@ def test_min_scalar_record_get_best_value_last_is_not_best() -> None:
     assert record.get_best_value() == 2
 
 
+@objectory_available
 def test_min_scalar_record_to_dict_from_dict() -> None:
     assert BaseRecord.from_dict(
         MinScalarRecord(
