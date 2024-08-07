@@ -9,14 +9,24 @@ __all__ = [
 ]
 
 import logging
-from abc import ABC, abstractmethod
+from abc import ABC, ABCMeta, abstractmethod
 from typing import TYPE_CHECKING, Any, Generic, TypeVar
+from unittest.mock import Mock
 
 from coola.equality.comparators import BaseEqualityComparator
 from coola.equality.handlers import EqualHandler, SameObjectHandler, SameTypeHandler
 from coola.equality.testers import EqualityTester
-from objectory import OBJECT_TARGET, AbstractFactory
-from objectory.utils import full_object_name
+
+from minrecord.utils.imports import is_objectory_available
+
+if is_objectory_available():
+    import objectory
+    from objectory import AbstractFactory
+else:  # pragma: no cover
+    objectory = Mock()
+
+    AbstractFactory = ABCMeta
+
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -114,8 +124,10 @@ class BaseRecord(Generic[T], ABC, metaclass=AbstractFactory):
         ```pycon
 
         >>> from minrecord import Record
-        >>> record = Record("epoch")
+        >>> record = Record("loss")
         >>> record_cloned = record.clone()
+        >>> record_cloned
+        Record(name=loss, max_size=10, size=0)
 
         ```
         """
@@ -382,7 +394,7 @@ class BaseRecord(Generic[T], ABC, metaclass=AbstractFactory):
         ```
         """
         return {
-            OBJECT_TARGET: full_object_name(self.__class__),
+            objectory.OBJECT_TARGET: objectory.utils.full_object_name(self.__class__),
             "name": self.name,
         }
 
