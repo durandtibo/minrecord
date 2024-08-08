@@ -32,7 +32,7 @@ jobs:
           poetry run make config-poetry
           poetry run make install
 
-      - name: Install PyTorch
+      - name: Install coola
         run: |
           poetry run pip install coola==${{ matrix.coola-version }}
 
@@ -74,7 +74,7 @@ jobs:
           poetry run make config-poetry
           poetry run make install
 
-      - name: Install PyTorch
+      - name: Install objectory
         run: |
           poetry run pip install objectory==${{ matrix.objectory-version }}
 
