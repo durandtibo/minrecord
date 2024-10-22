@@ -1447,5 +1447,5 @@ all = ["objectory"]
 
 [metadata]
 lock-version = "2.0"
-python-versions = ">=3.9,<3.13"
-content-hash = "3eca044ddabbd6fc596ce023f3b4cdda5d0540f387c19cb0cc5b7d3f796593f3"
+python-versions = ">=3.9,<3.14"
+content-hash = "5cfa88b27e6fdb339ecd60534b36777d27f3046adf3da0471ab37a24c684193b"
