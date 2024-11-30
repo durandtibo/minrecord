@@ -4,9 +4,9 @@ from __future__ import annotations
 
 __all__ = [
     "BaseComparator",
+    "ComparatorEqualityComparator",
     "MaxScalarComparator",
     "MinScalarComparator",
-    "ComparatorEqualityComparator",
 ]
 
 import logging
