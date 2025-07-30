@@ -514,7 +514,7 @@ class NotAComparableRecordError(Exception):
     the record."""
 
 
-class RecordEqualityComparator(BaseEqualityComparator[BaseRecord]):
+class RecordEqualityComparator(BaseEqualityComparator[BaseRecord]):  # noqa: PLW1641
     r"""Implement an equality comparator for ``BaseRecord`` objects."""
 
     def __init__(self) -> None:
