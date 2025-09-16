@@ -25,7 +25,7 @@ T = TypeVar("T")
 logger = logging.getLogger(__name__)
 
 
-class BaseComparator(Generic[T], ABC):
+class BaseComparator(ABC, Generic[T]):
     r"""Define the base comparator class to implement a comparator.
 
     Example usage:
