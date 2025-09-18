@@ -38,7 +38,7 @@ T = TypeVar("T")
 logger = logging.getLogger(__name__)
 
 
-class BaseRecord(Generic[T], ABC, metaclass=AbstractFactory):
+class BaseRecord(ABC, Generic[T], metaclass=AbstractFactory):
     r"""Define the base class to implement a record.
 
     The record tracks the value added as well as the step
