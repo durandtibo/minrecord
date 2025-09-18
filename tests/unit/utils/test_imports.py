@@ -28,7 +28,7 @@ def test_check_objectory_with_package() -> None:
 def test_check_objectory_without_package() -> None:
     with (
         patch("minrecord.utils.imports.is_objectory_available", lambda: False),
-        pytest.raises(RuntimeError, match="'objectory' package is required but not installed."),
+        pytest.raises(RuntimeError, match=r"'objectory' package is required but not installed."),
     ):
         check_objectory()
 

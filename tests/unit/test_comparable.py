@@ -52,7 +52,7 @@ def test_comparable_record_max_size(max_size: int) -> None:
 
 
 def test_comparable_record_max_size_incorrect() -> None:
-    with pytest.raises(ValueError, match="Record size must be greater than 0"):
+    with pytest.raises(ValueError, match=r"Record size must be greater than 0"):
         ComparableRecord[float]("accuracy", MaxScalarComparator(), max_size=0)
 
 
@@ -117,7 +117,7 @@ def test_comparable_record_get_best_value_last_is_not_best() -> None:
 
 def test_comparable_record_get_best_value_empty() -> None:
     record = ComparableRecord[float]("accuracy", MaxScalarComparator())
-    with pytest.raises(EmptyRecordError, match="The record is empty."):
+    with pytest.raises(EmptyRecordError, match=r"The record is empty."):
         record.get_best_value()
 
 
@@ -161,7 +161,7 @@ def test_comparable_record_get_last_value() -> None:
 
 def test_comparable_record_get_last_value_empty() -> None:
     record = ComparableRecord("accuracy", comparator=MaxScalarComparator())
-    with pytest.raises(EmptyRecordError, match="'accuracy' record is empty."):
+    with pytest.raises(EmptyRecordError, match=r"'accuracy' record is empty."):
         record.get_last_value()
 
 
@@ -181,7 +181,7 @@ def test_comparable_record_has_improved_false() -> None:
 
 def test_comparable_record_has_improved_empty() -> None:
     record = ComparableRecord("accuracy", comparator=MaxScalarComparator())
-    with pytest.raises(EmptyRecordError, match="The record is empty."):
+    with pytest.raises(EmptyRecordError, match=r"The record is empty."):
         record.has_improved()
 
 
