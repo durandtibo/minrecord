@@ -69,7 +69,7 @@ def test_record_manager_add_record_without_key(key: str) -> None:
 def test_record_manager_add_record_duplicate_key() -> None:
     manager = RecordManager()
     manager.add_record(MinScalarRecord("loss"))
-    with pytest.raises(RuntimeError, match="A record .* is already registered for the key loss"):
+    with pytest.raises(RuntimeError, match=r"A record .* is already registered for the key loss"):
         manager.add_record(MinScalarRecord("loss"))
 
 

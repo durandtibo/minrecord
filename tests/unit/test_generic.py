@@ -40,7 +40,7 @@ def test_record_init_max_size(max_size: int) -> None:
 
 
 def test_record_init_max_size_incorrect() -> None:
-    with pytest.raises(ValueError, match="Record size must be greater than 0"):
+    with pytest.raises(ValueError, match=r"Record size must be greater than 0"):
         Record("loss", max_size=0)
 
 
@@ -107,13 +107,15 @@ def test_record_equal_false_different_types_record() -> None:
 
 def test_record_get_best_value() -> None:
     record = Record("loss")
-    with pytest.raises(NotAComparableRecordError, match="It is not possible to get the best value"):
+    with pytest.raises(
+        NotAComparableRecordError, match=r"It is not possible to get the best value"
+    ):
         record.get_best_value()
 
 
 def test_record__get_best_value() -> None:
     record = Record("loss")
-    with pytest.raises(NotImplementedError, match="_get_best_value method is not implemented"):
+    with pytest.raises(NotImplementedError, match=r"_get_best_value method is not implemented"):
         record._get_best_value()
 
 
@@ -145,7 +147,7 @@ def test_record_get_last_value() -> None:
 
 def test_record_get_last_value_empty() -> None:
     record = Record("loss")
-    with pytest.raises(EmptyRecordError, match="'loss' record is empty."):
+    with pytest.raises(EmptyRecordError, match=r"'loss' record is empty."):
         record.get_last_value()
 
 
@@ -153,14 +155,14 @@ def test_record_has_improved() -> None:
     record = Record("loss")
     with pytest.raises(
         NotAComparableRecordError,
-        match="It is not possible to indicate if the last value is the best value",
+        match=r"It is not possible to indicate if the last value is the best value",
     ):
         record.has_improved()
 
 
 def test_record__has_improved() -> None:
     record = Record("loss")
-    with pytest.raises(NotImplementedError, match="_has_improved method is not implemented"):
+    with pytest.raises(NotImplementedError, match=r"_has_improved method is not implemented"):
         record._has_improved()
 
 
