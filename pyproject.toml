@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "minrecord"
-version = "0.1.0"
+version = "0.1.1a0"
 description = "Minimalist library to record values in a ML workflow"
 readme = "README.md"
 authors = ["Thibaut Durand <durand.tibo+gh@gmail.com>"]
@@ -51,19 +51,19 @@ optional = true
 [tool.poetry.group.docs.dependencies]
 mike = "^2.1"
 mkdocs-material = "^9.5"
-mkdocstrings = { extras = ["python"], version = ">=0.30,<1.0" }
+mkdocstrings = { extras = ["python"], version = "^0.30" }
 
 [tool.poetry.group.dev.dependencies]
-black = ">=25.1"
+black = ">=25.9"
 coverage = { extras = ["toml"], version = "^7.10" }
 docformatter = { extras = ["tomli"], version = "^1.7" }
-feu = { extras = ["cli"], version = ">=0.3.5,<1.0" }
-pre-commit = ">=4.0,<5.0"
+feu = { extras = ["cli"], version = ">=0.4.0,<1.0" }
+pre-commit = "^4.0"
 pygments = "^2.19"
 pytest = "^8.4"
-pytest-cov = ">=7,<8"
+pytest-cov = "^7.0"
 pytest-timeout = "^2.4"
-ruff = ">=0.13,<1.0"
+ruff = "^0.14"
 xdoctest = "^1.3"
 
 
