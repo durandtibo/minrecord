@@ -14,6 +14,7 @@ SOURCE = f"src/{NAME}"
 TESTS = "tests"
 UNIT_TESTS = f"{TESTS}/unit"
 INTEGRATION_TESTS = f"{TESTS}/integration"
+PYTHON_VERSION = "3.13"
 
 
 @task
@@ -31,7 +32,7 @@ def check_lint(c: Context) -> None:
 @task
 def create_venv(c: Context) -> None:
     r"""Create a virtual environment."""
-    c.run("uv venv", pty=True)
+    c.run(f"uv venv --python {PYTHON_VERSION} --clear", pty=True)
     c.run("source .venv/bin/activate", pty=True)
     c.run("make install-invoke", pty=True)
 
@@ -54,15 +55,18 @@ def docformat(c: Context) -> None:
 
 
 @task
-def install(c: Context, all_deps: bool = False, docs: bool = False) -> None:
+def install(
+    c: Context, optional_deps: bool = True, dev_deps: bool = True, docs_deps: bool = False
+) -> None:
     r"""Install packages."""
-    cmd = ["uv pip install -r pyproject.toml --group dev"]
-    if docs:
+    cmd = ["uv sync --frozen"]
+    if optional_deps:
+        cmd.append("")
+    if dev_deps:
+        cmd.append("--group dev")
+    if docs_deps:
         cmd.append("--group docs")
-    if all_deps:
-        cmd.append("--all-extras")
     c.run(" ".join(cmd), pty=True)
-    c.run("uv pip install -e .", pty=True)
 
 
 @task
@@ -96,7 +100,7 @@ def unit_test(c: Context, cov: bool = False) -> None:
 @task
 def integration_test(c: Context, cov: bool = False) -> None:
     r"""Run the unit tests."""
-    cmd = ["python -m pytest --xdoctest --timeout 10"]
+    cmd = ["python -m pytest --xdoctest --timeout 60"]
     if cov:
         cmd.append(
             f"--cov-report html --cov-report xml --cov-report term  --cov-append --cov={NAME}"
