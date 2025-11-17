@@ -14,22 +14,32 @@ jobs:
   stable:
     uses: ./.github/workflows/test-package.yaml
     with:
-      install-cmd: 'uv pip install batcharray'
+      install-cmd: 'uv pip install minrecord'
 
   stable-all:
     uses: ./.github/workflows/test-package.yaml
     with:
-      install-cmd: 'uv pip install "batcharray[all]"'
+      install-cmd: 'uv pip install "minrecord[all]"'
+
+  stable-objectory:
+    uses: ./.github/workflows/test-package.yaml
+    with:
+      install-cmd: 'uv pip install "minrecord[objectory]"'
 
   latest:
     uses: ./.github/workflows/test-package.yaml
     with:
-      install-cmd: 'uv pip install --pre batcharray'
+      install-cmd: 'uv pip install --pre minrecord'
 
   latest-all:
     uses: ./.github/workflows/test-package.yaml
     with:
-      install-cmd: 'uv pip install --pre "batcharray[all]"'
+      install-cmd: 'uv pip install --pre "minrecord[all]"'
+
+  latest-objectory:
+    uses: ./.github/workflows/test-package.yaml
+    with:
+      install-cmd: 'uv pip install --pre "minrecord[objectory]"'
 
 
   ########################
