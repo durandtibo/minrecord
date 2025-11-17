@@ -943,15 +943,15 @@ files = [
 
 [[package]]
 name = "objectory"
-version = "0.2.1"
+version = "0.2.2"
 description = "A light library for general purpose object factories"
 optional = true
-python-versions = "<3.15,>=3.10"
+python-versions = ">=3.10"
 groups = ["main"]
 markers = "extra == \"all\""
 files = [
-    {file = "objectory-0.2.1-py3-none-any.whl", hash = "sha256:eceb7c12df39bdfe9e9cf95ea52217ae6eb3888889e859c6dff58e481ca318f8"},
-    {file = "objectory-0.2.1.tar.gz", hash = "sha256:11ecf5e654eed913dcfa8f8c43717728f4e9c81664a1dc5aa9e9f418aac21b2d"},
+    {file = "objectory-0.2.2-py3-none-any.whl", hash = "sha256:40ac83229c07ef172f22e01966b3d39d6335a7539431ee619f80d1d403a2e461"},
+    {file = "objectory-0.2.2.tar.gz", hash = "sha256:31b62a66313fa9da8f0845b7b298567bf387ee182dac6a5b018c2cd9f0a21c42"},
 ]
 
 [package.dependencies]
