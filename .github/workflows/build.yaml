@@ -31,16 +31,16 @@ jobs:
 
       - name: Inspect package
         run: |
-          uv pip show minevent
+          uv pip show minrecord
 
       - name: Show dependency tree
         shell: bash
         run: |
-          uv pip tree --package minevent --show-version-specifiers
+          uv pip tree --package minrecord --show-version-specifiers
 
       - name: Import package
         run: |
-          python -c "import minevent; print('OK')"
+          python -c "import minrecord; print('OK')"
 
   extras:
     runs-on: ubuntu-latest
@@ -73,13 +73,13 @@ jobs:
 
       - name: Inspect package
         run: |
-          uv pip show minevent
+          uv pip show minrecord
 
       - name: Show dependency tree
         shell: bash
         run: |
-          uv pip tree --package minevent --show-version-specifiers
+          uv pip tree --package minrecord --show-version-specifiers
 
       - name: Import package
         run: |
-          python -c "import minevent; print('OK')"
+          python -c "import minrecord; print('OK')"
