@@ -73,8 +73,6 @@ homepage = "https://github.com/durandtibo/minrecord"
 repository = "https://github.com/durandtibo/minrecord"
 documentation = "https://durandtibo.github.io/minrecord/"
 
-[tool.hatch.metadata.hooks.autoextras]
-
 [tool.uv.pip]
 torch-backend = "auto"
 
