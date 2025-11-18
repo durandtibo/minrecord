@@ -21,6 +21,14 @@ jobs:
         run: |
           python -c "import minrecord"
 
+      - name: check records
+        run: |
+          python -c "from minrecord import BaseRecord"
+          python -c "from minrecord import ComparableRecord"
+          python -c "from minrecord import MaxScalarRecord"
+          python -c "from minrecord import MinScalarRecord"
+          python -c "from minrecord import Record"
+
       - name: check minrecord.utils
         run: |
           python -c "from minrecord import utils"
