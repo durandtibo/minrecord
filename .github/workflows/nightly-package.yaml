@@ -21,10 +21,8 @@ jobs:
     with:
       install-cmd: 'uv pip install "minrecord[all]"'
 
-  stable-objectory:
-    uses: ./.github/workflows/test-package.yaml
-    with:
-      install-cmd: 'uv pip install "minrecord[objectory]"'
+  stable-extras:
+    uses: ./.github/workflows/test-package-extras.yaml
 
   latest:
     uses: ./.github/workflows/test-package.yaml
@@ -36,10 +34,10 @@ jobs:
     with:
       install-cmd: 'uv pip install --pre "minrecord[all]"'
 
-  latest-objectory:
-    uses: ./.github/workflows/test-package.yaml
+  latest-extras:
+    uses: ./.github/workflows/test-package-extras.yaml
     with:
-      install-cmd: 'uv pip install --pre "minrecord[objectory]"'
+      install-args: '--pre'
 
 
   ########################
