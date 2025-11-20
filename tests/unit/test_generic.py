@@ -15,7 +15,8 @@ from minrecord.utils.imports import is_objectory_available
 
 if is_objectory_available():
     from objectory import OBJECT_TARGET
-
+else:  # pragma: no cover
+    from minrecord.utils.fallback.objectory import OBJECT_TARGET
 
 ############################
 #     Tests for Record     #
@@ -191,7 +192,6 @@ def test_record_update_empty() -> None:
     assert record.equal(Record("loss"))
 
 
-@objectory_available
 def test_record_config_dict() -> None:
     assert Record("loss").config_dict() == {
         OBJECT_TARGET: "minrecord.generic.Record",
@@ -205,13 +205,6 @@ def test_record_config_dict_create_new_record() -> None:
     assert BaseRecord.factory(**Record("loss", max_size=5, elements=[(0, 1)]).config_dict()).equal(
         Record("loss", max_size=5)
     )
-
-
-@objectory_not_available
-def test_record_config_dict_missing_objectory() -> None:
-    record = Record("loss")
-    with pytest.raises(RuntimeError, match=r"'objectory' package is required but not installed."):
-        record.config_dict()
 
 
 def test_record_load_state_dict_empty() -> None:
@@ -244,7 +237,6 @@ def test_record_state_dict_empty() -> None:
     assert objects_are_equal(Record("loss").state_dict(), {"record": ()})
 
 
-@objectory_available
 def test_record_to_dict() -> None:
     assert objects_are_equal(
         Record("loss", elements=[(0, 5)]).to_dict(),
@@ -255,7 +247,6 @@ def test_record_to_dict() -> None:
     )
 
 
-@objectory_available
 def test_record_to_dict_empty() -> None:
     assert objects_are_equal(
         Record("loss").to_dict(),
@@ -264,13 +255,6 @@ def test_record_to_dict_empty() -> None:
             "state": {"record": ()},
         },
     )
-
-
-@objectory_not_available
-def test_record_to_dict_objectory_missing() -> None:
-    record = Record("loss", elements=[(0, 5)])
-    with pytest.raises(RuntimeError, match=r"'objectory' package is required but not installed."):
-        record.to_dict()
 
 
 @objectory_available
