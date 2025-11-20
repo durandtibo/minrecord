@@ -3,7 +3,7 @@ is not available."""
 
 from __future__ import annotations
 
-__all__ = ["OBJECT_TARGET", "AbstractFactory", "full_object_name"]
+__all__ = ["OBJECT_TARGET", "AbstractFactory"]
 
 from abc import ABCMeta
 from typing import Any
@@ -19,8 +19,3 @@ class AbstractFactory(ABCMeta):
     def factory(cls, *args: Any, **kwargs: Any) -> Any:  # noqa: ARG002
         r"""Fallback of ``objectory.AbstractFactory.factory``."""
         raise_error_objectory_missing()
-
-
-def full_object_name(*args: Any, **kwargs: Any) -> str:  # noqa: ARG001
-    r"""Fallback of ``objectory.utils.full_object_name``."""
-    raise_error_objectory_missing()

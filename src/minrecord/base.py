@@ -15,18 +15,14 @@ from typing import TYPE_CHECKING, Any, Generic, TypeVar
 from coola.equality.comparators import BaseEqualityComparator
 from coola.equality.handlers import EqualHandler, SameObjectHandler, SameTypeHandler
 from coola.equality.testers import EqualityTester
+from coola.utils.introspection import get_fully_qualified_name
 
 from minrecord.utils.imports import check_objectory, is_objectory_available
 
 if is_objectory_available():
     from objectory import OBJECT_TARGET, AbstractFactory
-    from objectory.utils import full_object_name
 else:  # pragma: no cover
-    from minrecord.utils.fallback.objectory import (
-        OBJECT_TARGET,
-        AbstractFactory,
-        full_object_name,
-    )
+    from minrecord.utils.fallback.objectory import OBJECT_TARGET, AbstractFactory
 
 
 if TYPE_CHECKING:
@@ -394,8 +390,7 @@ class BaseRecord(ABC, Generic[T], metaclass=AbstractFactory):
 
         ```
         """
-        check_objectory()
-        return {OBJECT_TARGET: full_object_name(self.__class__), "name": self.name}
+        return {OBJECT_TARGET: get_fully_qualified_name(self.__class__), "name": self.name}
 
     @abstractmethod
     def load_state_dict(self, state_dict: dict[str, Any]) -> None:
