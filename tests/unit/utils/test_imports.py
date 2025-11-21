@@ -8,6 +8,7 @@ from minrecord.utils.imports import (
     check_objectory,
     is_objectory_available,
     objectory_available,
+    raise_error_objectory_missing,
 )
 
 
@@ -67,3 +68,8 @@ def test_objectory_available_decorator_without_package() -> None:
             return 42 + n
 
         assert fn(2) is None
+
+
+def test_raise_error_objectory_missing() -> None:
+    with pytest.raises(RuntimeError, match=r"'objectory' package is required but not installed."):
+        raise_error_objectory_missing()
