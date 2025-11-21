@@ -9,23 +9,20 @@ __all__ = [
 ]
 
 import logging
-from abc import ABC, ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, Generic, TypeVar
-from unittest.mock import Mock
 
 from coola.equality.comparators import BaseEqualityComparator
 from coola.equality.handlers import EqualHandler, SameObjectHandler, SameTypeHandler
 from coola.equality.testers import EqualityTester
+from coola.utils.introspection import get_fully_qualified_name
 
-from minrecord.utils.imports import is_objectory_available
+from minrecord.utils.imports import check_objectory, is_objectory_available
 
 if is_objectory_available():
-    import objectory
-    from objectory import AbstractFactory
+    from objectory import OBJECT_TARGET, AbstractFactory
 else:  # pragma: no cover
-    objectory = Mock()
-
-    AbstractFactory = ABCMeta
+    from minrecord.utils.fallback.objectory import OBJECT_TARGET, AbstractFactory
 
 
 if TYPE_CHECKING:
@@ -393,10 +390,7 @@ class BaseRecord(ABC, Generic[T], metaclass=AbstractFactory):
 
         ```
         """
-        return {
-            objectory.OBJECT_TARGET: objectory.utils.full_object_name(self.__class__),
-            "name": self.name,
-        }
+        return {OBJECT_TARGET: get_fully_qualified_name(self.__class__), "name": self.name}
 
     @abstractmethod
     def load_state_dict(self, state_dict: dict[str, Any]) -> None:
@@ -474,6 +468,7 @@ class BaseRecord(ABC, Generic[T], metaclass=AbstractFactory):
 
         ```
         """
+        check_objectory()
         obj = cls.factory(**data["config"])
         obj.load_state_dict(data["state"])
         return obj

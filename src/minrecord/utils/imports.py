@@ -6,9 +6,10 @@ __all__ = [
     "check_objectory",
     "is_objectory_available",
     "objectory_available",
+    "raise_error_objectory_missing",
 ]
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, NoReturn
 
 from coola.utils.imports import decorator_package_available, package_available
 
@@ -55,12 +56,7 @@ def check_objectory() -> None:
     ```
     """
     if not is_objectory_available():
-        msg = (
-            "'objectory' package is required but not installed. "
-            "You can install 'objectory' package with the command:\n\n"
-            "pip install objectory\n"
-        )
-        raise RuntimeError(msg)
+        raise_error_objectory_missing()
 
 
 def objectory_available(fn: Callable[..., Any]) -> Callable[..., Any]:
@@ -88,3 +84,14 @@ def objectory_available(fn: Callable[..., Any]) -> Callable[..., Any]:
     ```
     """
     return decorator_package_available(fn, is_objectory_available)
+
+
+def raise_error_objectory_missing() -> NoReturn:
+    r"""Raise a RuntimeError to indicate the ``objectory`` package is
+    missing."""
+    msg = (
+        "'objectory' package is required but not installed. "
+        "You can install 'objectory' package with the command:\n\n"
+        "pip install objectory\n"
+    )
+    raise RuntimeError(msg)
