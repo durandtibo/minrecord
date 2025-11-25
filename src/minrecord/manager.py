@@ -109,7 +109,7 @@ class RecordManager:
         self._records[key] = record
 
     def get_best_values(self, prefix: str = "", suffix: str = "") -> dict[str, Any]:
-        """Get the best value of each metric.
+        r"""Get the best value of each metric.
 
         This method ignores the metrics with empty record and the
         non-comparable record.
