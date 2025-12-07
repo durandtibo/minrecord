@@ -60,6 +60,17 @@ In particular, it provides functionalities to track the best value, or the most 
 storing a limiting number of values.
 It is possible to customize the library e.g. it is possible to define a new logic to track the best
 value.
+
+### Key Features
+
+- **📊 Track Best Values**: Automatically track the best value seen during training
+- **🔄 Recent History**: Store only recent values to minimize memory usage
+- **✅ Improvement Detection**: Easily check if your model is still improving
+- **🎯 Flexible Comparators**: Define custom logic to determine what "better" means
+- **🗂️ Record Manager**: Organize and manage multiple metrics efficiently
+- **💾 Serialization**: Save and load record states for checkpointing
+- **🚀 Minimal Dependencies**: Lightweight with only essential dependencies
+
 Below is an example to show how to track the best scalar value when the best value is the maximum
 value and when the best value is the minimum value.
 

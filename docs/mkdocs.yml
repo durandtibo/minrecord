@@ -25,9 +25,16 @@ nav:
   - Home: index.md
   - get_started.md
   - quickstart.md
+  - usage_guide.md
+  - faq.md
   - Reference:
       - minrecord: refs/root.md
+      - minrecord.base: refs/base.md
+      - minrecord.comparable: refs/comparable.md
       - minrecord.comparator: refs/comparator.md
+      - minrecord.functional: refs/functional.md
+      - minrecord.generic: refs/generic.md
+      - minrecord.manager: refs/manager.md
       - minrecord.utils: refs/utils.md
   - GitHub: https://github.com/durandtibo/minrecord
 

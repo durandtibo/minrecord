@@ -1,0 +1,3 @@
+# minrecord.comparable
+
+::: minrecord.comparable

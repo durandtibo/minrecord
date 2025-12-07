@@ -294,3 +294,53 @@ class method.
 42
 
 ```
+
+## Record Manager
+
+When working with multiple records, `RecordManager` provides a convenient way to organize and manage them.
+It allows you to add, update, and query multiple records efficiently.
+
+```pycon
+
+>>> from minrecord import RecordManager, MinScalarRecord, MaxScalarRecord
+>>> manager = RecordManager()
+>>> manager.add_record(MinScalarRecord("loss"))
+>>> manager.add_record(MaxScalarRecord("accuracy"))
+>>> manager
+RecordManager(num_records=2)
+
+```
+
+You can update multiple records at once:
+
+```pycon
+
+>>> from minrecord import RecordManager, MinScalarRecord, MaxScalarRecord
+>>> manager = RecordManager()
+>>> manager.add_record(MinScalarRecord("loss"))
+>>> manager.add_record(MaxScalarRecord("accuracy"))
+>>> manager.update({"loss": (0, 1.5), "accuracy": (0, 0.85)})
+>>> manager.update({"loss": (1, 1.3), "accuracy": (1, 0.87)})
+>>> manager.get_record("loss").get_best_value()
+1.3
+>>> manager.get_record("accuracy").get_best_value()
+0.87
+
+```
+
+The manager provides convenient methods to get all best or last values:
+
+```pycon
+
+>>> from minrecord import RecordManager, MinScalarRecord, MaxScalarRecord
+>>> manager = RecordManager()
+>>> manager.add_record(MinScalarRecord("loss"))
+>>> manager.add_record(MaxScalarRecord("accuracy"))
+>>> manager.update({"loss": (0, 1.5), "accuracy": (0, 0.85)})
+>>> manager.update({"loss": (1, 1.3), "accuracy": (1, 0.87)})
+>>> manager.get_best_values()
+{'loss': 1.3, 'accuracy': 0.87}
+>>> manager.get_last_values()
+{'loss': 1.3, 'accuracy': 0.87}
+
+```

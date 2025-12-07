@@ -60,6 +60,17 @@ In particular, it provides functionalities to track the best value, or the most 
 storing a limiting number of values.
 It is possible to customize the library e.g. it is possible to define a new logic to track the best
 value.
+
+### Key Features
+
+- **📊 Track Best Values**: Automatically track the best value seen during training
+- **🔄 Recent History**: Store only recent values to minimize memory usage
+- **✅ Improvement Detection**: Easily check if your model is still improving
+- **🎯 Flexible Comparators**: Define custom logic to determine what "better" means
+- **🗂️ Record Manager**: Organize and manage multiple metrics efficiently
+- **💾 Serialization**: Save and load record states for checkpointing
+- **🚀 Minimal Dependencies**: Lightweight with only essential dependencies
+
 Below is an example to show how to track the best scalar value when the best value is the maximum
 value and when the best value is the minimum value.
 
@@ -118,6 +129,15 @@ The following is the corresponding `minrecord` versions and tested dependencies.
 | `0.0.1`     | `>=0.7,<1.0`   | `>=0.1,<1.0`             | `>=3.9,<3.13` |
 
 <sup>*</sup> indicates an optional dependency
+
+## Examples
+
+Check out the [examples](examples/) directory for practical usage examples:
+
+- **basic_usage.py**: Basic record operations and value tracking
+- **tracking_metrics.py**: Tracking ML training metrics (loss, accuracy)
+- **record_manager_example.py**: Managing multiple records with RecordManager
+- **custom_comparator.py**: Creating custom comparators for specialized use cases
 
 ## Contributing
 

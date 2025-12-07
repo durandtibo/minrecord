@@ -30,23 +30,28 @@ pip install minrecord numpy
 ## Installing from source
 
 To install `minrecord` from source, you can follow the steps below. First, you will need to
-install [`poetry`](https://python-poetry.org/docs/master/). `poetry` is used to manage and install
+install [`uv`](https://docs.astral.sh/uv/). `uv` is used to manage and install
 the dependencies.
-If `poetry` is already installed on your machine, you can skip this step. There are several ways to
-install `poetry` so you can use the one that you prefer. You can check the `poetry` installation by
-running the following command:
+If `uv` is already installed on your machine, you can skip this step. You can install `uv` by running:
 
 ```shell
-poetry --version
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+You can check the `uv` installation by running the following command:
+
+```shell
+uv --version
 ```
 
 Then, you can clone the git repository:
 
 ```shell
 git clone git@github.com:durandtibo/minrecord.git
+cd minrecord
 ```
 
-It is recommended to create a Python 3.9+ virtual environment. This step is optional so you
+It is recommended to create a Python 3.10+ virtual environment. This step is optional so you
 can skip it. To create a virtual environment, you can use the following command:
 
 ```shell
@@ -60,7 +65,14 @@ can activate it with the following command:
 conda activate minrecord
 ```
 
-This example uses `conda` to create a virtual environment, but you can use other tools or
+Alternatively, you can use `uv` to create a virtual environment:
+
+```shell
+make setup-venv
+source .venv/bin/activate
+```
+
+This example uses `conda` or `uv` to create a virtual environment, but you can use other tools or
 configurations. Then, you should install the required package to use `minrecord` with the following
 command:
 
