@@ -90,6 +90,16 @@ value and when the best value is the minimum value.
 
 ```
 
+## Documentation
+
+- **[Get Started](get_started.md)**: Installation instructions
+- **[Quickstart](quickstart.md)**: Quick overview of the main features
+- **[Usage Guide](usage_guide.md)**: Detailed patterns and best practices
+- **[FAQ](faq.md)**: Frequently asked questions and troubleshooting
+- **[Migration Guide](migration_guide.md)**: Guide for upgrading between versions
+- **[Examples](https://github.com/durandtibo/minrecord/tree/main/examples)**: Complete working examples
+- **[API Reference](refs/root.md)**: Detailed API documentation
+
 ## API stability
 
 :warning: While `minrecord` is in development stage, no API is guaranteed to be stable from one

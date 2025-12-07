@@ -272,4 +272,13 @@ assert record1.equal(record2)
 
 - [Quickstart Guide](quickstart.md) for basic usage
 - [Examples](https://github.com/durandtibo/minrecord/tree/main/examples) for complete working examples
-- [API Reference](refs/root.md) for detailed API documentation
+- [FAQ](faq.md) for common questions and troubleshooting
+- [Migration Guide](migration_guide.md) for upgrading between versions
+- API Reference:
+  - [minrecord](refs/root.md) - Main package
+  - [minrecord.base](refs/base.md) - Base classes and exceptions
+  - [minrecord.comparable](refs/comparable.md) - Comparable record implementations
+  - [minrecord.comparator](refs/comparator.md) - Comparator classes
+  - [minrecord.functional](refs/functional.md) - Utility functions
+  - [minrecord.generic](refs/generic.md) - Generic record implementation
+  - [minrecord.manager](refs/manager.md) - Record manager
