@@ -81,13 +81,11 @@ manager.add_record(MinScalarRecord("val/loss"))
 manager.add_record(MaxScalarRecord("train/accuracy"))
 manager.add_record(MaxScalarRecord("val/accuracy"))
 
-# Update all at once
-manager.update({
-    "train/loss": (epoch, train_loss),
-    "val/loss": (epoch, val_loss),
-    "train/accuracy": (epoch, train_acc),
-    "val/accuracy": (epoch, val_acc),
-})
+# Add values to each record
+manager.get_record("train/loss").add_value(train_loss, step=epoch)
+manager.get_record("val/loss").add_value(val_loss, step=epoch)
+manager.get_record("train/accuracy").add_value(train_acc, step=epoch)
+manager.get_record("val/accuracy").add_value(val_acc, step=epoch)
 
 # Get best values for logging
 best_values = manager.get_best_values()
@@ -205,7 +203,9 @@ manager = RecordManager()
 
 for epoch in range(epochs):
     # Training...
-    manager.update({...})
+    # Add values to records
+    for name, value in metrics.items():
+        manager.get_record(name).add_value(value, step=epoch)
     
     # Log to wandb
     wandb.log({

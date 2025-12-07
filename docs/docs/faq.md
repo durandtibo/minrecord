@@ -238,10 +238,12 @@ manager = RecordManager()
 
 for epoch in range(epochs):
     # Training...
-    manager.update({...})
+    # Add values to records
+    for name, value in metrics.items():
+        manager.get_record(name).add_value(value, step=epoch)
     
     # Log to TensorBoard
-    for name in manager.get_record_names():
+    for name in manager.get_records().keys():
         record = manager.get_record(name)
         if not record.is_empty():
             writer.add_scalar(name, record.get_last_value(), epoch)
@@ -258,7 +260,9 @@ manager = RecordManager()
 
 for epoch in range(epochs):
     # Training...
-    manager.update({...})
+    # Add values to records
+    for name, value in metrics.items():
+        manager.get_record(name).add_value(value, step=epoch)
     
     wandb.log({
         "epoch": epoch,
@@ -317,13 +321,16 @@ last_values = manager.get_last_values()  # All non-empty records
 best_values = manager.get_best_values()  # Only comparable records
 ```
 
-### Record manager updates fail silently
+### Record not found errors
 
 Check that record names match exactly:
 
 ```python
 manager.add_record(MinScalarRecord("train/loss"))  # Note the "/"
-manager.update({"train_loss": (0, 1.5)})  # Wrong! Use "train/loss"
+# Wrong name:
+manager.get_record("train_loss").add_value(1.5, step=0)  # KeyError if not auto-created
+# Correct:
+manager.get_record("train/loss").add_value(1.5, step=0)
 ```
 
 ## Need More Help?

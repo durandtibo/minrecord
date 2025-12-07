@@ -22,15 +22,11 @@ print(f"Manager has {len(manager)} records\n")
 # Simulate training
 print("Simulating training for 5 epochs...\n")
 for epoch in range(5):
-    # Update multiple records at once
-    manager.update(
-        {
-            "train/loss": (epoch, 2.0 - epoch * 0.3),
-            "val/loss": (epoch, 2.2 - epoch * 0.25),
-            "train/accuracy": (epoch, 0.5 + epoch * 0.08),
-            "val/accuracy": (epoch, 0.48 + epoch * 0.07),
-        }
-    )
+    # Add values to each record
+    manager.get_record("train/loss").add_value(2.0 - epoch * 0.3, step=epoch)
+    manager.get_record("val/loss").add_value(2.2 - epoch * 0.25, step=epoch)
+    manager.get_record("train/accuracy").add_value(0.5 + epoch * 0.08, step=epoch)
+    manager.get_record("val/accuracy").add_value(0.48 + epoch * 0.07, step=epoch)
     
     print(f"Epoch {epoch}:")
     print(f"  Train Loss: {manager.get_record('train/loss').get_last_value():.3f}")
@@ -41,7 +37,7 @@ for epoch in range(5):
 
 # Get all record names
 print("All records in manager:")
-for name in manager.get_record_names():
+for name in manager.get_records().keys():
     print(f"  - {name}")
 print()
 
@@ -63,24 +59,24 @@ print(f"Auto-created record: {test_loss}")
 print(f"Manager now has {len(manager)} records")
 print()
 
-# Remove a record
-manager.remove_record("test/loss")
-print(f"After removing test/loss, manager has {len(manager)} records")
+# Get all records
+print("Getting all records...")
+all_records = manager.get_records()
+print(f"Total records: {len(all_records)}")
+for name, record in all_records.items():
+    print(f"  {name}: {record.__class__.__name__}")
 print()
 
-# Clone the manager
-print("Cloning manager...")
-manager_clone = manager.clone()
-print(f"Clone has {len(manager_clone)} records")
-print(f"Original and clone are equal: {manager.equal(manager_clone)}")
-print()
-
-# Load and save state
-print("Saving and loading manager state...")
+# Save and load state
+print("Saving manager state...")
 state = manager.state_dict()
-print(f"State has {len(state['records'])} records")
+print(f"State dictionary has {len(state)} record entries")
+print(f"Example state keys: {list(state.keys())[:3]}")
+print()
 
-new_manager = RecordManager()
-new_manager.load_state_dict(state)
-print(f"New manager loaded with {len(new_manager)} records")
-print(f"Managers are equal: {manager.equal(new_manager)}")
+# You can save this state to disk and restore it later
+# import pickle
+# with open("manager_state.pkl", "wb") as f:
+#     pickle.dump(state, f)
+
+print("Manager state can be saved and restored for checkpointing!")

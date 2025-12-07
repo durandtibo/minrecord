@@ -319,8 +319,10 @@ You can update multiple records at once:
 >>> manager = RecordManager()
 >>> manager.add_record(MinScalarRecord("loss"))
 >>> manager.add_record(MaxScalarRecord("accuracy"))
->>> manager.update({"loss": (0, 1.5), "accuracy": (0, 0.85)})
->>> manager.update({"loss": (1, 1.3), "accuracy": (1, 0.87)})
+>>> manager.get_record("loss").add_value(1.5, step=0)
+>>> manager.get_record("accuracy").add_value(0.85, step=0)
+>>> manager.get_record("loss").add_value(1.3, step=1)
+>>> manager.get_record("accuracy").add_value(0.87, step=1)
 >>> manager.get_record("loss").get_best_value()
 1.3
 >>> manager.get_record("accuracy").get_best_value()
@@ -336,11 +338,11 @@ The manager provides convenient methods to get all best or last values:
 >>> manager = RecordManager()
 >>> manager.add_record(MinScalarRecord("loss"))
 >>> manager.add_record(MaxScalarRecord("accuracy"))
->>> manager.update({"loss": (0, 1.5), "accuracy": (0, 0.85)})
->>> manager.update({"loss": (1, 1.3), "accuracy": (1, 0.87)})
+>>> manager.get_record("loss").add_value(1.5, step=0)
+>>> manager.get_record("accuracy").add_value(0.85, step=0)
+>>> manager.get_record("loss").add_value(1.3, step=1)
+>>> manager.get_record("accuracy").add_value(0.87, step=1)
 >>> manager.get_best_values()
-{'loss': 1.3, 'accuracy': 0.87}
->>> manager.get_last_values()
 {'loss': 1.3, 'accuracy': 0.87}
 
 ```

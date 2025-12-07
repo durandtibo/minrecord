@@ -44,11 +44,9 @@ manager = RecordManager()
 manager.add_record(MinScalarRecord("loss"))
 manager.add_record(MaxScalarRecord("accuracy"))
 
-# Batch updates
-manager.update({
-    "loss": (epoch, loss_value),
-    "accuracy": (epoch, acc_value),
-})
+# Add values to records
+manager.get_record("loss").add_value(loss_value, step=epoch)
+manager.get_record("accuracy").add_value(acc_value, step=epoch)
 ```
 
 #### Configuration Functions
