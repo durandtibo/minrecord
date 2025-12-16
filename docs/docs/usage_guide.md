@@ -65,7 +65,7 @@ for epoch in range(num_epochs):
     # Training...
     train_loss.add_value(epoch_loss, step=epoch)
     val_accuracy.add_value(epoch_acc, step=epoch)
-    
+
     if val_accuracy.has_improved():
         save_checkpoint(model, "best_model.pt")
 ```
@@ -103,13 +103,13 @@ no_improvement_count = 0
 for epoch in range(num_epochs):
     # Training...
     val_loss.add_value(epoch_val_loss, step=epoch)
-    
+
     if val_loss.has_improved():
         no_improvement_count = 0
         save_checkpoint(model, "best_model.pt")
     else:
         no_improvement_count += 1
-    
+
     if no_improvement_count >= patience:
         print(f"Early stopping at epoch {epoch}")
         break
@@ -123,20 +123,24 @@ For specialized metrics, create custom comparators:
 from minrecord import ComparableRecord
 from minrecord.comparator import BaseComparator
 
+
 class F1Comparator(BaseComparator[tuple[float, float]]):
     """Maximize F1 score from precision and recall."""
-    
+
     def equal(self, other: object) -> bool:
         return isinstance(other, self.__class__)
-    
+
     def get_initial_best_value(self) -> tuple[float, float]:
         return (0.0, 0.0)
-    
-    def is_better(self, old_value: tuple[float, float], 
-                  new_value: tuple[float, float]) -> bool:
+
+    def is_better(
+        self, old_value: tuple[float, float], new_value: tuple[float, float]
+    ) -> bool:
         def f1(p, r):
             return 2 * p * r / (p + r) if (p + r) > 0 else 0
+
         return f1(*new_value) > f1(*old_value)
+
 
 record = ComparableRecord("f1_components", F1Comparator())
 record.add_value((precision, recall))
@@ -180,14 +184,14 @@ for epoch in range(epochs):
     for batch in train_loader:
         loss = train_step(model, batch)
         epoch_loss += loss.item()
-    
+
     train_loss.add_value(epoch_loss / len(train_loader), step=epoch)
-    
+
     model.eval()
     with torch.no_grad():
         acc = evaluate(model, val_loader)
     val_accuracy.add_value(acc, step=epoch)
-    
+
     if val_accuracy.has_improved():
         torch.save(model.state_dict(), "best_model.pt")
 ```
@@ -206,13 +210,15 @@ for epoch in range(epochs):
     # Add values to records
     for name, value in metrics.items():
         manager.get_record(name).add_value(value, step=epoch)
-    
+
     # Log to wandb
-    wandb.log({
-        "epoch": epoch,
-        **manager.get_last_values(prefix="current/"),
-        **manager.get_best_values(prefix="best/"),
-    })
+    wandb.log(
+        {
+            "epoch": epoch,
+            **manager.get_last_values(prefix="current/"),
+            **manager.get_best_values(prefix="best/"),
+        }
+    )
 ```
 
 ## State Management
@@ -249,7 +255,7 @@ record = MinScalarRecord("loss")
 record.add_value(1.5)
 record.add_value(1.3)
 print(f"Has improved: {record.has_improved()}")  # True
-print(f"Best value: {record.get_best_value()}")   # 1.3
+print(f"Best value: {record.get_best_value()}")  # 1.3
 ```
 
 ### Inspect recent history

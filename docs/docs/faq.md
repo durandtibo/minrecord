@@ -4,14 +4,17 @@
 
 ### What is minrecord?
 
-`minrecord` is a minimalist Python library designed to record and track values in machine learning workflows. It helps you track the best values, monitor recent metrics, and determine if your models are improving.
+`minrecord` is a minimalist Python library designed to record and track values in machine learning
+workflows. It helps you track the best values, monitor recent metrics, and determine if your models
+are improving.
 
 ### Why use minrecord instead of storing values in a list?
 
 While you can use a list, `minrecord` provides:
 
 - **Memory efficiency**: Only stores recent values (configurable)
-- **Best value tracking**: Automatically tracks the best value even if it's no longer in the recent history
+- **Best value tracking**: Automatically tracks the best value even if it's no longer in the recent
+  history
 - **Improvement detection**: Easy to check if the latest value improved
 - **Structured management**: RecordManager helps organize multiple metrics
 - **Serialization**: Built-in support for saving/loading state
@@ -40,11 +43,12 @@ pip install minrecord[all]
 
 ### What Python versions are supported?
 
-Python 3.10, 3.11, 3.12, 3.13, and 3.14 are officially supported.
+Python 3.10 and higher are officially supported.
 
 ### Do I need PyTorch or other ML frameworks?
 
-No, `minrecord` has minimal dependencies. It only requires `coola` (for equality testing).
+No, `minrecord` has minimal dependencies. It only requires `coola`, which is used for equality
+testing.
 
 ## Usage Questions
 
@@ -52,9 +56,9 @@ No, `minrecord` has minimal dependencies. It only requires `coola` (for equality
 
 - **Use `Record`** when you only need to track recent values
 - **Use `ComparableRecord`/`MinScalarRecord`/`MaxScalarRecord`** when you need to:
-  - Track the best value
-  - Check if values are improving
-  - Implement early stopping
+    - Track the best value
+    - Check if values are improving
+    - Implement early stopping
 
 ### How do I choose max_size?
 
@@ -75,11 +79,13 @@ No, `max_size` is fixed at creation. If you need to change it:
 
 ### What happens when the record is full?
 
-The oldest value is automatically removed when adding a new value. The record uses a `deque` internally with a fixed maximum length.
+The oldest value is automatically removed when adding a new value. The record uses a `deque`
+internally with a fixed maximum length.
 
 ### Why does ComparableRecord constructor behave differently?
 
-If you pass `elements` to `ComparableRecord`, you must also pass `best_value` and `improved` to maintain correctness. This is because the best value might not be in the recent history.
+If you pass `elements` to `ComparableRecord`, you must also pass `best_value` and `improved` to
+maintain correctness. This is because the best value might not be in the recent history.
 
 **Recommended approach:**
 
@@ -99,7 +105,8 @@ record = MinScalarRecord("loss", elements=[(0, 1.5), (1, 1.3)])  # ⚠️
 
 ### How does has_improved() work?
 
-`has_improved()` returns `True` if the last added value is equal to or better than the best value seen so far.
+`has_improved()` returns `True` if the last added value is equal to or better than the best value
+seen so far.
 
 ```python
 record = MinScalarRecord("loss")
@@ -115,7 +122,8 @@ record.has_improved()  # False (1.4 > 1.3)
 
 ### Why does has_improved() return True for equal values?
 
-By design, equal values are considered improvements. This is useful when a metric plateaus at the optimal value.
+By design, equal values are considered improvements. This is useful when a metric plateaus at the
+optimal value.
 
 ### Can I create custom comparators?
 
@@ -124,13 +132,14 @@ Yes! Implement `BaseComparator`:
 ```python
 from minrecord.comparator import BaseComparator
 
+
 class MyComparator(BaseComparator[float]):
     def equal(self, other: object) -> bool:
         return isinstance(other, self.__class__)
-    
+
     def get_initial_best_value(self) -> float:
         return 0.0  # Starting point
-    
+
     def is_better(self, old_value: float, new_value: float) -> bool:
         # Define your comparison logic
         return new_value > old_value
@@ -241,7 +250,7 @@ for epoch in range(epochs):
     # Add values to records
     for name, value in metrics.items():
         manager.get_record(name).add_value(value, step=epoch)
-    
+
     # Log to TensorBoard
     for name in manager.get_records().keys():
         record = manager.get_record(name)
@@ -263,12 +272,14 @@ for epoch in range(epochs):
     # Add values to records
     for name, value in metrics.items():
         manager.get_record(name).add_value(value, step=epoch)
-    
-    wandb.log({
-        "epoch": epoch,
-        **manager.get_last_values(prefix="train/"),
-        **manager.get_best_values(prefix="best/"),
-    })
+
+    wandb.log(
+        {
+            "epoch": epoch,
+            **manager.get_last_values(prefix="train/"),
+            **manager.get_best_values(prefix="best/"),
+        }
+    )
 ```
 
 ### Does minrecord work with PyTorch Lightning?
@@ -279,15 +290,16 @@ Yes! Use records in your LightningModule:
 import pytorch_lightning as pl
 from minrecord import MinScalarRecord
 
+
 class MyModel(pl.LightningModule):
     def __init__(self):
         super().__init__()
         self.val_loss = MinScalarRecord("val_loss")
-    
+
     def validation_epoch_end(self, outputs):
-        avg_loss = torch.stack([x['loss'] for x in outputs]).mean()
+        avg_loss = torch.stack([x["loss"] for x in outputs]).mean()
         self.val_loss.add_value(avg_loss.item(), step=self.current_epoch)
-        
+
         if self.val_loss.has_improved():
             self.save_checkpoint("best_model.ckpt")
 ```
