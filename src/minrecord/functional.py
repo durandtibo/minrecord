@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
 
 def get_best_values(
-    records: Mapping[str, BaseRecord], prefix: str = "", suffix: str = ""
+    records: Mapping[str, BaseRecord[Any]], prefix: str = "", suffix: str = ""
 ) -> dict[str, Any]:
     r"""Get the best value of each record.
 
@@ -65,7 +65,7 @@ def get_best_values(
 
 
 def get_last_values(
-    records: Mapping[str, BaseRecord], prefix: str = "", suffix: str = ""
+    records: Mapping[str, BaseRecord[Any]], prefix: str = "", suffix: str = ""
 ) -> dict[str, Any]:
     r"""Get the last value of each record.
 

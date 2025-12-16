@@ -14,7 +14,7 @@ from minrecord.base import BaseRecord
 from minrecord.functional import get_best_values
 from minrecord.generic import Record
 
-logger = logging.getLogger(__name__)
+logger: logging.Logger = logging.getLogger(__name__)
 
 
 class RecordManager:
@@ -42,7 +42,7 @@ class RecordManager:
     ```
     """
 
-    def __init__(self, records: dict[str, BaseRecord] | None = None) -> None:
+    def __init__(self, records: dict[str, BaseRecord[Any]] | None = None) -> None:
         self._records = records or {}
 
     def __len__(self) -> int:
@@ -61,7 +61,7 @@ class RecordManager:
         return f"{self.__class__.__qualname__}()"
 
     def add_record(
-        self, record: BaseRecord, key: str | None = None, exist_ok: bool = False
+        self, record: BaseRecord[Any], key: str | None = None, exist_ok: bool = False
     ) -> None:
         r"""Add a record to the manager.
 
@@ -148,7 +148,7 @@ class RecordManager:
         """
         return get_best_values(self._records, prefix=prefix, suffix=suffix)
 
-    def get_record(self, key: str) -> BaseRecord:
+    def get_record(self, key: str) -> BaseRecord[Any]:
         r"""Get the record associated to a key.
 
         Args:
@@ -177,7 +177,7 @@ class RecordManager:
             self._records[key] = Record(name=key)
         return self._records[key]
 
-    def get_records(self) -> dict[str, BaseRecord]:
+    def get_records(self) -> dict[str, BaseRecord[Any]]:
         r"""Get all the records.
 
         Returns:
@@ -222,7 +222,7 @@ class RecordManager:
         """
         return key in self._records
 
-    def load_state_dict(self, state_dict: dict) -> None:
+    def load_state_dict(self, state_dict: dict[str, Any]) -> None:
         r"""Load the state values from a dict.
 
         Args:
@@ -247,7 +247,7 @@ class RecordManager:
             else:
                 self._records[key] = BaseRecord.from_dict(state)
 
-    def state_dict(self) -> dict:
+    def state_dict(self) -> dict[str, Any]:
         r"""Return a dictionary containing state values of all the
         records.
 

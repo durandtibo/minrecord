@@ -22,7 +22,7 @@ if TYPE_CHECKING:
 
 T = TypeVar("T")
 
-logger = logging.getLogger(__name__)
+logger: logging.Logger = logging.getLogger(__name__)
 
 
 class BaseComparator(ABC, Generic[T]):
@@ -183,7 +183,7 @@ class ComparatorEqualityComparator(BaseEqualityComparator[BaseComparator]):  # n
     def clone(self) -> ComparatorEqualityComparator:
         return self.__class__()
 
-    def equal(self, actual: BaseComparator, expected: Any, config: EqualityConfig) -> bool:
+    def equal(self, actual: BaseComparator[Any], expected: Any, config: EqualityConfig) -> bool:
         return self._handler.handle(actual, expected, config=config)
 
 

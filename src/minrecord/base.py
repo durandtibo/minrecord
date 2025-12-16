@@ -32,7 +32,7 @@ if TYPE_CHECKING:
 
 T = TypeVar("T")
 
-logger = logging.getLogger(__name__)
+logger: logging.Logger = logging.getLogger(__name__)
 
 
 class BaseRecord(ABC, Generic[T], metaclass=AbstractFactory):
@@ -110,7 +110,7 @@ class BaseRecord(ABC, Generic[T], metaclass=AbstractFactory):
         """
 
     @abstractmethod
-    def clone(self) -> BaseRecord:
+    def clone(self) -> BaseRecord[T]:
         r"""Clone the current record.
 
         Returns:
@@ -435,7 +435,7 @@ class BaseRecord(ABC, Generic[T], metaclass=AbstractFactory):
         """
 
     @classmethod
-    def from_dict(cls, data: dict) -> BaseRecord:
+    def from_dict(cls, data: dict[str, Any]) -> BaseRecord[T]:
         r"""Instantiate a record from a dictionary.
 
         Args:
@@ -522,7 +522,7 @@ class RecordEqualityComparator(BaseEqualityComparator[BaseRecord]):  # noqa: PLW
     def clone(self) -> RecordEqualityComparator:
         return self.__class__()
 
-    def equal(self, actual: BaseRecord, expected: Any, config: EqualityConfig) -> bool:
+    def equal(self, actual: BaseRecord[Any], expected: Any, config: EqualityConfig) -> bool:
         return self._handler.handle(actual, expected, config=config)
 
 

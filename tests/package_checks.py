@@ -7,7 +7,7 @@ from coola import objects_are_equal
 
 from minrecord import Record
 
-logger = logging.getLogger(__name__)
+logger: logging.Logger = logging.getLogger(__name__)
 
 
 def check_imports() -> None:

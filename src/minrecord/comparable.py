@@ -96,7 +96,7 @@ class ComparableRecord(Record[T]):
             self._best_value = value
         super().add_value(value, step)
 
-    def clone(self) -> ComparableRecord:
+    def clone(self) -> ComparableRecord[T]:
         return self.__class__(
             name=self.name,
             elements=self._record,
