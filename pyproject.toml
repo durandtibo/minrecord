@@ -274,3 +274,8 @@ max-doc-length = 72
 force-sort-within-sections = true
 combine-as-imports = true
 known-first-party = ["src"]
+
+[tool.pyright]
+include = ["src"]
+venvPath = "."
+venv = ".venv"
