@@ -307,7 +307,10 @@ It allows you to add, update, and query multiple records efficiently.
 >>> manager.add_record(MinScalarRecord("loss"))
 >>> manager.add_record(MaxScalarRecord("accuracy"))
 >>> manager
-RecordManager(num_records=2)
+RecordManager(
+  (loss): MinScalarRecord(name=loss, max_size=10, size=0)
+  (accuracy): MaxScalarRecord(name=accuracy, max_size=10, size=0)
+)
 
 ```
 
