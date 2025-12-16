@@ -130,15 +130,6 @@ The following is the corresponding `minrecord` versions and tested dependencies.
 
 <sup>*</sup> indicates an optional dependency
 
-## Examples
-
-Check out the [examples](examples/) directory for practical usage examples:
-
-- **basic_usage.py**: Basic record operations and value tracking
-- **tracking_metrics.py**: Tracking ML training metrics (loss, accuracy)
-- **record_manager_example.py**: Managing multiple records with RecordManager
-- **custom_comparator.py**: Creating custom comparators for specialized use cases
-
 ## Contributing
 
 Please check the instructions in [CONTRIBUTING.md](.github/CONTRIBUTING.md).
