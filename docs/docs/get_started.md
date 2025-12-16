@@ -4,19 +4,27 @@ It is highly recommended to install in
 a [virtual environment](https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/)
 to keep your system in order.
 
-## Installing with `pip` (recommended)
+## Installing with `pip` or `uv pip` (recommended)
 
 The following command installs the latest version of the library:
 
 ```shell
+# pip
 pip install minrecord
+
+# uv
+uv pip install minrecord
 ```
 
 To make the package as slim as possible, only the packages required to use `minrecord` are installed.
 It is possible to install all the optional dependencies by running the following command:
 
 ```shell
+# pip
 pip install 'minrecord[all]'
+
+# uv
+uv pip install 'minrecord[all]'
 ```
 
 This command also installed NumPy and PyTorch.
@@ -52,32 +60,19 @@ cd minrecord
 ```
 
 It is recommended to create a Python 3.10+ virtual environment. This step is optional so you
-can skip it. To create a virtual environment, you can use the following command:
-
-```shell
-make conda
-```
-
-It automatically creates a conda virtual environment. When the virtual environment is created, you
-can activate it with the following command:
-
-```shell
-conda activate minrecord
-```
-
-Alternatively, you can use `uv` to create a virtual environment:
+can skip it. You can use `uv` to create a virtual environment:
 
 ```shell
 make setup-venv
 source .venv/bin/activate
 ```
 
-This example uses `conda` or `uv` to create a virtual environment, but you can use other tools or
+This example uses `uv` to create a virtual environment, but you can use other tools or
 configurations. Then, you should install the required package to use `minrecord` with the following
 command:
 
 ```shell
-make install
+inv install
 ```
 
 This command will install all the required packages. You can also use this command to update the
@@ -85,5 +80,5 @@ required packages. This command will check if there is a more recent package ava
 install it. Finally, you can test the installation with the following command:
 
 ```shell
-make unit-test-cov
+inv unit-test --cov
 ```

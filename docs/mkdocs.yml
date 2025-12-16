@@ -27,7 +27,6 @@ nav:
   - quickstart.md
   - usage_guide.md
   - faq.md
-  - migration_guide.md
   - Reference:
       - minrecord: refs/root.md
       - minrecord.base: refs/base.md
