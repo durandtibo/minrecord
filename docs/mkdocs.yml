@@ -24,9 +24,10 @@ theme:
 nav:
   - Home: index.md
   - get_started.md
-  - quickstart.md
-  - usage_guide.md
-  - faq.md
+  - User Guide:
+      - quickstart.md
+      - usage_guide.md
+      - faq.md
   - Reference:
       - minrecord: refs/root.md
       - minrecord.base: refs/base.md
