@@ -1,0 +1,3 @@
+# minrecord.functional
+
+::: minrecord.functional

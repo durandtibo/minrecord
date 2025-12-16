@@ -1,0 +1,3 @@
+# minrecord.base
+
+::: minrecord.base

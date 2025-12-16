@@ -294,3 +294,67 @@ class method.
 42
 
 ```
+
+## Record Manager
+
+When working with multiple records, `RecordManager` provides a convenient way to organize and manage them.
+It allows you to add, update, and query multiple records efficiently.
+
+```pycon
+
+>>> from minrecord import RecordManager, MinScalarRecord, MaxScalarRecord
+>>> manager = RecordManager()
+>>> manager.add_record(MinScalarRecord("loss"))
+>>> manager.add_record(MaxScalarRecord("accuracy"))
+>>> manager
+RecordManager(
+  (loss): MinScalarRecord(name=loss, max_size=10, size=0)
+  (accuracy): MaxScalarRecord(name=accuracy, max_size=10, size=0)
+)
+
+```
+
+You can update multiple records at once:
+
+```pycon
+
+>>> from minrecord import RecordManager, MinScalarRecord, MaxScalarRecord
+>>> manager = RecordManager()
+>>> manager.add_record(MinScalarRecord("loss"))
+>>> manager.add_record(MaxScalarRecord("accuracy"))
+>>> manager.get_record("loss").add_value(1.5, step=0)
+>>> manager.get_record("accuracy").add_value(0.85, step=0)
+>>> manager.get_record("loss").add_value(1.3, step=1)
+>>> manager.get_record("accuracy").add_value(0.87, step=1)
+>>> manager.get_record("loss").get_best_value()
+1.3
+>>> manager.get_record("accuracy").get_best_value()
+0.87
+
+```
+
+The manager provides convenient methods to get all best or last values:
+
+```pycon
+
+>>> from minrecord import RecordManager, MinScalarRecord, MaxScalarRecord
+>>> manager = RecordManager()
+>>> manager.add_record(MinScalarRecord("loss"))
+>>> manager.add_record(MaxScalarRecord("accuracy"))
+>>> manager.get_record("loss").add_value(1.5, step=0)
+>>> manager.get_record("accuracy").add_value(0.85, step=0)
+>>> manager.get_record("loss").add_value(1.3, step=1)
+>>> manager.get_record("accuracy").add_value(0.87, step=1)
+>>> manager.get_best_values()
+{'loss': 1.3, 'accuracy': 0.87}
+
+```
+
+## Next Steps
+
+Now that you understand the basics, you can:
+
+- Read the [Usage Guide](usage_guide.md) for detailed patterns and best practices
+- Explore [Examples](https://github.com/durandtibo/minrecord/tree/main/examples) for complete working code
+- Check the [FAQ](faq.md) for common questions and troubleshooting
+- Browse the [API Reference](refs/root.md) for detailed documentation

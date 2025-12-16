@@ -37,7 +37,7 @@ class ComparableRecord(Record[T]):
         comparator: The comparator to use to find the best value.
         elements: The initial elements. Each element is a tuple with
             the step and its associated value.
-        max_size: The maximum number of elements to store inthe record.
+        max_size: The maximum number of elements to store in the record.
         best_value: The initial best value. If ``None``, the initial
             best value of the ``comparator`` is used.
         improved: Indicate if the last value is the best value or not.

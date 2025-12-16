@@ -60,6 +60,17 @@ In particular, it provides functionalities to track the best value, or the most 
 storing a limiting number of values.
 It is possible to customize the library e.g. it is possible to define a new logic to track the best
 value.
+
+### Key Features
+
+- **📊 Track Best Values**: Automatically track the best value seen during training
+- **🔄 Recent History**: Store only recent values to minimize memory usage
+- **✅ Improvement Detection**: Easily check if your model is still improving
+- **🎯 Flexible Comparators**: Define custom logic to determine what "better" means
+- **🗂️ Record Manager**: Organize and manage multiple metrics efficiently
+- **💾 Serialization**: Save and load record states for checkpointing
+- **🚀 Minimal Dependencies**: Lightweight with only essential dependencies
+
 Below is an example to show how to track the best scalar value when the best value is the maximum
 value and when the best value is the minimum value.
 
@@ -78,6 +89,16 @@ value and when the best value is the minimum value.
 42
 
 ```
+
+## Documentation
+
+- **[Get Started](get_started.md)**: Installation instructions
+- **[Quickstart](quickstart.md)**: Quick overview of the main features
+- **[Usage Guide](usage_guide.md)**: Detailed patterns and best practices
+- **[FAQ](faq.md)**: Frequently asked questions and troubleshooting
+- **[Migration Guide](migration_guide.md)**: Guide for upgrading between versions
+- **[Examples](https://github.com/durandtibo/minrecord/tree/main/examples)**: Complete working examples
+- **[API Reference](refs/root.md)**: Detailed API documentation
 
 ## API stability
 

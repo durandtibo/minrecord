@@ -1,0 +1,3 @@
+# minrecord.generic
+
+::: minrecord.generic

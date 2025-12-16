@@ -1,0 +1,3 @@
+# minrecord.manager
+
+::: minrecord.manager
