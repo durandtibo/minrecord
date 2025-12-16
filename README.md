@@ -1,24 +1,24 @@
 # minrecord
 
 <p align="center">
-    <a href="https://github.com/durandtibo/minrecord/actions">
-        <img alt="CI" src="https://github.com/durandtibo/minrecord/workflows/CI/badge.svg">
+    <a href="https://github.com/durandtibo/minrecord/actions/workflows/ci.yaml">
+        <img alt="CI" src="https://github.com/durandtibo/minrecord/actions/workflows/ci.yaml/badge.svg">
     </a>
-    <a href="https://github.com/durandtibo/minrecord/actions">
-        <img alt="Nightly Tests" src="https://github.com/durandtibo/minrecord/workflows/Nightly%20Tests/badge.svg">
+    <a href="https://github.com/durandtibo/minrecord/actions/workflows/nightly-tests.yaml">
+        <img alt="Nightly Tests" src="https://github.com/durandtibo/minrecord/actions/workflows/nightly-tests.yaml/badge.svg">
     </a>
-    <a href="https://github.com/durandtibo/minrecord/actions">
-        <img alt="Nightly Package Tests" src="https://github.com/durandtibo/minrecord/workflows/Nightly%20Package%20Tests/badge.svg">
+    <a href="https://github.com/durandtibo/minrecord/actions/workflows/nightly-package.yaml">
+        <img alt="Nightly Package Tests" src="https://github.com/durandtibo/minrecord/actions/workflows/nightly-package.yaml/badge.svg">
     </a>
     <a href="https://codecov.io/gh/durandtibo/minrecord">
         <img alt="Codecov" src="https://codecov.io/gh/durandtibo/minrecord/branch/main/graph/badge.svg">
     </a>
     <br/>
     <a href="https://durandtibo.github.io/minrecord/">
-        <img alt="Documentation" src="https://github.com/durandtibo/minrecord/workflows/Documentation%20(stable)/badge.svg">
+        <img alt="Documentation" src="https://github.com/durandtibo/minrecord/actions/workflows/docs.yaml/badge.svg">
     </a>
-    <a href="https://durandtibo.github.io/minrecord/">
-        <img alt="Documentation" src="https://github.com/durandtibo/minrecord/workflows/Documentation%20(unstable)/badge.svg">
+    <a href="https://durandtibo.github.io/minrecord/dev/">
+        <img alt="Documentation" src="https://github.com/durandtibo/minrecord/actions/workflows/docs-dev.yaml/badge.svg">
     </a>
     <br/>
     <a href="https://github.com/psf/black">
@@ -123,7 +123,7 @@ The following is the corresponding `minrecord` versions and tested dependencies.
 
 | `minrecord` | `coola`        | `objectory`              | `python`      |
 |-------------|----------------|--------------------------|---------------|
-| `main`      | `>=0.8.4,<1.0` | `>=0.2,<1.0`<sup>*</sup> | `>=3.9,<3.14` |
+| `main`      | `>=0.8.4,<1.0` | `>=0.2,<1.0`<sup>*</sup> | `>=3.10`      |
 | `0.1.0`     | `>=0.8.4,<1.0` | `>=0.2,<1.0`<sup>*</sup> | `>=3.9,<3.14` |
 | `0.0.2`     | `>=0.7.2,<1.0` | `>=0.1,<1.0`<sup>*</sup> | `>=3.9,<3.13` |
 | `0.0.1`     | `>=0.7,<1.0`   | `>=0.1,<1.0`             | `>=3.9,<3.13` |
