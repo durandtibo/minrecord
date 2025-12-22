@@ -170,7 +170,7 @@ class MinScalarComparator(BaseComparator[float]):
         return new_value <= old_value
 
 
-class ComparatorEqualityComparator(BaseEqualityComparator[BaseComparator]):  # noqa: PLW1641
+class ComparatorEqualityComparator(BaseEqualityComparator[BaseComparator[Any]]):  # noqa: PLW1641
     r"""Implement an equality comparator for ``BaseBatch`` objects."""
 
     def __init__(self) -> None:
