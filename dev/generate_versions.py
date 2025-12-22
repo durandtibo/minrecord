@@ -20,7 +20,7 @@ def get_package_versions() -> dict[str, list[str]]:
     """
     return {
         "coola": list(fetch_versions("coola", lower="0.10.0")),
-        "objectory": list(fetch_versions("objectory", lower="0.2.1")),
+        "objectory": list(fetch_versions("objectory", lower="0.3.0")),
     }
 
 
