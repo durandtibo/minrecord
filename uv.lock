@@ -666,7 +666,7 @@ docs = [
 [package.metadata]
 requires-dist = [
     { name = "coola", specifier = ">=0.10.0,<1.0" },
-    { name = "objectory", marker = "extra == 'objectory'", specifier = ">=0.2.1,<1.0" },
+    { name = "objectory", marker = "extra == 'objectory'", specifier = ">=0.3.0,<1.0" },
 ]
 provides-extras = ["objectory"]
 
