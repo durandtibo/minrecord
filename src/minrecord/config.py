@@ -185,7 +185,7 @@ def reset_max_size() -> None:
 
     Example:
         ```pycon
-        >>> from minrecord.config import get_max_size, set_max_size
+        >>> from minrecord.config import get_max_size, set_max_size, reset_max_size
         >>> set_max_size(5)
         >>> get_max_size()
         5

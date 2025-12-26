@@ -22,7 +22,6 @@ __all__ = [
 
 from importlib.metadata import PackageNotFoundError, version
 
-from minrecord._config import get_max_size, set_max_size
 from minrecord.base import BaseRecord, EmptyRecordError, NotAComparableRecordError
 from minrecord.comparable import ComparableRecord, MaxScalarRecord, MinScalarRecord
 from minrecord.comparator import (

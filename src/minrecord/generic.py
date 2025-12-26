@@ -10,8 +10,8 @@ from typing import TYPE_CHECKING, Any, TypeVar
 from coola import objects_are_equal
 from coola.utils import str_indent, str_mapping
 
-from minrecord._config import get_max_size
 from minrecord.base import BaseRecord, EmptyRecordError
+from minrecord.config import get_max_size
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
