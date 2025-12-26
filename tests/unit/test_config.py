@@ -4,6 +4,10 @@ import pytest
 
 from minrecord.config import Config
 
+############################
+#     Tests for Config     #
+############################
+
 
 def test_config_init_default_max_size() -> None:
     """Test that Config initializes with the default max_size."""
