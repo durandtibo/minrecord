@@ -2,7 +2,7 @@ r"""Contain functionalities to configure the records."""
 
 from __future__ import annotations
 
-__all__ = ["Config"]
+__all__ = ["Config", "get_default_config"]
 
 
 class Config:
@@ -94,3 +94,41 @@ class Config:
             ```
         """
         self._max_size = self.DEFAULT_MAX_SIZE
+
+
+def get_default_config() -> Config:
+    r"""Get the default global config instance.
+
+    This function uses a singleton pattern to ensure the same config
+    instance is returned on all calls. The config is created lazily on
+    the first call and cached for subsequent calls.
+
+    Returns:
+        The singleton Config instance.
+
+    Note:
+        Since this returns a singleton, modifications to the config will
+        persist across all calls and affect the entire application. To use
+        an isolated config, create a new Config instance directly with
+        ``Config()``.
+
+    Example:
+        ```pycon
+        >>> from minrecord.config import get_default_config
+        >>> c1 = get_default_config()
+        >>> c1.get_max_size()
+        10
+        >>> c1.set_max_size(5)
+        >>> # The change persists across calls
+        >>> c2 = get_default_config()
+        >>> c2.get_max_size()
+        5
+        >>> c1 is c2  # Same instance
+        True
+
+        ```
+    """
+    if not hasattr(get_default_config, "_config"):
+        config = Config()
+        get_default_config._config = config
+    return get_default_config._config
