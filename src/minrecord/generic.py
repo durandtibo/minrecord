@@ -35,20 +35,18 @@ class Record(BaseRecord[T]):
             tuple with the step and its associated value.
         max_size: The maximum size of the record.
 
-    Example usage:
+    Example:
+        ```pycon
+        >>> from minrecord import Record
+        >>> record = Record(name="value", elements=((None, 64.0), (None, 42.0)))
+        >>> record
+        Record(name=value, max_size=10, size=2)
+        >>> record.get_last_value()
+        42.0
+        >>> record.get_most_recent()
+        ((None, 64.0), (None, 42.0))
 
-    ```pycon
-
-    >>> from minrecord import Record
-    >>> record = Record(name="value", elements=((None, 64.0), (None, 42.0)))
-    >>> record
-    Record(name=value, max_size=10, size=2)
-    >>> record.get_last_value()
-    42.0
-    >>> record.get_most_recent()
-    ((None, 64.0), (None, 42.0))
-
-    ```
+        ```
     """
 
     def __init__(

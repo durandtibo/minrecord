@@ -67,18 +67,16 @@ class BaseRecord(ABC, Generic[T], metaclass=AbstractFactory):
 
     You may also need to extend the ``config_dict`` method.
 
-    Example usage:
+    Example:
+        ```pycon
+        >>> from minrecord import Record
+        >>> record = Record("loss")
+        >>> record.add_value(value=2, step=0)
+        >>> record.add_value(value=1.2, step=1)
+        >>> record.get_last_value()
+        1.2
 
-    ```pycon
-
-    >>> from minrecord import Record
-    >>> record = Record("loss")
-    >>> record.add_value(value=2, step=0)
-    >>> record.add_value(value=1.2, step=1)
-    >>> record.get_last_value()
-    1.2
-
-    ```
+        ```
     """
 
     @property
@@ -95,18 +93,16 @@ class BaseRecord(ABC, Generic[T], metaclass=AbstractFactory):
             step: The step value to record. ``None`` means there is no
                 step to track.
 
-        Example usage:
+        Example:
+            ```pycon
+            >>> from minrecord import Record
+            >>> record = Record("loss")
+            >>> record.add_value(value=2)
+            >>> record.add_value(value=42, step=1)
+            >>> record
+            Record(name=loss, max_size=10, size=2)
 
-        ```pycon
-
-        >>> from minrecord import Record
-        >>> record = Record("loss")
-        >>> record.add_value(value=2)
-        >>> record.add_value(value=42, step=1)
-        >>> record
-        Record(name=loss, max_size=10, size=2)
-
-        ```
+            ```
         """
 
     @abstractmethod
@@ -116,17 +112,15 @@ class BaseRecord(ABC, Generic[T], metaclass=AbstractFactory):
         Returns:
             A copy of the current record.
 
-        Example usage:
+        Example:
+            ```pycon
+            >>> from minrecord import Record
+            >>> record = Record("loss")
+            >>> record_cloned = record.clone()
+            >>> record_cloned
+            Record(name=loss, max_size=10, size=0)
 
-        ```pycon
-
-        >>> from minrecord import Record
-        >>> record = Record("loss")
-        >>> record_cloned = record.clone()
-        >>> record_cloned
-        Record(name=loss, max_size=10, size=0)
-
-        ```
+            ```
         """
 
     @abstractmethod
@@ -139,20 +133,18 @@ class BaseRecord(ABC, Generic[T], metaclass=AbstractFactory):
         Returns:
             ``True`` if the records are equal, ``False`` otherwise.
 
-        Example usage:
+        Example:
+            ```pycon
+            >>> from minrecord import Record
+            >>> record1 = Record("loss")
+            >>> record2 = Record("accuracy")
+            >>> record3 = Record("loss")
+            >>> record1.equal(record2)
+            False
+            >>> record1.equal(record1)
+            True
 
-        ```pycon
-
-        >>> from minrecord import Record
-        >>> record1 = Record("loss")
-        >>> record2 = Record("accuracy")
-        >>> record3 = Record("loss")
-        >>> record1.equal(record2)
-        False
-        >>> record1.equal(record1)
-        True
-
-        ```
+            ```
         """
 
     def get_best_value(self) -> T:
@@ -169,18 +161,16 @@ class BaseRecord(ABC, Generic[T], metaclass=AbstractFactory):
             NotAComparableRecord: if it is not a comparable record.
             EmptyRecordError: if the record is empty
 
-        Example usage:
+        Example:
+            ```pycon
+            >>> from minrecord import MaxScalarRecord
+            >>> record = MaxScalarRecord("accuracy")
+            >>> record.add_value(value=2, step=0)
+            >>> record.add_value(value=4, step=1)
+            >>> record.get_best_value()
+            4
 
-        ```pycon
-
-        >>> from minrecord import MaxScalarRecord
-        >>> record = MaxScalarRecord("accuracy")
-        >>> record.add_value(value=2, step=0)
-        >>> record.add_value(value=4, step=1)
-        >>> record.get_best_value()
-        4
-
-        ```
+            ```
         """
         if not self.is_comparable():
             msg = (
@@ -211,21 +201,19 @@ class BaseRecord(ABC, Generic[T], metaclass=AbstractFactory):
         Returns:
             The last value added in the record.
 
-        Example usage:
+        Example:
+            ```pycon
+            >>> from minrecord import Record
+            >>> record = Record("loss")
+            >>> record.add_value(value=2, step=0)
+            >>> record.add_value(value=1.2, step=1)
+            >>> record.get_last_value()
+            1.2
+            >>> record.add_value(value=0.8, step=1)
+            >>> record.get_last_value()
+            0.8
 
-        ```pycon
-
-        >>> from minrecord import Record
-        >>> record = Record("loss")
-        >>> record.add_value(value=2, step=0)
-        >>> record.add_value(value=1.2, step=1)
-        >>> record.get_last_value()
-        1.2
-        >>> record.add_value(value=0.8, step=1)
-        >>> record.get_last_value()
-        0.8
-
-        ```
+            ```
         """
 
     @abstractmethod
@@ -239,19 +227,17 @@ class BaseRecord(ABC, Generic[T], metaclass=AbstractFactory):
         Returns:
             A tuple of the recent values in the record.
 
-        Example usage:
+        Example:
+            ```pycon
+            >>> from minrecord import Record
+            >>> record = Record("loss")
+            >>> record.add_value(value=2)
+            >>> record.add_value(value=1.2, step=1)
+            >>> record.add_value(value=0.8, step=2)
+            >>> record.get_most_recent()
+            ((None, 2), (1, 1.2), (2, 0.8))
 
-        ```pycon
-
-        >>> from minrecord import Record
-        >>> record = Record("loss")
-        >>> record.add_value(value=2)
-        >>> record.add_value(value=1.2, step=1)
-        >>> record.add_value(value=0.8, step=2)
-        >>> record.get_most_recent()
-        ((None, 2), (1, 1.2), (2, 0.8))
-
-        ```
+            ```
         """
 
     def has_improved(self) -> bool:
@@ -269,16 +255,16 @@ class BaseRecord(ABC, Generic[T], metaclass=AbstractFactory):
             NotAComparableRecord: if it is not a comparable record.
             EmptyRecordError: if the record is empty
 
-        ```pycon
+        Example:
+            ```pycon
+            >>> from minrecord import MaxScalarRecord
+            >>> record = MaxScalarRecord("accuracy")
+            >>> record.add_value(value=2, step=0)
+            >>> record.add_value(value=4, step=1)
+            >>> record.has_improved()
+            True
 
-        >>> from minrecord import MaxScalarRecord
-        >>> record = MaxScalarRecord("accuracy")
-        >>> record.add_value(value=2, step=0)
-        >>> record.add_value(value=4, step=1)
-        >>> record.has_improved()
-        True
-
-        ```
+            ```
         """
         if not self.is_comparable():
             msg = (
@@ -315,14 +301,14 @@ class BaseRecord(ABC, Generic[T], metaclass=AbstractFactory):
             ``True`` if it is possible to compare the values in
                 the record, otherwise ``False``.
 
-        ```pycon
+        Example:
+            ```pycon
+            >>> from minrecord import Record
+            >>> record = Record("loss")
+            >>> record.is_comparable()
+            False
 
-        >>> from minrecord import Record
-        >>> record = Record("loss")
-        >>> record.is_comparable()
-        False
-
-        ```
+            ```
         """
 
     @abstractmethod
@@ -332,14 +318,14 @@ class BaseRecord(ABC, Generic[T], metaclass=AbstractFactory):
         Returns:
             ``True`` if the record is empty, otherwise ``False``.
 
-        ```pycon
+        Example:
+            ```pycon
+            >>> from minrecord import Record
+            >>> record = Record("loss")
+            >>> record.is_empty()
+            True
 
-        >>> from minrecord import Record
-        >>> record = Record("loss")
-        >>> record.is_empty()
-        True
-
-        ```
+            ```
         """
 
     @abstractmethod
@@ -351,17 +337,15 @@ class BaseRecord(ABC, Generic[T], metaclass=AbstractFactory):
                 has the following structure ``(step, value)``.
                 The step can be ``None`` if there is no step.
 
-        Example usage:
+        Example:
+            ```pycon
+            >>> from minrecord import Record
+            >>> record = Record("loss")
+            >>> record.update([(0, 42), (1, 45)])
+            >>> record
+            Record(name=loss, max_size=10, size=2)
 
-        ```pycon
-
-        >>> from minrecord import Record
-        >>> record = Record("loss")
-        >>> record.update([(0, 42), (1, 45)])
-        >>> record
-        Record(name=loss, max_size=10, size=2)
-
-        ```
+            ```
         """
 
     def config_dict(self) -> dict[str, Any]:
@@ -378,17 +362,15 @@ class BaseRecord(ABC, Generic[T], metaclass=AbstractFactory):
         Returns:
             The config of the record.
 
-        Example usage:
+        Example:
+            ```pycon
+            >>> from minrecord import BaseRecord, Record
+            >>> config = Record("loss").config_dict()
+            >>> record = BaseRecord.factory(**config)  # Note that the state is not copied.
+            >>> record
+            Record(name=loss, max_size=10, size=0)
 
-        ```pycon
-
-        >>> from minrecord import BaseRecord, Record
-        >>> config = Record("loss").config_dict()
-        >>> record = BaseRecord.factory(**config)  # Note that the state is not copied.
-        >>> record
-        Record(name=loss, max_size=10, size=0)
-
-        ```
+            ```
         """
         return {OBJECT_TARGET: get_fully_qualified_name(self.__class__), "name": self.name}
 
@@ -400,17 +382,15 @@ class BaseRecord(ABC, Generic[T], metaclass=AbstractFactory):
         Args:
             state_dict: A dictionary containing state keys with values.
 
-        Example usage:
+        Example:
+            ```pycon
+            >>> from minrecord import Record
+            >>> record = Record("loss")
+            >>> record.load_state_dict({"record": ((0, 42.0),)})
+            >>> record.get_last_value()
+            42.0
 
-        ```pycon
-
-        >>> from minrecord import Record
-        >>> record = Record("loss")
-        >>> record.load_state_dict({"record": ((0, 42.0),)})
-        >>> record.get_last_value()
-        42.0
-
-        ```
+            ```
         """
 
     @abstractmethod
@@ -420,18 +400,16 @@ class BaseRecord(ABC, Generic[T], metaclass=AbstractFactory):
         Returns:
             The state values in a dict.
 
-        Example usage:
+        Example:
+            ```pycon
+            >>> from minrecord import Record
+            >>> record = Record("loss")
+            >>> record.add_value(42.0, step=0)
+            >>> state = record.state_dict()
+            >>> state
+            {'record': ((0, 42.0),)}
 
-        ```pycon
-
-        >>> from minrecord import Record
-        >>> record = Record("loss")
-        >>> record.add_value(42.0, step=0)
-        >>> state = record.state_dict()
-        >>> state
-        {'record': ((0, 42.0),)}
-
-        ```
+            ```
         """
 
     @classmethod
@@ -447,26 +425,24 @@ class BaseRecord(ABC, Generic[T], metaclass=AbstractFactory):
         Returns:
             The instantiated record.
 
-        Example usage:
+        Example:
+            ```pycon
+            >>> from minrecord import BaseRecord
+            >>> from objectory import OBJECT_TARGET
+            >>> record = BaseRecord.from_dict(
+            ...     {
+            ...         "config": {
+            ...             OBJECT_TARGET: "minrecord.Record",
+            ...             "name": "loss",
+            ...             "max_size": 7,
+            ...         },
+            ...         "state": {"record": ((0, 1), (1, 5))},
+            ...     }
+            ... )
+            >>> record
+            Record(name=loss, max_size=7, size=2)
 
-        ```pycon
-
-        >>> from minrecord import BaseRecord
-        >>> from objectory import OBJECT_TARGET
-        >>> record = BaseRecord.from_dict(
-        ...     {
-        ...         "config": {
-        ...             OBJECT_TARGET: "minrecord.Record",
-        ...             "name": "loss",
-        ...             "max_size": 7,
-        ...         },
-        ...         "state": {"record": ((0, 1), (1, 5))},
-        ...     }
-        ... )
-        >>> record
-        Record(name=loss, max_size=7, size=2)
-
-        ```
+            ```
         """
         check_objectory()
         obj = cls.factory(**data["config"])
@@ -485,17 +461,15 @@ class BaseRecord(ABC, Generic[T], metaclass=AbstractFactory):
             A dictionary with the config and the state of the
                 record.
 
-        Example usage:
+        Example:
+            ```pycon
+            >>> from minrecord import BaseRecord, Record
+            >>> record_dict = Record("loss").to_dict()
+            >>> record = BaseRecord.from_dict(record_dict)
+            >>> record
+            Record(name=loss, max_size=10, size=0)
 
-        ```pycon
-
-        >>> from minrecord import BaseRecord, Record
-        >>> record_dict = Record("loss").to_dict()
-        >>> record = BaseRecord.from_dict(record_dict)
-        >>> record
-        Record(name=loss, max_size=10, size=0)
-
-        ```
+            ```
         """
         return {"config": self.config_dict(), "state": self.state_dict()}
 
