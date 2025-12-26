@@ -4,7 +4,13 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from minrecord.config import Config, get_default_config
+from minrecord.config import (
+    Config,
+    get_default_config,
+    get_max_size,
+    reset_max_size,
+    set_max_size,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Generator
@@ -221,3 +227,37 @@ def test_attribute_storage_location() -> None:
 
     assert hasattr(get_default_config, "_config")
     assert get_default_config._config is config
+
+
+##################################
+#     Tests for get_max_size     #
+##################################
+
+
+def test_get_max_size() -> None:
+    """Test getting the max_size."""
+    assert get_max_size() == 10
+
+
+##################################
+#     Tests for set_max_size     #
+##################################
+
+
+def test_set_max_size() -> None:
+    """Test setting max_size to a valid positive integer."""
+    set_max_size(5)
+    assert get_max_size() == 5
+
+
+####################################
+#     Tests for reset_max_size     #
+####################################
+
+
+def test_reset_max_size() -> None:
+    """Test resetting max_size to the default value."""
+    set_max_size(5)
+    assert get_max_size() == 5
+    reset_max_size()
+    assert get_max_size() == Config.DEFAULT_MAX_SIZE
