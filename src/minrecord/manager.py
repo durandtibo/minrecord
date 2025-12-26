@@ -27,19 +27,17 @@ class RecordManager:
     Args:
         records: The initial records to add to the manager.
 
-    Example usage:
+    Example:
+        ```pycon
+        >>> from minrecord import RecordManager, MinScalarRecord
+        >>> manager = RecordManager()
+        >>> manager.add_record(MinScalarRecord("loss"))
+        >>> manager.get_record("loss")
+        MinScalarRecord(name=loss, max_size=10, size=0)
+        >>> manager.get_record("new_record")
+        Record(name=new_record, max_size=10, size=0)
 
-    ```pycon
-
-    >>> from minrecord import RecordManager, MinScalarRecord
-    >>> manager = RecordManager()
-    >>> manager.add_record(MinScalarRecord("loss"))
-    >>> manager.get_record("loss")
-    MinScalarRecord(name=loss, max_size=10, size=0)
-    >>> manager.get_record("new_record")
-    Record(name=new_record, max_size=10, size=0)
-
-    ```
+        ```
     """
 
     def __init__(self, records: dict[str, BaseRecord[Any]] | None = None) -> None:
@@ -77,25 +75,23 @@ class RecordManager:
             RuntimeError: if a record is already registered for the
                 key and ``exist_ok=False``.
 
-        Example usage:
+        Example:
+            ```pycon
+            >>> from minrecord import RecordManager, MinScalarRecord
+            >>> manager = RecordManager()
+            >>> manager.add_record(MinScalarRecord("loss"))
+            >>> manager
+            RecordManager(
+              (loss): MinScalarRecord(name=loss, max_size=10, size=0)
+            )
+            >>> manager.add_record(MinScalarRecord("loss"), "my key")
+            >>> manager
+            RecordManager(
+              (loss): MinScalarRecord(name=loss, max_size=10, size=0)
+              (my key): MinScalarRecord(name=loss, max_size=10, size=0)
+            )
 
-        ```pycon
-
-        >>> from minrecord import RecordManager, MinScalarRecord
-        >>> manager = RecordManager()
-        >>> manager.add_record(MinScalarRecord("loss"))
-        >>> manager
-        RecordManager(
-          (loss): MinScalarRecord(name=loss, max_size=10, size=0)
-        )
-        >>> manager.add_record(MinScalarRecord("loss"), "my key")
-        >>> manager
-        RecordManager(
-          (loss): MinScalarRecord(name=loss, max_size=10, size=0)
-          (my key): MinScalarRecord(name=loss, max_size=10, size=0)
-        )
-
-        ```
+            ```
         """
         if key is None:
             key = record.name
@@ -129,22 +125,20 @@ class RecordManager:
         Returns:
             The dict with the best value of each metric.
 
-        Example usage:
+        Example:
+            ```pycon
+            >>> from minrecord import RecordManager, MaxScalarRecord
+            >>> manager = RecordManager()
+            >>> manager.add_record(MaxScalarRecord("accuracy"))
+            >>> manager.get_record("accuracy").add_value(42.0)
+            >>> manager.get_best_values()
+            {'accuracy': 42.0}
+            >>> manager.get_best_values(prefix="best/")
+            {'best/accuracy': 42.0}
+            >>> manager.get_best_values(suffix="/best")
+            {'accuracy/best': 42.0}
 
-        ```pycon
-
-        >>> from minrecord import RecordManager, MaxScalarRecord
-        >>> manager = RecordManager()
-        >>> manager.add_record(MaxScalarRecord("accuracy"))
-        >>> manager.get_record("accuracy").add_value(42.0)
-        >>> manager.get_best_values()
-        {'accuracy': 42.0}
-        >>> manager.get_best_values(prefix="best/")
-        {'best/accuracy': 42.0}
-        >>> manager.get_best_values(suffix="/best")
-        {'accuracy/best': 42.0}
-
-        ```
+            ```
         """
         return get_best_values(self._records, prefix=prefix, suffix=suffix)
 
@@ -159,19 +153,17 @@ class RecordManager:
                 record. The created empty record is a ``Record``
                 object.
 
-        Example usage:
+        Example:
+            ```pycon
+            >>> from minrecord import RecordManager, MinScalarRecord
+            >>> manager = RecordManager()
+            >>> manager.add_record(MinScalarRecord("loss"))
+            >>> manager.get_record("loss")
+            MinScalarRecord(name=loss, max_size=10, size=0)
+            >>> manager.get_record("new_record")
+            Record(name=new_record, max_size=10, size=0)
 
-        ```pycon
-
-        >>> from minrecord import RecordManager, MinScalarRecord
-        >>> manager = RecordManager()
-        >>> manager.add_record(MinScalarRecord("loss"))
-        >>> manager.get_record("loss")
-        MinScalarRecord(name=loss, max_size=10, size=0)
-        >>> manager.get_record("new_record")
-        Record(name=new_record, max_size=10, size=0)
-
-        ```
+            ```
         """
         if not self.has_record(key):
             self._records[key] = Record(name=key)
@@ -183,17 +175,15 @@ class RecordManager:
         Returns:
             The records with their associated keys.
 
-        Example usage:
+        Example:
+            ```pycon
+            >>> from minrecord import RecordManager, MinScalarRecord
+            >>> manager = RecordManager()
+            >>> manager.add_record(MinScalarRecord("loss"))
+            >>> manager.get_records()
+            {'loss': MinScalarRecord(name=loss, max_size=10, size=0)}
 
-        ```pycon
-
-        >>> from minrecord import RecordManager, MinScalarRecord
-        >>> manager = RecordManager()
-        >>> manager.add_record(MinScalarRecord("loss"))
-        >>> manager.get_records()
-        {'loss': MinScalarRecord(name=loss, max_size=10, size=0)}
-
-        ```
+            ```
         """
         return copy.copy(self._records)
 
@@ -206,19 +196,17 @@ class RecordManager:
         Returns:
             ``True`` if the record exists, ``False`` otherwise
 
-        Example usage:
+        Example:
+            ```pycon
+            >>> from minrecord import RecordManager, MinScalarRecord
+            >>> manager = RecordManager()
+            >>> manager.add_record(MinScalarRecord("loss"))
+            >>> manager.has_record("loss")
+            True
+            >>> manager.has_record("missing")
+            False
 
-        ```pycon
-
-        >>> from minrecord import RecordManager, MinScalarRecord
-        >>> manager = RecordManager()
-        >>> manager.add_record(MinScalarRecord("loss"))
-        >>> manager.has_record("loss")
-        True
-        >>> manager.has_record("missing")
-        False
-
-        ```
+            ```
         """
         return key in self._records
 
@@ -228,18 +216,16 @@ class RecordManager:
         Args:
             state_dict: A dict with the new state values.
 
-        Example usage:
+        Example:
+            ```pycon
+            >>> from minrecord import RecordManager, Record
+            >>> manager = RecordManager()
+            >>> manager.add_record(Record("value"))
+            >>> manager.load_state_dict({"value": {"state": {"record": ((0, 1), (1, 0.5), (2, 0.25))}}})
+            >>> manager.get_record("value").get_last_value()
+            0.25
 
-        ```pycon
-
-        >>> from minrecord import RecordManager, Record
-        >>> manager = RecordManager()
-        >>> manager.add_record(Record("value"))
-        >>> manager.load_state_dict({"value": {"state": {"record": ((0, 1), (1, 0.5), (2, 0.25))}}})
-        >>> manager.get_record("value").get_last_value()
-        0.25
-
-        ```
+            ```
         """
         for key, state in state_dict.items():
             if self.has_record(key):
@@ -254,15 +240,13 @@ class RecordManager:
         Returns:
             The dictionary containing state values of all the records.
 
-        Example usage:
+        Example:
+            ```pycon
+            >>> from minrecord import RecordManager
+            >>> manager = RecordManager()
+            >>> manager.state_dict()
+            {}
 
-        ```pycon
-
-        >>> from minrecord import RecordManager
-        >>> manager = RecordManager()
-        >>> manager.state_dict()
-        {}
-
-        ```
+            ```
         """
         return {key: hist.to_dict() for key, hist in self._records.items()}

@@ -28,18 +28,16 @@ logger: logging.Logger = logging.getLogger(__name__)
 class BaseComparator(ABC, Generic[T]):
     r"""Define the base comparator class to implement a comparator.
 
-    Example usage:
+    Example:
+        ```pycon
+        >>> from minrecord import MinScalarComparator
+        >>> comparator = MinScalarComparator()
+        >>> comparator.is_better(old_value=0.4, new_value=0.6)
+        False
+        >>> comparator.get_initial_best_value()
+        inf
 
-    ```pycon
-
-    >>> from minrecord import MinScalarComparator
-    >>> comparator = MinScalarComparator()
-    >>> comparator.is_better(old_value=0.4, new_value=0.6)
-    False
-    >>> comparator.get_initial_best_value()
-    inf
-
-    ```
+        ```
     """
 
     @abstractmethod
@@ -52,18 +50,16 @@ class BaseComparator(ABC, Generic[T]):
         Returns:
             ``True`` if the comparators are equal, ``False`` otherwise.
 
-        Example usage:
+        Example:
+            ```pycon
+            >>> from minrecord import MinScalarComparator, MaxScalarComparator
+            >>> comparator = MinScalarComparator()
+            >>> comparator.equal(MinScalarComparator())
+            True
+            >>> comparator.equal(MaxScalarComparator())
+            False
 
-        ```pycon
-
-        >>> from minrecord import MinScalarComparator, MaxScalarComparator
-        >>> comparator = MinScalarComparator()
-        >>> comparator.equal(MinScalarComparator())
-        True
-        >>> comparator.equal(MaxScalarComparator())
-        False
-
-        ```
+            ```
         """
 
     @abstractmethod
@@ -73,16 +69,14 @@ class BaseComparator(ABC, Generic[T]):
         Returns:
             The initial best value.
 
-        Example usage:
+        Example:
+            ```pycon
+            >>> from minrecord import MinScalarComparator
+            >>> comparator = MinScalarComparator()
+            >>> comparator.get_initial_best_value()
+            inf
 
-        ```pycon
-
-        >>> from minrecord import MinScalarComparator
-        >>> comparator = MinScalarComparator()
-        >>> comparator.get_initial_best_value()
-        inf
-
-        ```
+            ```
         """
 
     @abstractmethod
@@ -97,16 +91,14 @@ class BaseComparator(ABC, Generic[T]):
             ``True`` if the new value is better than the old value,
                 otherwise ``False``.
 
-        Example usage:
+        Example:
+            ```pycon
+            >>> from minrecord import MinScalarComparator
+            >>> comparator = MinScalarComparator()
+            >>> comparator.is_better(old_value=0.4, new_value=0.6)
+            False
 
-        ```pycon
-
-        >>> from minrecord import MinScalarComparator
-        >>> comparator = MinScalarComparator()
-        >>> comparator.is_better(old_value=0.4, new_value=0.6)
-        False
-
-        ```
+            ```
         """
 
 
@@ -116,18 +108,16 @@ class MaxScalarComparator(BaseComparator[float]):
     This comparator can be used to find the maximum value between two
     scalar values.
 
-    Example usage:
+    Example:
+        ```pycon
+        >>> from minrecord import MaxScalarComparator
+        >>> comparator = MaxScalarComparator()
+        >>> comparator.is_better(old_value=0.4, new_value=0.6)
+        True
+        >>> comparator.get_initial_best_value()
+        -inf
 
-    ```pycon
-
-    >>> from minrecord import MaxScalarComparator
-    >>> comparator = MaxScalarComparator()
-    >>> comparator.is_better(old_value=0.4, new_value=0.6)
-    True
-    >>> comparator.get_initial_best_value()
-    -inf
-
-    ```
+        ```
     """
 
     def equal(self, other: Any) -> bool:
@@ -146,18 +136,16 @@ class MinScalarComparator(BaseComparator[float]):
     This comparator can be used to find the minimum value between two
     scalar values.
 
-    Example usage:
+    Example:
+        ```pycon
+        >>> from minrecord import MinScalarComparator
+        >>> comparator = MinScalarComparator()
+        >>> comparator.is_better(old_value=0.4, new_value=0.6)
+        False
+        >>> comparator.get_initial_best_value()
+        inf
 
-    ```pycon
-
-    >>> from minrecord import MinScalarComparator
-    >>> comparator = MinScalarComparator()
-    >>> comparator.is_better(old_value=0.4, new_value=0.6)
-    False
-    >>> comparator.get_initial_best_value()
-    inf
-
-    ```
+        ```
     """
 
     def equal(self, other: Any) -> bool:

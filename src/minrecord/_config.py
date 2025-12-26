@@ -20,15 +20,13 @@ def get_max_size() -> int:
 
     This value can be changed by using ``set_max_size``.
 
-    Example usage:
+    Example:
+        ```pycon
+        >>> from minrecord import get_max_size
+        >>> get_max_size()
+        10
 
-    ```pycon
-
-    >>> from minrecord import get_max_size
-    >>> get_max_size()
-    10
-
-    ```
+        ```
     """
     return _max_size.get_value()
 
@@ -44,17 +42,15 @@ def set_max_size(max_size: int) -> None:
         max_size: The new default maximum size of values to track in
             each record.
 
-    Example usage:
+    Example:
+        ```pycon
+        >>> from minrecord import get_max_size, set_max_size
+        >>> get_max_size()
+        10
+        >>> set_max_size(5)
+        >>> get_max_size()
+        5
 
-    ```pycon
-
-    >>> from minrecord import get_max_size, set_max_size
-    >>> get_max_size()
-    10
-    >>> set_max_size(5)
-    >>> get_max_size()
-    5
-
-    ```
+        ```
     """
     _max_size.set_value(max_size)
