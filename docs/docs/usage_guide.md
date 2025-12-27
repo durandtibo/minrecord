@@ -279,7 +279,6 @@ assert record1.equal(record2)
 - [Quickstart Guide](quickstart.md) for basic usage
 - [Examples](https://github.com/durandtibo/minrecord/tree/main/examples) for complete working examples
 - [FAQ](faq.md) for common questions and troubleshooting
-- [Migration Guide](migration_guide.md) for upgrading between versions
 - API Reference:
   - [minrecord](refs/root.md) - Main package
   - [minrecord.base](refs/base.md) - Base classes and exceptions

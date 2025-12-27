@@ -1,0 +1,3 @@
+# minrecord.config
+
+::: minrecord.config
