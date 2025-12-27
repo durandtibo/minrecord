@@ -33,6 +33,7 @@ nav:
       - minrecord.base: refs/base.md
       - minrecord.comparable: refs/comparable.md
       - minrecord.comparator: refs/comparator.md
+      - minrecord.config: refs/config.md
       - minrecord.functional: refs/functional.md
       - minrecord.generic: refs/generic.md
       - minrecord.manager: refs/manager.md
