@@ -125,6 +125,7 @@ def get_default_config() -> Config:
         5
         >>> c1 is c2  # Same instance
         True
+        >>> c1.reset_max_size()
 
         ```
     """
@@ -181,7 +182,7 @@ def set_max_size(max_size: int) -> None:
 
 
 def reset_max_size() -> None:
-    """Reset max_size to its default value.
+    """Reset maximum size to its default value.
 
     Example:
         ```pycon
@@ -189,7 +190,7 @@ def reset_max_size() -> None:
         >>> set_max_size(5)
         >>> get_max_size()
         5
-        >>> reset_max_size(5)
+        >>> reset_max_size()
         >>> get_max_size()
         10
 
