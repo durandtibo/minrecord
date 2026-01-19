@@ -8,7 +8,7 @@ import copy
 import logging
 from typing import Any
 
-from coola.utils import repr_indent, repr_mapping, str_indent, str_mapping
+from coola.utils.format import repr_indent, repr_mapping, str_indent, str_mapping
 
 from minrecord.base import BaseRecord
 from minrecord.functional import get_best_values

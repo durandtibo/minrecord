@@ -4,21 +4,15 @@ from __future__ import annotations
 
 __all__ = [
     "BaseComparator",
-    "ComparatorEqualityComparator",
     "MaxScalarComparator",
     "MinScalarComparator",
 ]
 
 import logging
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any, Generic, TypeVar
+from typing import Any, Generic, TypeVar
 
-from coola.equality.comparators import BaseEqualityComparator
-from coola.equality.handlers import EqualHandler, SameObjectHandler, SameTypeHandler
-from coola.equality.testers import EqualityTester
-
-if TYPE_CHECKING:
-    from coola.equality import EqualityConfig
+from coola.equality.tester import EqualEqualityTester, get_default_registry
 
 T = TypeVar("T")
 
@@ -158,22 +152,4 @@ class MinScalarComparator(BaseComparator[float]):
         return new_value <= old_value
 
 
-class ComparatorEqualityComparator(BaseEqualityComparator[BaseComparator[Any]]):  # noqa: PLW1641
-    r"""Implement an equality comparator for ``BaseBatch`` objects."""
-
-    def __init__(self) -> None:
-        self._handler = SameObjectHandler()
-        self._handler.chain(SameTypeHandler()).chain(EqualHandler())
-
-    def __eq__(self, other: object) -> bool:
-        return isinstance(other, self.__class__)
-
-    def clone(self) -> ComparatorEqualityComparator:
-        return self.__class__()
-
-    def equal(self, actual: BaseComparator[Any], expected: Any, config: EqualityConfig) -> bool:
-        return self._handler.handle(actual, expected, config=config)
-
-
-if not EqualityTester.has_comparator(BaseComparator):  # pragma: no cover
-    EqualityTester.add_comparator(BaseComparator, ComparatorEqualityComparator())
+get_default_registry().register(BaseComparator, EqualEqualityTester(), exist_ok=True)

@@ -12,9 +12,7 @@ import logging
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
-from coola.equality.comparators import BaseEqualityComparator
-from coola.equality.handlers import EqualHandler, SameObjectHandler, SameTypeHandler
-from coola.equality.testers import EqualityTester
+from coola.equality.tester import EqualEqualityTester, get_default_registry
 from coola.utils.introspection import get_fully_qualified_name
 
 from minrecord.utils.imports import check_objectory, is_objectory_available
@@ -28,7 +26,6 @@ else:  # pragma: no cover
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
-    from coola.equality import EqualityConfig
 
 T = TypeVar("T")
 
@@ -483,22 +480,4 @@ class NotAComparableRecordError(Exception):
     the record."""
 
 
-class RecordEqualityComparator(BaseEqualityComparator[BaseRecord[Any]]):  # noqa: PLW1641
-    r"""Implement an equality comparator for ``BaseRecord`` objects."""
-
-    def __init__(self) -> None:
-        self._handler = SameObjectHandler()
-        self._handler.chain(SameTypeHandler()).chain(EqualHandler())
-
-    def __eq__(self, other: object) -> bool:
-        return isinstance(other, self.__class__)
-
-    def clone(self) -> RecordEqualityComparator:
-        return self.__class__()
-
-    def equal(self, actual: BaseRecord[Any], expected: Any, config: EqualityConfig) -> bool:
-        return self._handler.handle(actual, expected, config=config)
-
-
-if not EqualityTester.has_comparator(BaseRecord):  # pragma: no cover
-    EqualityTester.add_comparator(BaseRecord, RecordEqualityComparator())
+get_default_registry().register(BaseRecord, EqualEqualityTester(), exist_ok=True)
