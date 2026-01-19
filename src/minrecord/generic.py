@@ -7,8 +7,8 @@ __all__ = ["Record"]
 from collections import deque
 from typing import TYPE_CHECKING, Any, TypeVar
 
-from coola import objects_are_equal
-from coola.utils import str_indent, str_mapping
+from coola.equality import objects_are_equal
+from coola.utils.format import str_indent, str_mapping
 
 from minrecord.base import BaseRecord, EmptyRecordError
 from minrecord.config import get_max_size
