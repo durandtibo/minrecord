@@ -9,7 +9,7 @@ only-include = ["src"]
 
 [project]
 name = "minrecord"
-version = "0.3.0a0"
+version = "0.3.0"
 description = "Minimalist library to record values in a ML workflow"
 readme = "README.md"
 authors = [
