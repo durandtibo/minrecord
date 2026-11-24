@@ -4,8 +4,7 @@ from __future__ import annotations
 
 __all__ = ["ComparableRecord", "MaxScalarRecord", "MinScalarRecord"]
 
-from numbers import Number
-from typing import TYPE_CHECKING, Any, TypeVar
+from typing import TYPE_CHECKING, Any, Self, TypeVar
 
 from coola.utils.format import str_indent, str_mapping
 
@@ -18,13 +17,7 @@ from minrecord.comparator import (
 from minrecord.generic import Record
 
 if TYPE_CHECKING:
-    import sys
     from collections.abc import Iterable
-
-    if sys.version_info >= (3, 11):
-        from typing import Self
-    else:
-        from typing_extensions import Self
 
 T = TypeVar("T")
 
@@ -59,11 +52,12 @@ class ComparableRecord(Record[T]):
         ```
     """
 
-    def __init__(
+    # The arguments cannot become keyword-only without a breaking change.
+    def __init__(  # noqa: PLR0917
         self,
         name: str,
         comparator: BaseComparator[T],
-        elements: Iterable[tuple[int | None, T]] = (),
+        elements: Iterable[tuple[float | None, T]] = (),
         max_size: int = 10,
         best_value: T | None = None,
         improved: bool = False,
@@ -88,7 +82,7 @@ class ComparableRecord(Record[T]):
         )
         return f"{self.__class__.__qualname__}(\n  {args}\n)"
 
-    def add_value(self, value: T, step: int | None = None) -> None:
+    def add_value(self, value: T, step: float | None = None) -> None:
         self._improved = self.is_better(new_value=value, old_value=self._best_value)
         if self._improved:
             self._best_value = value
@@ -169,7 +163,7 @@ class ComparableRecord(Record[T]):
         return record
 
 
-class MaxScalarRecord(ComparableRecord[Number]):
+class MaxScalarRecord(ComparableRecord[float]):
     r"""A specific implementation to track the max value of a scalar
     record.
 
@@ -180,7 +174,7 @@ class MaxScalarRecord(ComparableRecord[Number]):
         name: The name of the record.
         elements: The initial elements. Each element is a tuple with
             the step and its associated value.
-        max_size: The maximum number of elements to store inthe record.
+        max_size: The maximum number of elements to store in the record.
         best_value: The initial best value. If ``None``, the initial
             best value of the ``comparator`` is used.
         improved: Indicate if the last value is the best value or not.
@@ -204,9 +198,9 @@ class MaxScalarRecord(ComparableRecord[Number]):
     def __init__(
         self,
         name: str,
-        elements: Iterable[tuple[int | None, T]] = (),
+        elements: Iterable[tuple[float | None, float]] = (),
         max_size: int = 10,
-        best_value: T | None = None,
+        best_value: float | None = None,
         improved: bool = False,
     ) -> None:
         super().__init__(
@@ -224,7 +218,11 @@ class MaxScalarRecord(ComparableRecord[Number]):
         return config
 
     @classmethod
-    def from_elements(cls, name: str, elements: Iterable[tuple[float | None, T]]) -> Self:
+    # The scalar records have no ``comparator`` argument. Changing the signature of the
+    # inherited method is a breaking change, so the override is kept as it is.
+    def from_elements(  # ty: ignore[incompatible-method-override]
+        cls, name: str, elements: Iterable[tuple[float | None, float]]
+    ) -> Self:
         r"""Instantiate a ``MaxScalarRecord`` object from the elements.
 
         Args:
@@ -253,7 +251,7 @@ class MaxScalarRecord(ComparableRecord[Number]):
         return record
 
 
-class MinScalarRecord(ComparableRecord[Number]):
+class MinScalarRecord(ComparableRecord[float]):
     r"""A specific implementation to track the min value of a scalar
     record.
 
@@ -264,7 +262,7 @@ class MinScalarRecord(ComparableRecord[Number]):
         name: The name of the record.
         elements: The initial elements. Each element is a tuple with
             the step and its associated value.
-        max_size: The maximum number of elements to store inthe record.
+        max_size: The maximum number of elements to store in the record.
         best_value: The initial best value. If ``None``, the initial
             best  value of the ``comparator`` is used.
         improved: Indicate if the last value is the best value or not.
@@ -288,9 +286,9 @@ class MinScalarRecord(ComparableRecord[Number]):
     def __init__(
         self,
         name: str,
-        elements: Iterable[tuple[int | None, T]] = (),
+        elements: Iterable[tuple[float | None, float]] = (),
         max_size: int = 10,
-        best_value: T | None = None,
+        best_value: float | None = None,
         improved: bool = False,
     ) -> None:
         super().__init__(
@@ -308,7 +306,11 @@ class MinScalarRecord(ComparableRecord[Number]):
         return config
 
     @classmethod
-    def from_elements(cls, name: str, elements: Iterable[tuple[float | None, T]]) -> Self:
+    # The scalar records have no ``comparator`` argument. Changing the signature of the
+    # inherited method is a breaking change, so the override is kept as it is.
+    def from_elements(  # ty: ignore[incompatible-method-override]
+        cls, name: str, elements: Iterable[tuple[float | None, float]]
+    ) -> Self:
         r"""Instantiate a ``MaxScalarRecord`` object from the elements.
 
         Args:

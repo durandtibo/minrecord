@@ -1,0 +1,6 @@
+tasklib:
+  package:
+    name: minrecord
+  groups:
+    install: dev,docs
+    update: dev,docs

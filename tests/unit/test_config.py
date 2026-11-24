@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import pytest
 
@@ -19,11 +19,9 @@ if TYPE_CHECKING:
 @pytest.fixture(autouse=True)
 def _reset_default_config() -> Generator[None, None, None]:
     """Reset the config before and after each test."""
-    if hasattr(get_default_config, "_config"):
-        del get_default_config._config
+    get_default_config.cache_clear()
     yield
-    if hasattr(get_default_config, "_config"):
-        del get_default_config._config
+    get_default_config.cache_clear()
 
 
 ############################
@@ -85,22 +83,25 @@ def test_config_set_max_size_negative_raises_value_error() -> None:
 def test_config_set_max_size_float_raises_value_error() -> None:
     """Test that setting max_size to a float raises ValueError."""
     config = Config()
+    max_size: Any = 5.5
     with pytest.raises(ValueError, match=r"max_size must be a positive integer, got 5.5"):
-        config.set_max_size(5.5)
+        config.set_max_size(max_size)
 
 
 def test_config_set_max_size_string_raises_value_error() -> None:
     """Test that setting max_size to a string raises ValueError."""
     config = Config()
+    max_size: Any = "10"
     with pytest.raises(ValueError, match=r"max_size must be a positive integer, got 10"):
-        config.set_max_size("10")
+        config.set_max_size(max_size)
 
 
 def test_config_set_max_size_none_raises_value_error() -> None:
     """Test that setting max_size to None raises ValueError."""
     config = Config()
+    max_size: Any = None
     with pytest.raises(ValueError, match=r"max_size must be a positive integer, got None"):
-        config.set_max_size(None)
+        config.set_max_size(max_size)
 
 
 def test_config_reset_max_size() -> None:
@@ -184,12 +185,12 @@ def test_singleton_pattern() -> None:
 
 def test_lazy_initialization() -> None:
     """Test that config is created lazily on first call."""
-    # Before first call, _config attribute should not exist
-    assert not hasattr(get_default_config, "_config")
+    # Before first call, the config is not created
+    assert get_default_config.cache_info().currsize == 0
 
-    # After first call, it should exist
+    # After first call, it is created and cached
     get_default_config()
-    assert hasattr(get_default_config, "_config")
+    assert get_default_config.cache_info().currsize == 1
 
 
 def test_modifications_persist() -> None:
@@ -221,12 +222,11 @@ def test_state_isolation_from_new_instances() -> None:
     assert Config().get_max_size() == 10
 
 
-def test_attribute_storage_location() -> None:
-    """Test that the config is stored as a function attribute."""
-    config = get_default_config()
-
-    assert hasattr(get_default_config, "_config")
-    assert get_default_config._config is config
+def test_config_is_created_once() -> None:
+    """Test that the config is created only once and then cached."""
+    get_default_config()
+    get_default_config()
+    assert get_default_config.cache_info().misses == 1
 
 
 ##################################

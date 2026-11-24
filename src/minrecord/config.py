@@ -4,6 +4,8 @@ from __future__ import annotations
 
 __all__ = ["Config", "get_default_config", "get_max_size", "reset_max_size", "set_max_size"]
 
+from functools import cache
+
 
 class Config:
     r"""Config class to configure the records.
@@ -96,6 +98,7 @@ class Config:
         self._max_size = self.DEFAULT_MAX_SIZE
 
 
+@cache
 def get_default_config() -> Config:
     r"""Get the default global config instance.
 
@@ -129,10 +132,7 @@ def get_default_config() -> Config:
 
         ```
     """
-    if not hasattr(get_default_config, "_config"):
-        config = Config()
-        get_default_config._config = config
-    return get_default_config._config
+    return Config()
 
 
 def get_max_size() -> int:

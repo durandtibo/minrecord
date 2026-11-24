@@ -22,11 +22,11 @@ jobs:
 
       - name: Install packages
         run: |
-          inv update
+          inv env.update
 
       - name: Install packages
         run: |
-          inv install --docs-deps
+          inv env.install --groups dev,docs
 
       - name: Show dependency tree
         shell: bash
@@ -35,7 +35,7 @@ jobs:
 
       - name: Run unit tests
         run: |
-          inv unit-test --cov
+          inv test.unit --cov
 
       - uses: peter-evans/create-pull-request@v8
         if: always()

@@ -43,7 +43,7 @@ pip install minrecord[all]
 
 ### What Python versions are supported?
 
-Python 3.10 and higher are officially supported.
+Python 3.11 and higher are officially supported.
 
 ### Do I need PyTorch or other ML frameworks?
 
