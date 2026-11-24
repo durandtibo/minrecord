@@ -1449,7 +1449,7 @@ and <code>load_dict</code> are all defined from this snapshot.</p>
 </tr>
 <tr>
 <td>Fails early</td>
-<td>An input that cannot work is rejected by the call that receives it and is never stored: a value that the comparator cannot compare, an invalid <code>max_size</code>, a <code>name</code> that is not a <code>str</code>, an unknown manager key.</td>
+<td>An input that cannot work is rejected by the call that receives it and is never stored: a value that the comparator cannot compare, an invalid <code>max_size</code>, a <code>name</code> or a manager key that is not a <code>str</code>, a record that is not a record, an element that is not a pair <code>(step, value)</code>, an unknown manager key.</td>
 </tr>
 <tr>
 <td>Atomic</td>
@@ -1457,7 +1457,7 @@ and <code>load_dict</code> are all defined from this snapshot.</p>
 </tr>
 <tr>
 <td>Typed errors</td>
-<td><code>EmptyRecordError</code>, <code>NotAComparableRecordError</code>, <code>ValueError</code> (<code>max_size</code>, <code>best</code>), <code>TypeError</code> (<code>name</code>, dict or comparator of the wrong type), <code>KeyError</code> (unknown manager key).</td>
+<td><code>EmptyRecordError</code>, <code>NotAComparableRecordError</code>, <code>ValueError</code> (<code>max_size</code>, <code>best</code>, an element that is not a pair), <code>TypeError</code> (<code>name</code>, a key, a record, a dict or comparator of the wrong type), <code>KeyError</code> (unknown manager key).</td>
 </tr>
 <tr>
 <td>Readable text</td>

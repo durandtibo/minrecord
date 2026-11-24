@@ -1021,6 +1021,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#minrecord.utils.validation.check_key" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        check_key
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#minrecord.utils.validation.check_max_size" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1036,6 +1047,17 @@
     <span class="md-ellipsis">
       
         check_name
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.utils.validation.check_pair" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        check_pair
       
     </span>
   </a>
@@ -1166,6 +1188,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#minrecord.utils.validation.check_key" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        check_key
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#minrecord.utils.validation.check_max_size" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1181,6 +1214,17 @@
     <span class="md-ellipsis">
       
         check_name
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.utils.validation.check_pair" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        check_pair
       
     </span>
   </a>
@@ -1484,6 +1528,112 @@ imported.</p>
 <div class="doc doc-object doc-function">
 
 
+<h3 id="minrecord.utils.validation.check_key" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">minrecord.utils.validation.check_key</span>
+
+
+<a href="#minrecord.utils.validation.check_key" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">check_key</span><span class="p">(</span><span class="n">key</span><span class="p">:</span> <span class="n"><span title="typing.Any">Any</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="str">str</span></span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Check that the key of a record in a manager is valid.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>key</code>
+            </td>
+            <td>
+                  <code><span title="typing.Any">Any</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The key to check. It must be a <code>str</code>. An empty string
+is valid.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The key.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="TypeError">TypeError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If <code>key</code> is not a <code>str</code>.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<details class="example" open>
+  <summary>Example</summary>
+  <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">minrecord.utils.validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">check_key</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">check_key</span><span class="p">(</span><span class="s2">"loss"</span><span class="p">)</span>
+<span class="go">'loss'</span>
+</code></pre></div>
+</details>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
 <h3 id="minrecord.utils.validation.check_max_size" class="doc doc-heading">
             <span class="doc doc-object-name doc-function-name">minrecord.utils.validation.check_max_size</span>
 
@@ -1689,6 +1839,129 @@ is valid.</p>
   <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">minrecord.utils.validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">check_name</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">check_name</span><span class="p">(</span><span class="s2">"loss"</span><span class="p">)</span>
 <span class="go">'loss'</span>
+</code></pre></div>
+</details>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="minrecord.utils.validation.check_pair" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">minrecord.utils.validation.check_pair</span>
+
+
+<a href="#minrecord.utils.validation.check_pair" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">check_pair</span><span class="p">(</span><span class="n">pair</span><span class="p">:</span> <span class="n"><span title="typing.Any">Any</span></span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="n"><span title="str">str</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="tuple">tuple</span></span><span class="p">[</span><span class="n"><span title="typing.Any">Any</span></span><span class="p">,</span> <span class="n"><span title="typing.Any">Any</span></span><span class="p">]</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Check that an object is a pair <code>(step, value)</code>.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>pair</code>
+            </td>
+            <td>
+                  <code><span title="typing.Any">Any</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The pair to check. It must be a <code>tuple</code> or a <code>list</code>
+of length 2.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>name</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The name of the argument, used in the error message.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="tuple">tuple</span>[<span title="typing.Any">Any</span>, <span title="typing.Any">Any</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The pair as a tuple.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="ValueError">ValueError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If <code>pair</code> is not a <code>tuple</code> or a <code>list</code> of
+length 2.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<details class="example" open>
+  <summary>Example</summary>
+  <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">minrecord.utils.validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">check_pair</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">check_pair</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">],</span> <span class="s2">"best"</span><span class="p">)</span>
+<span class="go">(1, 2.0)</span>
 </code></pre></div>
 </details>
 

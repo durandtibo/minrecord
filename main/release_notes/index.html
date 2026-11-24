@@ -1255,6 +1255,9 @@ compatibility layer. The <a href="../design/">design page</a> explains the curre
   cannot compare (<code>None</code>, a string, <code>10**400</code>) is rejected by the <code>add_value</code> that receives it
   (<code>TypeError</code> or <code>OverflowError</code>, from the comparator) and the record stays empty.</li>
 <li><code>Record(name)</code> raises <code>TypeError</code> if <code>name</code> is not a <code>str</code>.</li>
+<li>An element of <code>elements</code> or of <code>update</code> that is not a <code>tuple</code> or a <code>list</code> of length 2 raises
+  <code>ValueError</code> (<code>element must be a pair (step, value)</code>). It was a raw unpacking error, and a string
+  of two characters was accepted.</li>
 <li>An invalid <code>max_size</code> (not a positive <code>int</code>, a <code>bool</code>, or larger than <code>sys.maxsize</code>) raises
   <code>ValueError</code>.</li>
 <li><code>equal</code> requires the same type. The equality of records, comparators and managers is the equality
@@ -1281,6 +1284,12 @@ compatibility layer. The <a href="../design/">design page</a> explains the curre
 <li><code>exist_ok</code> (<code>RecordManager.add_record</code>), and <code>prefix</code> and <code>suffix</code> (<code>RecordManager.get_best_values</code>,
   <code>get_best_values</code>, <code>get_last_values</code>) are keyword-only.</li>
 <li><code>RecordManager(records)</code> copies the mapping.</li>
+<li>The manager validates what it receives and <code>TypeError</code> is raised, before anything is stored, for a
+  value that is not a <code>BaseRecord</code> (<code>RecordManager(records)</code>, <code>add_record</code>, and the result of the
+  <code>default_factory</code>), for a key that is not a <code>str</code> (<code>RecordManager(records)</code>, <code>add_record</code>,
+  <code>load_state_dict</code>) and for a <code>state_dict</code> that is not a dict (<code>load_state_dict</code>).</li>
+<li><code>minrecord.utils.validation</code> has two new public helpers, <code>check_key</code> and <code>check_pair</code> (the latter
+  was the private <code>_check_pair</code> of <code>minrecord.comparable</code>).</li>
 <li><code>RecordManager.get_record(key)</code> raises <code>KeyError</code> for a key that nobody registered. The new
   keyword-only <code>default_factory</code> argument creates the records on demand. The factory is not part of
   the state.</li>

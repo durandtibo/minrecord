@@ -3713,6 +3713,30 @@ The step can be <code>None</code> if there is no step.</p>
     </table>
 
 
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="ValueError">ValueError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>if an element is not a <code>tuple</code> or a <code>list</code>
+of length 2.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
 <details class="example" open>
   <summary>Example</summary>
   <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">minrecord</span><span class="w"> </span><span class="kn">import</span> <span class="n">Record</span>
@@ -3897,9 +3921,9 @@ is a dictionary that is not the dictionary of a comparator
             </td>
             <td>
               <div class="doc-md-description">
-                <p>if <code>max_size</code> is not a positive integer, if
-<code>best</code> is not a pair <code>(step, value)</code>, or if <code>best</code>
-is given without <code>elements</code>.</p>
+                <p>if <code>max_size</code> is not a positive integer, if an
+element or <code>best</code> is not a pair <code>(step, value)</code>, or if
+<code>best</code> is given without <code>elements</code>.</p>
               </div>
             </td>
           </tr>
@@ -4184,9 +4208,9 @@ means there is no value yet.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>if <code>max_size</code> is not a positive integer, if
-<code>best</code> is not a pair <code>(step, value)</code>, or if <code>best</code>
-is given without <code>elements</code>.</p>
+                <p>if <code>max_size</code> is not a positive integer, if an
+element or <code>best</code> is not a pair <code>(step, value)</code>, or if
+<code>best</code> is given without <code>elements</code>.</p>
               </div>
             </td>
           </tr>
@@ -4441,9 +4465,9 @@ means there is no value yet.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>if <code>max_size</code> is not a positive integer, if
-<code>best</code> is not a pair <code>(step, value)</code>, or if <code>best</code>
-is given without <code>elements</code>.</p>
+                <p>if <code>max_size</code> is not a positive integer, if an
+element or <code>best</code> is not a pair <code>(step, value)</code>, or if
+<code>best</code> is given without <code>elements</code>.</p>
               </div>
             </td>
           </tr>
@@ -4653,7 +4677,8 @@ the creation of the record is used.</p>
             <td>
               <div class="doc-md-description">
                 <p>if <code>max_size</code> is not a positive integer or is
-larger than <code>sys.maxsize</code>.</p>
+larger than <code>sys.maxsize</code>, or if an element is not a
+<code>tuple</code> or a <code>list</code> of length 2.</p>
               </div>
             </td>
           </tr>
@@ -4806,6 +4831,30 @@ of the state of the manager (<code>state_dict</code>, <code>equal</code>).</p>
     </table>
 
 
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="TypeError">TypeError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>if a value of <code>records</code> is not a <code>BaseRecord</code>
+or if a key is not a <code>str</code>.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
 <details class="example" open>
   <summary>Example</summary>
   <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">minrecord</span><span class="w"> </span><span class="kn">import</span> <span class="n">RecordManager</span><span class="p">,</span> <span class="n">MinScalarRecord</span>
@@ -4935,6 +4984,17 @@ to <code>True</code> to overwrite the record for this key.</p>
         </tr>
       </thead>
       <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="TypeError">TypeError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>if <code>record</code> is not a <code>BaseRecord</code> or if the
+key is not a <code>str</code>.</p>
+              </div>
+            </td>
+          </tr>
           <tr class="doc-section-item">
             <td>
                   <code><span title="RuntimeError">RuntimeError</span></code>
@@ -5374,8 +5434,19 @@ returned. The next call returns the same object.</p>
             <td>
               <div class="doc-md-description">
                 <p>if no record is registered for the key and the
-manager has no <code>default_factory</code>. The manager is not
-modified (also if the factory raises).</p>
+manager has no <code>default_factory</code>.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="TypeError">TypeError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>if the factory does not return a <code>BaseRecord</code>.
+The manager is not modified (also if the factory
+raises).</p>
               </div>
             </td>
           </tr>
@@ -5624,9 +5695,10 @@ structure of the output of <code>state_dict</code>.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>if the data of a key is the data of a record
-of another type than the existing record, or if it is
-not the data of a record.</p>
+                <p>if <code>state_dict</code> is not a dict, if a key is
+not a <code>str</code>, if the data of a key is the data of a
+record of another type than the existing record, or if
+it is not the data of a record.</p>
               </div>
             </td>
           </tr>
