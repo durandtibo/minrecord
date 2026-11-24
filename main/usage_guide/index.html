@@ -1746,12 +1746,15 @@ with comparison logic:</p>
 <h2 id="state-management">State Management<a class="headerlink" href="#state-management" title="Permanent link">&para;</a></h2>
 <p>Records support serialization for checkpointing:</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Save state</span>
-<span class="n">state</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()</span>
+<span class="n">state</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
 <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="s2">"record_state.pt"</span><span class="p">)</span>
 
-<span class="c1"># Load state</span>
+<span class="c1"># Load state in a new record</span>
 <span class="n">state</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">"record_state.pt"</span><span class="p">)</span>
-<span class="n">record</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+<span class="n">record</span> <span class="o">=</span> <span class="n">BaseRecord</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+
+<span class="c1"># Or load state in place (the record is not changed if the state is invalid)</span>
+<span class="n">record</span><span class="o">.</span><span class="n">load_dict</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
 </code></pre></div>
 <p>For RecordManager:</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Save entire manager</span>
@@ -1775,8 +1778,8 @@ with comparison logic:</p>
 </code></pre></div>
 <h3 id="verify-record-equality">Verify record equality<a class="headerlink" href="#verify-record-equality" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="c1"># Useful for testing</span>
-<span class="n">record1</span> <span class="o">=</span> <span class="n">MinScalarRecord</span><span class="o">.</span><span class="n">from_elements</span><span class="p">(</span><span class="s2">"loss"</span><span class="p">,</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">1.3</span><span class="p">)])</span>
-<span class="n">record2</span> <span class="o">=</span> <span class="n">MinScalarRecord</span><span class="o">.</span><span class="n">from_elements</span><span class="p">(</span><span class="s2">"loss"</span><span class="p">,</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">1.3</span><span class="p">)])</span>
+<span class="n">record1</span> <span class="o">=</span> <span class="n">MinScalarRecord</span><span class="p">(</span><span class="s2">"loss"</span><span class="p">,</span> <span class="n">elements</span><span class="o">=</span><span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">1.3</span><span class="p">)])</span>
+<span class="n">record2</span> <span class="o">=</span> <span class="n">MinScalarRecord</span><span class="p">(</span><span class="s2">"loss"</span><span class="p">,</span> <span class="n">elements</span><span class="o">=</span><span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">1.3</span><span class="p">)])</span>
 <span class="k">assert</span> <span class="n">record1</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span><span class="n">record2</span><span class="p">)</span>
 </code></pre></div>
 <h2 id="see-also">See Also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>

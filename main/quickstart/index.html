@@ -1274,29 +1274,10 @@ shown in the example below.</p>
 </code></pre></div>
 <p><img alt="⚠" class="twemoji" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/26a0.svg" title=":warning:" /> Calling <code>has_improved</code> or <code>get_best_value</code> on non-comparable record raises
 a <code>NotAComparableRecord</code> exception.</p>
-<p><strong><img alt="⚠" class="twemoji" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/26a0.svg" title=":warning:" /> Note about constructors:</strong> the constructor of <code>ComparableRecord</code> works slightly
-differently from <code>Record</code>.
-If you pass some elements to the constructor, you also need to pass the <code>best_value</code> and <code>improved</code>
-arguments to have the correct behavior.
-It is not a mistake but the expected behavior as the best value can be outside of the values store
-in the record.</p>
+<p>The <code>elements</code> argument of the constructor adds the values with <code>add_value</code>, so the best value and
+<code>has_improved</code> are correct when a record is created from some elements.</p>
 <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">minrecord</span><span class="w"> </span><span class="kn">import</span> <span class="n">MinScalarRecord</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Incorrect behavior</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">record</span> <span class="o">=</span> <span class="n">MinScalarRecord</span><span class="p">(</span><span class="s2">"loss"</span><span class="p">,</span> <span class="n">elements</span><span class="o">=</span><span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">42</span><span class="p">),</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">45</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">46</span><span class="p">)])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">add_value</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">get_best_value</span><span class="p">()</span>
-<span class="go">50</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Correct behavior</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span> <span class="o">=</span> <span class="n">MinScalarRecord</span><span class="p">(</span><span class="s2">"loss"</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">update</span><span class="p">([(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">42</span><span class="p">),</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">45</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">46</span><span class="p">)])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">add_value</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">get_best_value</span><span class="p">()</span>
-<span class="go">42</span>
-</code></pre></div>
-<p>To automatically instantiate the record based on the input elements, you can use the <code>from_elements</code>
-class method.</p>
-<div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">minrecord</span><span class="w"> </span><span class="kn">import</span> <span class="n">MinScalarRecord</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span> <span class="o">=</span> <span class="n">MinScalarRecord</span><span class="o">.</span><span class="n">from_elements</span><span class="p">(</span><span class="s2">"loss"</span><span class="p">,</span> <span class="n">elements</span><span class="o">=</span><span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">42</span><span class="p">),</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">45</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">46</span><span class="p">)])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">add_value</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">get_best_value</span><span class="p">()</span>
 <span class="go">42</span>

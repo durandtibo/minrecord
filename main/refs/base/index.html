@@ -781,17 +781,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#minrecord.base.BaseRecord.config_dict" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        config_dict
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#minrecord.base.BaseRecord.equal" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -880,21 +869,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#minrecord.base.BaseRecord.load_state_dict" class="md-nav__link">
+  <a href="#minrecord.base.BaseRecord.load_dict" class="md-nav__link">
     <span class="md-ellipsis">
       
-        load_state_dict
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#minrecord.base.BaseRecord.state_dict" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        state_dict
+        load_dict
       
     </span>
   </a>
@@ -1278,17 +1256,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#minrecord.base.BaseRecord.config_dict" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        config_dict
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#minrecord.base.BaseRecord.equal" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1377,21 +1344,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#minrecord.base.BaseRecord.load_state_dict" class="md-nav__link">
+  <a href="#minrecord.base.BaseRecord.load_dict" class="md-nav__link">
     <span class="md-ellipsis">
       
-        load_state_dict
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#minrecord.base.BaseRecord.state_dict" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        state_dict
+        load_dict
       
     </span>
   </a>
@@ -1535,22 +1491,32 @@ where step is the index of the step when the value was added. The
 length of the recent record depends on the concrete
 implementation.</p>
 <p>To implement your own record, you will need to define the
-following methods:</p>
-<div class="highlight"><pre><span></span><code>- ``add_value``
+following members:</p>
+<div class="highlight"><pre><span></span><code>- ``name``
+- ``add_value``
 - ``get_last_value``
 - ``get_most_recent``
-- ``is_comparable``
 - ``is_empty``
-- ``update``
-- ``load_state_dict``
-- ``state_dict``
+- ``to_dict``
 </code></pre></div>
-<p>If it is a comparable record, you will need to implement
-the following methods too:</p>
-<div class="highlight"><pre><span></span><code>- ``_get_best_value``
-- ``_has_improved``
+<p>The other methods are derived from them and must not be overridden
+(<code>clone</code>, <code>equal</code>, <code>update</code>, <code>from_dict</code> and <code>load_dict</code>),
+except by a comparable record that overrides <code>is_comparable</code>,
+<code>get_best_value</code> and <code>has_improved</code>.</p>
+<p>The contract of a record is:</p>
+<div class="highlight"><pre><span></span><code>1. ``to_dict`` returns exactly the arguments of the constructor
+    that rebuild the record, including its content, and the
+    full name of the class with the key ``_target_``. Thus
+    ``BaseRecord.from_dict(record.to_dict()).equal(record)``.
+2. The constructor accepts what ``to_dict`` returns, validates
+    its arguments and raises before any object exists.
+3. ``get_best_value`` and ``has_improved`` raise
+    ``NotAComparableRecordError`` if the record is not
+    comparable, and ``EmptyRecordError`` if the record is
+    comparable and empty.
 </code></pre></div>
-<p>You may also need to extend the <code>config_dict</code> method.</p>
+<p>The values are stored by reference: <code>to_dict</code> and <code>clone</code> share
+the value objects with the original record.</p>
 
 
 <details class="example" open>
@@ -1699,17 +1665,15 @@ step to track.</p>
             <span class="doc doc-object-name doc-function-name">minrecord.base.BaseRecord.clone</span>
 
 
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
-  </span>
-
 <a href="#minrecord.base.BaseRecord.clone" class="headerlink" title="Permanent link">&para;</a></h4>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">clone</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" title="minrecord.base.BaseRecord" href="#minrecord.base.BaseRecord">BaseRecord</a></span><span class="p">[</span><span class="n"><span title="minrecord.base.T">T</span></span><span class="p">]</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">clone</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n"><span title="typing.Self">Self</span></span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
 
         <p>Clone the current record.</p>
+<p>The clone is independent: adding values to it does not change
+the original record. The values are shared, not copied.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -1723,7 +1687,7 @@ step to track.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-internal" title="minrecord.base.BaseRecord" href="#minrecord.base.BaseRecord">BaseRecord</a>[<span title="minrecord.base.T">T</span>]</code>
+                  <code><span title="typing.Self">Self</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1752,74 +1716,9 @@ step to track.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="minrecord.base.BaseRecord.config_dict" class="doc doc-heading">
-            <span class="doc doc-object-name doc-function-name">minrecord.base.BaseRecord.config_dict</span>
-
-
-<a href="#minrecord.base.BaseRecord.config_dict" class="headerlink" title="Permanent link">&para;</a></h4>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">config_dict</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><span title="typing.Any">Any</span></span><span class="p">]</span>
-</code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Get the config of the record.</p>
-<p>The config dictionary should contain all the values necessary
-to instantiate a record with the same parameters
-with <code>coola.factory.factory</code>. It is expected to contain values
-like the full name of the class and the arguments of the
-constructor. This dictionary should not contain the state
-values. It is possible to get the state values with the
-<code>state_dict</code> method.</p>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="dict">dict</span>[<span title="str">str</span>, <span title="typing.Any">Any</span>]</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The config of the record.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-<details class="example" open>
-  <summary>Example</summary>
-  <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">coola.factory</span><span class="w"> </span><span class="kn">import</span> <span class="n">factory</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">minrecord</span><span class="w"> </span><span class="kn">import</span> <span class="n">Record</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">config</span> <span class="o">=</span> <span class="n">Record</span><span class="p">(</span><span class="s2">"loss"</span><span class="p">)</span><span class="o">.</span><span class="n">config_dict</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span> <span class="o">=</span> <span class="n">factory</span><span class="p">(</span><span class="o">**</span><span class="n">config</span><span class="p">)</span>  <span class="c1"># Note that the state is not copied.</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span>
-<span class="go">Record(name=loss, max_size=10, size=0)</span>
-</code></pre></div>
-</details>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
 <h4 id="minrecord.base.BaseRecord.equal" class="doc doc-heading">
             <span class="doc doc-object-name doc-function-name">minrecord.base.BaseRecord.equal</span>
 
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
-  </span>
 
 <a href="#minrecord.base.BaseRecord.equal" class="headerlink" title="Permanent link">&para;</a></h4>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">equal</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n"><span title="typing.Any">Any</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="bool">bool</span></span>
@@ -1828,6 +1727,8 @@ values. It is possible to get the state values with the
     <div class="doc doc-contents ">
 
         <p>Indicate if two records are equal or not.</p>
+<p>Two records are equal if they have the same type and the same
+<code>to_dict</code> output.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1892,7 +1793,7 @@ values. It is possible to get the state values with the
 <span class="gp">&gt;&gt;&gt; </span><span class="n">record3</span> <span class="o">=</span> <span class="n">Record</span><span class="p">(</span><span class="s2">"loss"</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">record1</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span><span class="n">record2</span><span class="p">)</span>
 <span class="go">False</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">record1</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span><span class="n">record1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record1</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span><span class="n">record3</span><span class="p">)</span>
 <span class="go">True</span>
 </code></pre></div>
 </details>
@@ -1919,6 +1820,9 @@ values. It is possible to get the state values with the
     <div class="doc doc-contents ">
 
         <p>Instantiate a record from a dictionary.</p>
+<p>This method is equivalent to <code>coola.factory.factory(**data)</code>,
+so the constructor validates the arguments. The dictionary is
+not modified.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1942,9 +1846,8 @@ values. It is possible to get the state values with the
             <td>
               <div class="doc-md-description">
                 <p>The dictionary that is used to instantiate the
-record. The dictionary is expected to contain the
-parameters to create instantiate the record and the
-state of the record.</p>
+record. It is expected to have the structure of the
+output of <code>to_dict</code>.</p>
               </div>
             </td>
             <td>
@@ -1984,12 +1887,10 @@ state of the record.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">coola.factory</span><span class="w"> </span><span class="kn">import</span> <span class="n">OBJECT_TARGET</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">record</span> <span class="o">=</span> <span class="n">BaseRecord</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span>
 <span class="gp">... </span>    <span class="p">{</span>
-<span class="gp">... </span>        <span class="s2">"config"</span><span class="p">:</span> <span class="p">{</span>
-<span class="gp">... </span>            <span class="n">OBJECT_TARGET</span><span class="p">:</span> <span class="s2">"minrecord.Record"</span><span class="p">,</span>
-<span class="gp">... </span>            <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"loss"</span><span class="p">,</span>
-<span class="gp">... </span>            <span class="s2">"max_size"</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span>
-<span class="gp">... </span>        <span class="p">},</span>
-<span class="gp">... </span>        <span class="s2">"state"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"record"</span><span class="p">:</span> <span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">))},</span>
+<span class="gp">... </span>        <span class="n">OBJECT_TARGET</span><span class="p">:</span> <span class="s2">"minrecord.Record"</span><span class="p">,</span>
+<span class="gp">... </span>        <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"loss"</span><span class="p">,</span>
+<span class="gp">... </span>        <span class="s2">"max_size"</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span>
+<span class="gp">... </span>        <span class="s2">"elements"</span><span class="p">:</span> <span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)),</span>
 <span class="gp">... </span>    <span class="p">}</span>
 <span class="gp">... </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">record</span>
@@ -2054,11 +1955,12 @@ values in the record.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code>NotAComparableRecord</code>
+                  <code><a class="autorefs autorefs-internal" title="minrecord.base.NotAComparableRecordError" href="#minrecord.base.NotAComparableRecordError">NotAComparableRecordError</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>if it is not a comparable record.</p>
+                <p>if it is not a comparable
+record.</p>
               </div>
             </td>
           </tr>
@@ -2127,6 +2029,29 @@ values in the record.</p>
             <td>
               <div class="doc-md-description">
                 <p>The last value added in the record.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="minrecord.base.EmptyRecordError" href="#minrecord.base.EmptyRecordError">EmptyRecordError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>if the record is empty.</p>
               </div>
             </td>
           </tr>
@@ -2268,11 +2193,12 @@ otherwise <code>False</code>.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code>NotAComparableRecord</code>
+                  <code><a class="autorefs autorefs-internal" title="minrecord.base.NotAComparableRecordError" href="#minrecord.base.NotAComparableRecordError">NotAComparableRecordError</a></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>if it is not a comparable record.</p>
+                <p>if it is not a comparable
+record.</p>
               </div>
             </td>
           </tr>
@@ -2311,10 +2237,6 @@ otherwise <code>False</code>.</p>
 <h4 id="minrecord.base.BaseRecord.is_comparable" class="doc doc-heading">
             <span class="doc doc-object-name doc-function-name">minrecord.base.BaseRecord.is_comparable</span>
 
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
-  </span>
 
 <a href="#minrecord.base.BaseRecord.is_comparable" class="headerlink" title="Permanent link">&para;</a></h4>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">is_comparable</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n"><span title="bool">bool</span></span>
@@ -2424,22 +2346,20 @@ the record, otherwise <code>False</code>.</p>
 <div class="doc doc-object doc-function">
 
 
-<h4 id="minrecord.base.BaseRecord.load_state_dict" class="doc doc-heading">
-            <span class="doc doc-object-name doc-function-name">minrecord.base.BaseRecord.load_state_dict</span>
+<h4 id="minrecord.base.BaseRecord.load_dict" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">minrecord.base.BaseRecord.load_dict</span>
 
 
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
-  </span>
-
-<a href="#minrecord.base.BaseRecord.load_state_dict" class="headerlink" title="Permanent link">&para;</a></h4>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">load_state_dict</span><span class="p">(</span><span class="n">state_dict</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><span title="typing.Any">Any</span></span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+<a href="#minrecord.base.BaseRecord.load_dict" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">load_dict</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><span title="typing.Any">Any</span></span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Set up the record from a dictionary containing the state
-values.</p>
+        <p>Load a dictionary in the current record, in place.</p>
+<p>The new record is built first from the dictionary (with
+<code>from_dict</code>), so the record is not modified if the
+dictionary is invalid.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2455,14 +2375,16 @@ values.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                <code>state_dict</code>
+                <code>data</code>
             </td>
             <td>
                   <code><span title="dict">dict</span>[<span title="str">str</span>, <span title="typing.Any">Any</span>]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A dictionary containing state keys with values.</p>
+                <p>The dictionary to load. It is expected to have the
+structure of the output of <code>to_dict</code> of a record of
+the same type.</p>
               </div>
             </td>
             <td>
@@ -2473,41 +2395,7 @@ values.</p>
     </table>
 
 
-<details class="example" open>
-  <summary>Example</summary>
-  <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">minrecord</span><span class="w"> </span><span class="kn">import</span> <span class="n">Record</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span> <span class="o">=</span> <span class="n">Record</span><span class="p">(</span><span class="s2">"loss"</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">({</span><span class="s2">"record"</span><span class="p">:</span> <span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mf">42.0</span><span class="p">),)})</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">get_last_value</span><span class="p">()</span>
-<span class="go">42.0</span>
-</code></pre></div>
-</details>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="minrecord.base.BaseRecord.state_dict" class="doc doc-heading">
-            <span class="doc doc-object-name doc-function-name">minrecord.base.BaseRecord.state_dict</span>
-
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
-  </span>
-
-<a href="#minrecord.base.BaseRecord.state_dict" class="headerlink" title="Permanent link">&para;</a></h4>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">state_dict</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><span title="typing.Any">Any</span></span><span class="p">]</span>
-</code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Get a dictionary containing the state values of the record.</p>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
+<p><span class="doc-section-title">Raises:</span></p>
     <table>
       <thead>
         <tr>
@@ -2518,11 +2406,12 @@ values.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="dict">dict</span>[<span title="str">str</span>, <span title="typing.Any">Any</span>]</code>
+                  <code><span title="TypeError">TypeError</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The state values in a dict.</p>
+                <p>if the dictionary is the dictionary of a
+record of another type.</p>
               </div>
             </td>
           </tr>
@@ -2534,10 +2423,9 @@ values.</p>
   <summary>Example</summary>
   <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">minrecord</span><span class="w"> </span><span class="kn">import</span> <span class="n">Record</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">record</span> <span class="o">=</span> <span class="n">Record</span><span class="p">(</span><span class="s2">"loss"</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">add_value</span><span class="p">(</span><span class="mf">42.0</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">state</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">state</span>
-<span class="go">{'record': ((0, 42.0),)}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">load_dict</span><span class="p">(</span><span class="n">Record</span><span class="p">(</span><span class="s2">"loss"</span><span class="p">,</span> <span class="n">elements</span><span class="o">=</span><span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">42.0</span><span class="p">)])</span><span class="o">.</span><span class="n">to_dict</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">get_last_value</span><span class="p">()</span>
+<span class="go">42.0</span>
 </code></pre></div>
 </details>
 
@@ -2552,6 +2440,10 @@ values.</p>
             <span class="doc doc-object-name doc-function-name">minrecord.base.BaseRecord.to_dict</span>
 
 
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
+  </span>
+
 <a href="#minrecord.base.BaseRecord.to_dict" class="headerlink" title="Permanent link">&para;</a></h4>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">to_dict</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><span title="typing.Any">Any</span></span><span class="p">]</span>
 </code></pre></div>
@@ -2559,10 +2451,11 @@ values.</p>
     <div class="doc doc-contents ">
 
         <p>Export the current record to a dictionary.</p>
-<p>This method exports all the information to re-create the
-record with the same state. The returned dictionary
-can be used as input of the <code>from_dict</code> method to resume the
-record.</p>
+<p>The dictionary contains the full name of the class (key
+<code>_target_</code>) and the arguments of the constructor that
+re-create the record with the same content. It can be used as
+input of <code>from_dict</code> or <code>load_dict</code>, or as the arguments of
+<code>coola.factory.factory</code>.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -2580,8 +2473,7 @@ record.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A dictionary with the config and the state of the
-record.</p>
+                <p>A dictionary with the arguments of the constructor.</p>
               </div>
             </td>
           </tr>
@@ -2591,11 +2483,9 @@ record.</p>
 
 <details class="example" open>
   <summary>Example</summary>
-  <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">minrecord</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseRecord</span><span class="p">,</span> <span class="n">Record</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">record_dict</span> <span class="o">=</span> <span class="n">Record</span><span class="p">(</span><span class="s2">"loss"</span><span class="p">)</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span> <span class="o">=</span> <span class="n">BaseRecord</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">record_dict</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span>
-<span class="go">Record(name=loss, max_size=10, size=0)</span>
+  <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">minrecord</span><span class="w"> </span><span class="kn">import</span> <span class="n">Record</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Record</span><span class="p">(</span><span class="s2">"loss"</span><span class="p">,</span> <span class="n">elements</span><span class="o">=</span><span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">)],</span> <span class="n">max_size</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+<span class="go">{'_target_': 'minrecord.generic.Record', 'name': 'loss', 'max_size': 3, 'elements': ((0, 1.5),)}</span>
 </code></pre></div>
 </details>
 
@@ -2609,10 +2499,6 @@ record.</p>
 <h4 id="minrecord.base.BaseRecord.update" class="doc doc-heading">
             <span class="doc doc-object-name doc-function-name">minrecord.base.BaseRecord.update</span>
 
-
-  <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-abstractmethod"><code>abstractmethod</code></small>
-  </span>
 
 <a href="#minrecord.base.BaseRecord.update" class="headerlink" title="Permanent link">&para;</a></h4>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">update</span><span class="p">(</span>
