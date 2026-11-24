@@ -172,7 +172,8 @@ def test_state_dict_json_round_trip_nan_resume_training_is_equal() -> None:
 
 
 def train_with_missing_metric(record: MinScalarRecord, metrics: list[Any]) -> None:
-    """Add the metrics, and skip the epoch of a metric that is rejected."""
+    """Add the metrics, and skip the epoch of a metric that is
+    rejected."""
     for epoch, metric in enumerate(metrics):
         try:
             record.add_value(metric, step=epoch)

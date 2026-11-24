@@ -8,18 +8,18 @@ compatibility layer. The [design page](design.md) explains the current behavior.
 
 ### Migrating from 0.3
 
-| Before                                                                                      | Now                                                                                                                             |
-| ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| `record.config_dict()`, `record.state_dict()`, `record.load_state_dict(...)`                | `record.to_dict()`, `BaseRecord.from_dict(data)` (new record), `record.load_dict(data)` (in place)                              |
-| `{"config": ..., "state": ...}`                                                             | One flat dict: `_target_`, `name`, `max_size`, `elements` and, for a comparable record, `comparator` and `best`                 |
-| `MinScalarRecord.from_elements(name, elements)`                                             | `MinScalarRecord(name, elements=elements)`                                                                                      |
-| `best_value=...`, `improved=...`                                                            | `best=(step, value)` (a pair, with at least one element). `has_improved()` is derived from the values                           |
-| `record.is_better(...)`                                                                     | `comparator.is_better(new_value=..., old_value=...)`                                                                            |
-| `BaseComparator.get_initial_best_value`                                                     | Removed: the first value of a record is the best value                                                                          |
-| `BaseRecord._get_best_value`, `_has_improved` hooks                                         | Override `get_best_value`, `get_best_step`, `has_improved` and `is_comparable`                                                  |
-| `manager.get_record("new")` created a `Record`                                              | `KeyError`. Use `RecordManager(default_factory=Record)` (or another record class) to create records on demand                   |
-| `minrecord.config.Config`, `get_default_config`                                             | `get_max_size`, `set_max_size`, `reset_max_size`                                                                                |
-| `minrecord.utils.value.MutableValue`                                                        | Removed                                                                                                                         |
+| Before                                                                       | Now                                                                                                             |
+| ---------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `record.config_dict()`, `record.state_dict()`, `record.load_state_dict(...)` | `record.to_dict()`, `BaseRecord.from_dict(data)` (new record), `record.load_dict(data)` (in place)              |
+| `{"config": ..., "state": ...}`                                              | One flat dict: `_target_`, `name`, `max_size`, `elements` and, for a comparable record, `comparator` and `best` |
+| `MinScalarRecord.from_elements(name, elements)`                              | `MinScalarRecord(name, elements=elements)`                                                                      |
+| `best_value=...`, `improved=...`                                             | `best=(step, value)` (a pair, with at least one element). `has_improved()` is derived from the values           |
+| `record.is_better(...)`                                                      | `comparator.is_better(new_value=..., old_value=...)`                                                            |
+| `BaseComparator.get_initial_best_value`                                      | Removed: the first value of a record is the best value                                                          |
+| `BaseRecord._get_best_value`, `_has_improved` hooks                          | Override `get_best_value`, `get_best_step`, `has_improved` and `is_comparable`                                  |
+| `manager.get_record("new")` created a `Record`                               | `KeyError`. Use `RecordManager(default_factory=Record)` (or another record class) to create records on demand   |
+| `minrecord.config.Config`, `get_default_config`                              | `get_max_size`, `set_max_size`, `reset_max_size`                                                                |
+| `minrecord.utils.value.MutableValue`                                         | Removed                                                                                                         |
 
 The checkpoints of the previous versions are not read.
 

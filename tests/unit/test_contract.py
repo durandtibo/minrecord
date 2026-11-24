@@ -20,8 +20,8 @@ from tests.unit.helpers import ToleranceComparator
 
 
 class UnitRecord(Record[float]):
-    r"""Define a record with an additional argument to test the
-    contract of a custom record."""
+    r"""Define a record with an additional argument to test the contract
+    of a custom record."""
 
     def __init__(
         self,

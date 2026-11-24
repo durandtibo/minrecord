@@ -59,7 +59,8 @@ check it.
 
 Not guaranteed, and documented as such (`usage_guide.md` has the first six; the last is new):
 
-- **Thread safety.** A record and a manager are not thread-safe. Use one record per thread or a lock.
+- **Thread safety.** A record and a manager are not thread-safe. Use one record per thread or
+  a lock.
 - **Values are stored by reference.** `add_value` does not copy the value, and `to_dict` and `clone`
   share the value objects between the copies. Store scalars or immutable objects.
 - **Order of the `step` values.** `step` is a label: it is not checked to increase, nor to be a
@@ -70,8 +71,8 @@ Not guaranteed, and documented as such (`usage_guide.md` has the first six; the 
   never calls anything but a record class, but a dict from an untrusted source can still make the
   process import a module.
 - **`load_dict` replaces the whole state**, name and `max_size` included.
-- **`copy.copy(record)` is not a clone.** A shallow copy shares the deque, so `add_value` on the copy
-  changes the original **[verified]**. `clone()` and `copy.deepcopy` are independent (both
+- **`copy.copy(record)` is not a clone.** A shallow copy shares the deque, so `add_value` on the
+  copy changes the original **[verified]**. `clone()` and `copy.deepcopy` are independent (both
   **[verified]**, as is `pickle`). Use `clone()`.
 
 ## 2. Constraints
@@ -115,12 +116,12 @@ once in `BaseRecord`; 6 abstract members; the first value compared with itself; 
 NaN-aware `equal`; `@final` on the five derived methods; `best` as one pair that needs `elements`;
 the module-level `max_size` read at creation; `elements` replayed through `add_value`; atomic
 `add_value` (the comparison runs before the append); `EmptyRecordError` and
-`NotAComparableRecordError`; the registrations in the `coola` equality registry; `instantiate` as the
-only loader (it does not instantiate a `_target_` stored in a value); `get_best_step`; the shared
-`_ScalarRecord` (`_target_` of the public classes unchanged); the two-phase `load_state_dict` with its
-merge semantics; the contract test (`tests/unit/test_contract.py`) and the JSON checkpoint integration
-tests; the doctests on every public function and on every Markdown file; `deepcopy` and `pickle`
-of a record; no `ty` or `pyright` suppression in `src`.
+`NotAComparableRecordError`; the registrations in the `coola` equality registry; `instantiate` as
+the only loader (it does not instantiate a `_target_` stored in a value); `get_best_step`; the
+shared `_ScalarRecord` (`_target_` of the public classes unchanged); the two-phase `load_state_dict`
+with its merge semantics; the contract test (`tests/unit/test_contract.py`) and the JSON checkpoint
+integration tests; the doctests on every public function and on every Markdown file; `deepcopy` and
+`pickle` of a record; no `ty` or `pyright` suppression in `src`.
 
 ### Module by module
 
@@ -205,8 +206,8 @@ def instantiate(config: dict[str, Any], cls: type[T]) -> T:
         ...  # unchanged
 ```
 
-`{config!r:.80}` bounds the message (the repr of a class is 50 characters, the repr of a huge list is
-cut). The messages of the two paths are the ones of the prototype:
+`{config!r:.80}` bounds the message (the repr of a class is 50 characters, the repr of a huge list
+is cut). The messages of the two paths are the ones of the prototype:
 `Expected the configuration of a BaseComparator (a dict), got <class 'minrecord.comparator.MinScalarComparator'>`.
 It fixes `from_dict`, `load_dict`, `load_state_dict` and the comparator argument with one line.
 
@@ -220,8 +221,9 @@ def check_name(name: Any) -> str:
     return name
 ```
 
-`Record.__init__` calls it (`self._name = check_name(name)`), next to `check_max_size`. It is a public
-helper of `minrecord.utils.validation` with its own tests (`CLAUDE.md`). An empty string stays valid.
+`Record.__init__` calls it (`self._name = check_name(name)`), next to `check_max_size`. It is a
+public helper of `minrecord.utils.validation` with its own tests (`CLAUDE.md`). An empty
+string stays valid.
 
 ### 4.4 The manager is explicit (F4)
 
@@ -247,21 +249,20 @@ class RecordManager:
 
 It is the contract of `collections.defaultdict`, which every Python user knows: strict by default,
 creation when the caller gives a factory. The three logging examples of the documentation (`FAQ`:
-TensorBoard and wandb, `usage_guide.md`: wandb) become `RecordManager(default_factory=Record)`,
-and a
-user who wants a best value for every new metric writes `RecordManager(default_factory=MinScalarRecord)`,
-which the current manager cannot do. `default_factory` is not part of the state: `state_dict`,
-`equal` and `load_state_dict` do not change (a key that the state adds is built with
-`BaseRecord.from_dict`, as today). `manager.py` no longer imports `Record`, and no longer reads the
-global default behind the caller's back. The alternative that only makes `get_record` strict is
-decision D2.
+TensorBoard and wandb, `usage_guide.md`: wandb) become `RecordManager(default_factory=Record)`, and
+a user who wants a best value for every new metric writes
+`RecordManager(default_factory=MinScalarRecord)`, which the current manager cannot do.
+`default_factory` is not part of the state: `state_dict`, `equal` and `load_state_dict` do not
+change (a key that the state adds is built with `BaseRecord.from_dict`, as today). `manager.py` no
+longer imports `Record`, and no longer reads the global default behind the caller's back. The
+alternative that only makes `get_record` strict is decision D2.
 
 ### 4.5 The documentation says what the code does (F5, F6, F7)
 
 - **`equal` of the records, the comparators and the manager**: the docstring says "Two records are
-  equal if they have the same type and the same `to_dict` output. A NaN value is equal to a NaN value,
-  also when `objects_are_equal` is called with `equal_nan=False`: the equality of a record is the
-  equality of its snapshot." The property table has the row **Equality is snapshot equality**.
+  equal if they have the same type and the same `to_dict` output. A NaN value is equal to a NaN
+  value, also when `objects_are_equal` is called with `equal_nan=False`: the equality of a record is
+  the equality of its snapshot." The property table has the row **Equality is snapshot equality**.
 - **`load_state_dict`**: the docstring and the release notes say that the data of an existing key is
   validated by building a record, then loaded with `load_dict`, so it is built twice; the manager is
   still not modified if an entry is invalid. No code change.
@@ -329,8 +330,8 @@ constructor calls (F6); `copy.copy(record).add_value(...)` changes the original,
 
 Cost of the operations, for the record (**[verified]**, not a gate): `Record.add_value` 59 ns,
 `MinScalarRecord.add_value` 200 ns, `get_last_value` 63 ns; for a window of 1,000 pairs `to_dict` 6
-µs, `get_most_recent` 5 µs, `clone` 184 µs, `equal` against a clone 1.55 ms (the `coola` engine walks
-the tuples; with the default `max_size=10` it is about 15 µs). Nothing here asks for a change.
+µs, `get_most_recent` 5 µs, `clone` 184 µs, `equal` against a clone 1.55 ms (the `coola` engine
+walks the tuples; with the default `max_size=10` it is about 15 µs). Nothing here asks for a change.
 
 ## 7. Changes to reach the target state
 
@@ -345,7 +346,8 @@ One branch and one pull request per step (`CLAUDE.md`). The steps are independen
 | 3    | **Documentation.** Snapshot equality (docstrings, property row, one test for `equal_nan=False`), the `load_state_dict` sentence, the `BaseRecord` half sentence, the FAQ memory figures, the properties table of `usage_guide.md` replaced by the one of section 1, the `copy.copy` note.                                         | F5, F6, F7 | no                    |
 | 4    | **Tests and package checks.** `package_checks.py` on `minrecord.__all__` plus a manager round trip; the 8 tests split or parametrised.                                                                                                                                                                                            | F8         | no                    |
 
-Status: step 1 is done in #552, step 2 in #553 and step 3 in #554 (stacked on #552), step 4 in #555 (stacked on #554).
+Status: step 1 is done in #552, step 2 in #553 and step 3 in #554 (stacked on #552), step 4 in #555
+(stacked on #554).
 
 Steps 1 and 2 change what a caller observes, and nothing else does; they should be released with
 the notes of the new checks. Steps 3 and 4 change no behaviour. Step 4 can be done first to get the
@@ -384,8 +386,8 @@ literal expected values, a regression test for every bug that fails without the 
   `Known keys` and the manager is unchanged; with `default_factory=MinScalarRecord` the key creates
   a `MinScalarRecord` named after the key and the second call returns the same object; with
   `default_factory=Record`; a factory that raises leaves the manager unchanged; `equal`,
-  `state_dict` and `load_state_dict` ignore `default_factory` (a literal `state_dict`); the six tests
-  that created a record by `get_record` use `add_record` or `default_factory`.
+  `state_dict` and `load_state_dict` ignore `default_factory` (a literal `state_dict`); the six
+  tests that created a record by `get_record` use `add_record` or `default_factory`.
 - **Equality** (`test_base.py`, `test_comparator.py`, `test_manager.py`, step 3): a record, a
   comparator and a manager that hold NaN are equal to their copy through
   `objects_are_equal(..., equal_nan=False)` (one test per class, documents F5).
@@ -414,12 +416,12 @@ and every user comparison of a NaN-holding record pass `equal_nan=True`. It is a
 (three `equal` methods, the eight `test_contract_nan_*` tests) if the maintainers prefer
 consistency to convenience.
 
-**D2. How strict is the manager?** _Recommended: strict `get_record` plus an opt-in `default_factory`
-(section 4.4)._ The alternatives: (A) strict only, which is the smallest code (no new argument) but
-makes the three logging examples three lines longer and leaves no way to create comparable records
-on demand; (C) keep the creation of a `Record`, which keeps the typo of F4 silent and is documented
-as a troubleshooting entry. The recommended option costs 4 lines and has the semantics of
-`defaultdict`.
+**D2. How strict is the manager?** _Recommended: strict `get_record` plus an opt-in
+`default_factory` (section 4.4)._ The alternatives: (A) strict only, which is the smallest code (no
+new argument) but makes the three logging examples three lines longer and leaves no way to create
+comparable records on demand; (C) keep the creation of a `Record`, which keeps the typo of F4 silent
+and is documented as a troubleshooting entry. The recommended option costs 4 lines and has the
+semantics of `defaultdict`.
 
 **D3. Remove the global default `max_size`?** _Recommended: no._ Deleting `config.py`,
 `set_max_size`, `get_max_size` and `reset_max_size` would leave a package with **no** global state,
@@ -434,19 +436,19 @@ record and the key of the manager state. A `bytes` or `int` name would be a surp
 round trip. Not validating costs nothing today and a lost record on the day it is a `None`.
 
 **D5. `__copy__`?** _Recommended: no; document that `copy.copy` shares the window (section 1)._ A
-`__copy__ = clone` would be two lines, but it adds a dunder that duplicates `clone()` for a call that
-nobody has asked for; `deepcopy` and `pickle` already work.
+`__copy__ = clone` would be two lines, but it adds a dunder that duplicates `clone()` for a call
+that nobody has asked for; `deepcopy` and `pickle` already work.
 
 **D6. Remove the double build of `load_state_dict`?** _Recommended: no; document it._ A single build
 needs a way to load an already built record into an existing one (a second public method on
 `BaseRecord`, or the manager reaching into `vars`). The cost is one extra constructor call for a
 window of at most `max_size` pairs, once per key per load.
 
-**D7. Rename `state_dict`/`load_state_dict` of the manager to `to_dict`/`load_dict`?**
-_Recommended: no._ The manager state is a dict of snapshots, not the arguments of a constructor, and
-`state_dict` is the vocabulary of the ML frameworks that the manager is used with (a user puts
-`manager.state_dict()` in a PyTorch checkpoint). The records use `to_dict` because it is the input of
-`from_dict` and `coola.factory.factory`. The manager has no `from_dict`, so the two names do not
+**D7. Rename `state_dict`/`load_state_dict` of the manager to `to_dict`/`load_dict`?** _Recommended:
+no._ The manager state is a dict of snapshots, not the arguments of a constructor, and `state_dict`
+is the vocabulary of the ML frameworks that the manager is used with (a user puts
+`manager.state_dict()` in a PyTorch checkpoint). The records use `to_dict` because it is the input
+of `from_dict` and `coola.factory.factory`. The manager has no `from_dict`, so the two names do not
 promise the same thing.
 
 **D8. Keep `RuntimeError` for a duplicate key of `add_record`, and two independent error classes?**
@@ -462,12 +464,12 @@ no `steps_since_best` helper (D5), `load_dict` replaces the name (D7).
 ## 10. Not covered
 
 - **Folding `ComparableRecord` into `Record` with an optional comparator.** One class fewer, but the
-  type checker would no longer know that a `MinScalarRecord` has a best value, and `Record.add_value`
-  would grow a branch. The 3-level hierarchy is small and each level has one job.
-- **A `__eq__` on records and managers.** `==` stays identity. `equal` is the `coola` convention, and
-  `__eq__` would need a `__hash__` decision for mutable objects.
-- **Other record kinds.** A record of the whole history (no `max_size`), a windowed mean, a record of
-  vectors: each is a possible `BaseRecord` subclass (6 members), and nothing in the documentation
+  type checker would no longer know that a `MinScalarRecord` has a best value, and
+  `Record.add_value` would grow a branch. The 3-level hierarchy is small and each level has one job.
+- **A `__eq__` on records and managers.** `==` stays identity. `equal` is the `coola` convention,
+  and `__eq__` would need a `__hash__` decision for mutable objects.
+- **Other record kinds.** A record of the whole history (no `max_size`), a windowed mean, a record
+  of vectors: each is a possible `BaseRecord` subclass (6 members), and nothing in the documentation
   asks for them.
 - **Thread safety and multi-process aggregation.** The FAQ answer ("one record per process, gather
   after") stays the answer.
@@ -477,7 +479,8 @@ no `steps_since_best` helper (D5), `load_dict` replaces the name (D7).
 - **Renaming modules** (`generic.py` for `Record`) or moving the scalar records: the `_target_` of
   every saved checkpoint (`minrecord.comparable.MaxScalarRecord`) would change for no gain.
 - **A strict `load_state_dict(strict=...)`**: the merge (unknown records kept, known ones loaded in
-  place, new ones created) matches how the manager is used, and no document asks for the strict mode.
+  place, new ones created) matches how the manager is used, and no document asks for the
+  strict mode.
 - **The repository tooling** (workflows, `invoke` tasks, `.make`), which follows `coola`.
 
 ## Appendix: what the previous reviews delivered

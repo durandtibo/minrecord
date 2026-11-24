@@ -50,8 +50,8 @@ dictionary. The logic that defines the best value is customizable with a compara
 - **🗂️ Record Manager**: Organize and manage multiple metrics efficiently
 - **💾 Serialization**: Save and load record states (`to_dict`, `from_dict`) for checkpointing
 - **🚀 Minimal Dependencies**: Lightweight, with `coola` as the only dependency
-- **🛡️ Strict by Design**: Invalid inputs are rejected when they are received, and a failed call leaves
-  the record unchanged
+- **🛡️ Strict by Design**: Invalid inputs are rejected when they are received, and a failed call
+  leaves the record unchanged
 
 Below is an example to show how to track the best scalar value when the best value is the maximum
 value and when the best value is the minimum value.
@@ -80,14 +80,14 @@ value and when the best value is the minimum value.
   main branch of the repo. This documentation may contain a lot of work-in-progress/outdated/missing
   parts.
 
-The [quickstart](https://durandtibo.github.io/minrecord/quickstart/) shows how to use the records and the
-manager, and the [design page](https://durandtibo.github.io/minrecord/design/) explains the guarantees
-and the design choices.
+The [quickstart](https://durandtibo.github.io/minrecord/quickstart/) shows how to use the records
+and the manager, and the [design page](https://durandtibo.github.io/minrecord/design/) explains the
+guarantees and the design choices.
 
 ## Installation
 
-We highly recommend installing
-a [virtual environment](https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/).
+We highly recommend installing a
+[virtual environment](https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/).
 `minrecord` can be installed from pip using the following command:
 
 ```shell

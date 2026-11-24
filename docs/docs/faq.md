@@ -41,8 +41,8 @@ Python 3.11 and higher are officially supported.
 
 ### Do I need PyTorch or other ML frameworks?
 
-No, `minrecord` has minimal dependencies. It only requires `coola`, which is used for equality, string
-formatting and the creation of objects from a dictionary.
+No, `minrecord` has minimal dependencies. It only requires `coola`, which is used for equality,
+string formatting and the creation of objects from a dictionary.
 
 ## Usage Questions
 
@@ -210,8 +210,8 @@ manager.add_record(Record("custom_metric"))
 
 ### How do I save and resume a record or a manager?
 
-Use `to_dict()` / `BaseRecord.from_dict()` for a record and `state_dict()` / `load_state_dict()` for a
-manager. The dictionaries can be written to JSON. See the
+Use `to_dict()` / `BaseRecord.from_dict()` for a record and `state_dict()` / `load_state_dict()` for
+a manager. The dictionaries can be written to JSON. See the
 [usage guide](usage_guide.md#state-management) and the
 [design choices](design.md#load_dict-replaces-the-whole-state).
 
@@ -254,8 +254,8 @@ if record.is_comparable():
 There's no hard limit. Each record has minimal overhead. With max_size=10:
 
 - Memory per record: about 1 KB when empty, and about 3 KB for a `MinScalarRecord` that holds 10
-  `(step, float)` pairs (measured with `tracemalloc` on Python 3.14; it depends on the Python version
-  and on the values)
+  `(step, float)` pairs (measured with `tracemalloc` on Python 3.14; it depends on the Python
+  version and on the values)
 - 1000 records with 10 scalars each: about 3 MB
 
 ### Is minrecord thread-safe?
@@ -374,8 +374,8 @@ best_values = manager.get_best_values()  # Only comparable records
 
 ### Record not found errors
 
-`get_record()` raises a `KeyError` that lists the known keys when no record is registered for the key.
-Check that record names match exactly:
+`get_record()` raises a `KeyError` that lists the known keys when no record is registered for the
+key. Check that record names match exactly:
 
 ```python
 manager.add_record(MinScalarRecord("train/loss"))  # Note the "/"
