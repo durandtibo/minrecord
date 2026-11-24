@@ -1723,7 +1723,7 @@ with comparison logic:</p>
 </code></pre></div>
 <h3 id="logging-integration">Logging Integration<a class="headerlink" href="#logging-integration" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">wandb</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">minrecord</span><span class="w"> </span><span class="kn">import</span> <span class="n">RecordManager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">minrecord</span><span class="w"> </span><span class="kn">import</span> <span class="n">RecordManager</span><span class="p">,</span> <span class="n">get_last_values</span>
 
 <span class="n">manager</span> <span class="o">=</span> <span class="n">RecordManager</span><span class="p">()</span>
 <span class="c1"># ... add records ...</span>
@@ -1738,7 +1738,7 @@ with comparison logic:</p>
     <span class="n">wandb</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
         <span class="p">{</span>
             <span class="s2">"epoch"</span><span class="p">:</span> <span class="n">epoch</span><span class="p">,</span>
-            <span class="o">**</span><span class="n">manager</span><span class="o">.</span><span class="n">get_last_values</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">"current/"</span><span class="p">),</span>
+            <span class="o">**</span><span class="n">get_last_values</span><span class="p">(</span><span class="n">manager</span><span class="o">.</span><span class="n">get_records</span><span class="p">(),</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">"current/"</span><span class="p">),</span>
             <span class="o">**</span><span class="n">manager</span><span class="o">.</span><span class="n">get_best_values</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">"best/"</span><span class="p">),</span>
         <span class="p">}</span>
     <span class="p">)</span>
@@ -1782,7 +1782,6 @@ with comparison logic:</p>
 <h2 id="see-also">See Also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
 <ul>
 <li><a href="../quickstart/">Quickstart Guide</a> for basic usage</li>
-<li><a href="https://github.com/durandtibo/minrecord/tree/main/examples">Examples</a> for complete working examples</li>
 <li><a href="../faq/">FAQ</a> for common questions and troubleshooting</li>
 <li>API Reference:</li>
 <li><a href="../refs/root/">minrecord</a> - Main package</li>

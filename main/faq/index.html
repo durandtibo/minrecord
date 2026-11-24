@@ -1979,9 +1979,6 @@ are improving.</p>
 <h3 id="how-do-i-install-minrecord">How do I install minrecord?<a class="headerlink" href="#how-do-i-install-minrecord" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>minrecord
 </code></pre></div>
-<p>For all optional dependencies:</p>
-<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>minrecord<span class="o">[</span>all<span class="o">]</span>
-</code></pre></div>
 <h3 id="what-python-versions-are-supported">What Python versions are supported?<a class="headerlink" href="#what-python-versions-are-supported" title="Permanent link">&para;</a></h3>
 <p>Python 3.11 and higher are officially supported.</p>
 <h3 id="do-i-need-pytorch-or-other-ml-frameworks">Do I need PyTorch or other ML frameworks?<a class="headerlink" href="#do-i-need-pytorch-or-other-ml-frameworks" title="Permanent link">&para;</a></h3>
@@ -2065,8 +2062,7 @@ optimal value.</p>
 <p>RecordManager provides:</p>
 <ul>
 <li><strong>Organized storage</strong>: All records in one place</li>
-<li><strong>Batch updates</strong>: Update multiple records at once</li>
-<li><strong>Convenience methods</strong>: <code>get_best_values()</code>, <code>get_last_values()</code></li>
+<li><strong>Convenience methods</strong>: <code>get_best_values()</code></li>
 <li><strong>State management</strong>: Save/load all records together</li>
 </ul>
 <h3 id="does-recordmanager-create-records-automatically">Does RecordManager create records automatically?<a class="headerlink" href="#does-recordmanager-create-records-automatically" title="Permanent link">&para;</a></h3>
@@ -2145,7 +2141,7 @@ optimal value.</p>
 </code></pre></div>
 <h3 id="how-do-i-integrate-with-weights-biases-wandb">How do I integrate with Weights &amp; Biases (wandb)?<a class="headerlink" href="#how-do-i-integrate-with-weights-biases-wandb" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">wandb</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">minrecord</span><span class="w"> </span><span class="kn">import</span> <span class="n">RecordManager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">minrecord</span><span class="w"> </span><span class="kn">import</span> <span class="n">RecordManager</span><span class="p">,</span> <span class="n">get_last_values</span>
 
 <span class="n">wandb</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">project</span><span class="o">=</span><span class="s2">"my-project"</span><span class="p">)</span>
 <span class="n">manager</span> <span class="o">=</span> <span class="n">RecordManager</span><span class="p">()</span>
@@ -2159,7 +2155,7 @@ optimal value.</p>
     <span class="n">wandb</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
         <span class="p">{</span>
             <span class="s2">"epoch"</span><span class="p">:</span> <span class="n">epoch</span><span class="p">,</span>
-            <span class="o">**</span><span class="n">manager</span><span class="o">.</span><span class="n">get_last_values</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">"train/"</span><span class="p">),</span>
+            <span class="o">**</span><span class="n">get_last_values</span><span class="p">(</span><span class="n">manager</span><span class="o">.</span><span class="n">get_records</span><span class="p">(),</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">"train/"</span><span class="p">),</span>
             <span class="o">**</span><span class="n">manager</span><span class="o">.</span><span class="n">get_best_values</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">"best/"</span><span class="p">),</span>
         <span class="p">}</span>
     <span class="p">)</span>
@@ -2199,21 +2195,22 @@ optimal value.</p>
 <li>Comparable records</li>
 </ul>
 <p>Use <code>get_last_values()</code> for all records:</p>
-<div class="highlight"><pre><span></span><code><span class="n">last_values</span> <span class="o">=</span> <span class="n">manager</span><span class="o">.</span><span class="n">get_last_values</span><span class="p">()</span>  <span class="c1"># All non-empty records</span>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">minrecord</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_last_values</span>
+
+<span class="n">last_values</span> <span class="o">=</span> <span class="n">get_last_values</span><span class="p">(</span><span class="n">manager</span><span class="o">.</span><span class="n">get_records</span><span class="p">())</span>  <span class="c1"># All non-empty records</span>
 <span class="n">best_values</span> <span class="o">=</span> <span class="n">manager</span><span class="o">.</span><span class="n">get_best_values</span><span class="p">()</span>  <span class="c1"># Only comparable records</span>
 </code></pre></div>
 <h3 id="record-not-found-errors">Record not found errors<a class="headerlink" href="#record-not-found-errors" title="Permanent link">&para;</a></h3>
 <p>Check that record names match exactly:</p>
 <div class="highlight"><pre><span></span><code><span class="n">manager</span><span class="o">.</span><span class="n">add_record</span><span class="p">(</span><span class="n">MinScalarRecord</span><span class="p">(</span><span class="s2">"train/loss"</span><span class="p">))</span>  <span class="c1"># Note the "/"</span>
 <span class="c1"># Wrong name:</span>
-<span class="n">manager</span><span class="o">.</span><span class="n">get_record</span><span class="p">(</span><span class="s2">"train_loss"</span><span class="p">)</span><span class="o">.</span><span class="n">add_value</span><span class="p">(</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># KeyError if not auto-created</span>
+<span class="n">manager</span><span class="o">.</span><span class="n">get_record</span><span class="p">(</span><span class="s2">"train_loss"</span><span class="p">)</span><span class="o">.</span><span class="n">add_value</span><span class="p">(</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># Creates a new empty record</span>
 <span class="c1"># Correct:</span>
 <span class="n">manager</span><span class="o">.</span><span class="n">get_record</span><span class="p">(</span><span class="s2">"train/loss"</span><span class="p">)</span><span class="o">.</span><span class="n">add_value</span><span class="p">(</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 </code></pre></div>
 <h2 id="need-more-help">Need More Help?<a class="headerlink" href="#need-more-help" title="Permanent link">&para;</a></h2>
 <ul>
 <li>Check the <a href="../usage_guide/">Usage Guide</a> for detailed patterns</li>
-<li>See <a href="https://github.com/durandtibo/minrecord/tree/main/examples">Examples</a> for complete code</li>
 <li>Open an <a href="https://github.com/durandtibo/minrecord/issues">Issue</a> on GitHub</li>
 <li>Read the <a href="../refs/root/">API Reference</a> for detailed documentation</li>
 </ul>

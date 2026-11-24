@@ -1061,19 +1061,7 @@ pip<span class="w"> </span>install<span class="w"> </span>minrecord
 <span class="c1"># uv</span>
 uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>minrecord
 </code></pre></div>
-<p>To make the package as slim as possible, only the packages required to use <code>minrecord</code> are installed.
-It is possible to install all the optional dependencies by running the following command:</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># pip</span>
-pip<span class="w"> </span>install<span class="w"> </span><span class="s1">'minrecord[all]'</span>
-
-<span class="c1"># uv</span>
-uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span><span class="s1">'minrecord[all]'</span>
-</code></pre></div>
-<p>This command also installed NumPy and PyTorch.
-It is also possible to install the optional packages manually or to select the packages to install.
-In the following example, only NumPy is installed:</p>
-<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>minrecord<span class="w"> </span>numpy
-</code></pre></div>
+<p><code>minrecord</code> has no optional dependency: only <code>coola</code> is installed with it.</p>
 <h2 id="installing-from-source">Installing from source<a class="headerlink" href="#installing-from-source" title="Permanent link">&para;</a></h2>
 <p>To install <code>minrecord</code> from source, you can follow the steps below. First, you will need to
 install <a href="https://docs.astral.sh/uv/"><code>uv</code></a>. <code>uv</code> is used to manage and install
