@@ -4,6 +4,8 @@ import json
 from typing import Any
 
 import pytest
+from coola.equality import objects_are_equal
+from coola.equality.tester import get_default_registry
 from coola.factory import OBJECT_TARGET, factory
 
 from minrecord import (
@@ -16,6 +18,7 @@ from minrecord import (
     MinScalarRecord,
     Record,
 )
+from minrecord.utils.equality import SnapshotEqualityTester
 from tests.unit.helpers import ToleranceComparator
 
 
@@ -119,7 +122,7 @@ def is_reflexive(comparator: BaseComparator[float], value: float) -> bool:
 
 
 def test_contract_from_dict_to_dict_is_equal(record: BaseRecord[Any]) -> None:
-    assert BaseRecord.from_dict(record.to_dict()).equal(record)
+    assert objects_are_equal(BaseRecord.from_dict(record.to_dict()), record)
 
 
 def test_contract_from_dict_to_dict_same_type(record: BaseRecord[Any]) -> None:
@@ -127,7 +130,7 @@ def test_contract_from_dict_to_dict_same_type(record: BaseRecord[Any]) -> None:
 
 
 def test_contract_clone_is_equal(record: BaseRecord[Any]) -> None:
-    assert record.clone().equal(record)
+    assert objects_are_equal(record.clone(), record)
 
 
 def test_contract_clone_is_new_object(record: BaseRecord[Any]) -> None:
@@ -137,7 +140,7 @@ def test_contract_clone_is_new_object(record: BaseRecord[Any]) -> None:
 def test_contract_clone_is_independent(record: BaseRecord[Any]) -> None:
     clone = record.clone()
     clone.add_value(100.0, step=10)
-    assert not clone.equal(record)
+    assert not objects_are_equal(clone, record)
 
 
 def test_contract_clone_is_independent_does_not_change_original(record: BaseRecord[Any]) -> None:
@@ -164,13 +167,13 @@ def test_contract_json_round_trip_same_best_step(comparable_record: BaseRecord[A
 
 
 def test_contract_factory_accepts_to_dict(record: BaseRecord[Any]) -> None:
-    assert factory(**record.to_dict()).equal(record)
+    assert objects_are_equal(factory(**record.to_dict()), record)
 
 
 def test_contract_constructor_accepts_to_dict(record: BaseRecord[Any]) -> None:
     data = record.to_dict()
     del data[OBJECT_TARGET]
-    assert type(record)(**data).equal(record)
+    assert objects_are_equal(type(record)(**data), record)
 
 
 def test_contract_to_dict_has_target(record: BaseRecord[Any]) -> None:
@@ -186,7 +189,7 @@ def test_contract_to_dict_is_json_serializable(record: BaseRecord[Any]) -> None:
 
 
 def test_contract_json_round_trip_is_equal(record: BaseRecord[Any]) -> None:
-    assert BaseRecord.from_dict(json.loads(json.dumps(record.to_dict()))).equal(record)
+    assert objects_are_equal(BaseRecord.from_dict(json.loads(json.dumps(record.to_dict()))), record)
 
 
 def test_contract_to_dict_does_not_change_record(record: BaseRecord[Any]) -> None:
@@ -202,11 +205,17 @@ def test_contract_from_dict_does_not_modify_data(record: BaseRecord[Any]) -> Non
     assert data == expected
 
 
+def test_contract_custom_record_uses_the_snapshot_tester() -> None:
+    assert get_default_registry().find_equality_tester(UnitRecord) == SnapshotEqualityTester(
+        "to_dict"
+    )
+
+
 def test_contract_load_dict_makes_record_equal(record: BaseRecord[Any]) -> None:
     other = create_record(type(record).__name__)
     other.add_value(50.0, step=9)
     record.load_dict(other.to_dict())
-    assert record.equal(other)
+    assert objects_are_equal(record, other)
 
 
 def test_contract_load_dict_invalid_leaves_record_unchanged(record: BaseRecord[Any]) -> None:
@@ -215,7 +224,7 @@ def test_contract_load_dict_invalid_leaves_record_unchanged(record: BaseRecord[A
     expected = record.clone()
     with pytest.raises(ValueError, match=r"max_size must be a positive integer, got 0"):
         record.load_dict(data)
-    assert record.equal(expected)
+    assert objects_are_equal(record, expected)
 
 
 @pytest.mark.parametrize(
@@ -234,7 +243,7 @@ def test_contract_load_dict_other_type_leaves_record_unchanged(cls: str, foreign
     expected = record.clone()
     with pytest.raises(TypeError, match=r"Cannot load the data of a"):
         record.load_dict(create_record(foreign).to_dict())
-    assert record.equal(expected)
+    assert objects_are_equal(record, expected)
 
 
 def test_contract_comparable_best_survives_from_dict(comparable_record: BaseRecord[Any]) -> None:
@@ -248,15 +257,19 @@ def test_contract_comparable_best_survives_from_dict(comparable_record: BaseReco
 
 
 def test_contract_nan_from_dict_to_dict_is_equal(nan_record: BaseRecord[Any]) -> None:
-    assert BaseRecord.from_dict(nan_record.to_dict()).equal(nan_record)
+    assert objects_are_equal(BaseRecord.from_dict(nan_record.to_dict()), nan_record, equal_nan=True)
 
 
 def test_contract_nan_json_round_trip_is_equal(nan_record: BaseRecord[Any]) -> None:
-    assert BaseRecord.from_dict(json.loads(json.dumps(nan_record.to_dict()))).equal(nan_record)
+    assert objects_are_equal(
+        BaseRecord.from_dict(json.loads(json.dumps(nan_record.to_dict()))),
+        nan_record,
+        equal_nan=True,
+    )
 
 
 def test_contract_nan_clone_is_equal(nan_record: BaseRecord[Any]) -> None:
-    assert nan_record.clone().equal(nan_record)
+    assert objects_are_equal(nan_record.clone(), nan_record, equal_nan=True)
 
 
 def test_contract_nan_clone_same_has_improved(comparable_nan_record: BaseRecord[Any]) -> None:
@@ -278,7 +291,9 @@ def test_contract_nan_clone_same_best_step(comparable_nan_record: BaseRecord[Any
 
 
 def test_contract_nan_record_is_not_equal_to_a_record_with_a_number() -> None:
-    assert not create_nan_record("RecordNaN").equal(Record("loss", elements=[(0, 1.0), (1, 2.0)]))
+    assert not objects_are_equal(
+        create_nan_record("RecordNaN"), Record("loss", elements=[(0, 1.0), (1, 2.0)])
+    )
 
 
 @pytest.mark.parametrize("max_size", [1, 2, 3])
@@ -363,7 +378,7 @@ def test_contract_comparator_to_dict_has_target(comparator: BaseComparator[float
 
 @pytest.mark.parametrize("cls", [MaxScalarComparator, MinScalarComparator, ToleranceComparator])
 def test_contract_comparator_equal_for_two_instances(cls: type[BaseComparator[float]]) -> None:
-    assert cls().equal(cls())
+    assert objects_are_equal(cls(), cls())
 
 
 @pytest.mark.parametrize(

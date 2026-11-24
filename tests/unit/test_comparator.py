@@ -3,11 +3,12 @@ from __future__ import annotations
 from typing import Any
 
 import pytest
-from coola.equality import objects_are_equal
+from coola.equality import objects_are_allclose, objects_are_equal
 from coola.equality.tester import get_default_registry
 from coola.factory import OBJECT_TARGET, factory
 
 from minrecord import BaseComparator, MaxScalarComparator, MinScalarComparator
+from minrecord.utils.equality import SnapshotEqualityTester
 from tests.unit.helpers import ToleranceComparator
 
 NAN = float("nan")
@@ -30,7 +31,7 @@ def test_base_comparator_to_dict() -> None:
 
 
 def test_base_comparator_to_dict_factory() -> None:
-    assert factory(**MinScalarComparator().to_dict()).equal(MinScalarComparator())
+    assert objects_are_equal(factory(**MinScalarComparator().to_dict()), MinScalarComparator())
 
 
 def test_base_comparator_to_dict_with_argument() -> None:
@@ -41,31 +42,49 @@ def test_base_comparator_to_dict_with_argument() -> None:
 
 
 def test_base_comparator_equal_true() -> None:
-    assert MinScalarComparator().equal(MinScalarComparator())
+    assert objects_are_equal(MinScalarComparator(), MinScalarComparator())
 
 
 def test_base_comparator_equal_false_different_types() -> None:
-    assert not MinScalarComparator().equal(MaxScalarComparator())
+    assert not objects_are_equal(MinScalarComparator(), MaxScalarComparator())
 
 
 def test_base_comparator_equal_false_not_a_comparator() -> None:
-    assert not MinScalarComparator().equal(1)
+    assert not objects_are_equal(MinScalarComparator(), 1)
 
 
 def test_base_comparator_equal_true_with_argument() -> None:
-    assert ToleranceComparator(0.5).equal(ToleranceComparator(0.5))
+    assert objects_are_equal(ToleranceComparator(0.5), ToleranceComparator(0.5))
 
 
 def test_base_comparator_equal_false_different_argument() -> None:
-    assert not ToleranceComparator(0.5).equal(ToleranceComparator(0.1))
+    assert not objects_are_equal(ToleranceComparator(0.5), ToleranceComparator(0.1))
+
+
+def test_base_comparator_equality_tester_is_the_snapshot_tester() -> None:
+    assert get_default_registry().find_equality_tester(BaseComparator) == SnapshotEqualityTester(
+        "to_dict"
+    )
+
+
+def test_base_comparator_equality_tester_of_a_subclass_is_the_snapshot_tester() -> None:
+    assert get_default_registry().find_equality_tester(
+        MinScalarComparator
+    ) == SnapshotEqualityTester("to_dict")
+
+
+def test_base_comparator_objects_are_allclose_with_atol() -> None:
+    assert objects_are_allclose(
+        ToleranceComparator(0.5), ToleranceComparator(0.5 + 1e-7), atol=1e-3
+    )
 
 
 def test_base_comparator_equal_true_with_nan_argument() -> None:
-    assert ToleranceComparator(NAN).equal(ToleranceComparator(NAN))
+    assert objects_are_equal(ToleranceComparator(NAN), ToleranceComparator(NAN), equal_nan=True)
 
 
 def test_base_comparator_equal_false_nan_and_number_argument() -> None:
-    assert not ToleranceComparator(NAN).equal(ToleranceComparator(0.5))
+    assert not objects_are_equal(ToleranceComparator(NAN), ToleranceComparator(0.5))
 
 
 def test_base_comparator_repr_without_argument() -> None:
@@ -166,5 +185,7 @@ def test_min_scalar_comparator_is_better(
     assert MinScalarComparator().is_better(new_value=new_value, old_value=old_value) is expected
 
 
-def test_base_comparator_objects_are_equal_nan_argument_ignores_equal_nan() -> None:
-    assert objects_are_equal(ToleranceComparator(NAN), ToleranceComparator(NAN), equal_nan=False)
+def test_base_comparator_objects_are_equal_nan_argument_is_different_by_default() -> None:
+    assert not objects_are_equal(
+        ToleranceComparator(float("nan")), ToleranceComparator(float("nan"))
+    )

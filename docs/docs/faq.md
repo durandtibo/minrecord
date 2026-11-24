@@ -119,7 +119,8 @@ record.has_improved()  # False (1.4 > 1.3)
 A NaN value is never better than a number, so it never becomes the best value when a number
 exists. A NaN best value is replaced by any value: the first number, or another NaN (a tie). The
 first value of a record is always the best value, even if it is NaN. Two records that hold the same
-NaN values are equal (`equal` treats NaN as equal to NaN), also after a JSON round trip.
+NaN values are equal with `objects_are_equal(a, b, equal_nan=True)`, also after a JSON round trip.
+Without `equal_nan=True` a NaN is different from a NaN, as for every other object of `coola`.
 
 ```python
 record = MinScalarRecord("loss")
@@ -185,8 +186,8 @@ record = manager.get_record("new_metric")  # A Record named "new_metric"
 manager = RecordManager(default_factory=MinScalarRecord)
 ```
 
-The `default_factory` is not part of the state: `state_dict()`, `equal()` and `load_state_dict()` do
-not use it.
+The `default_factory` is not part of the state: `state_dict()` and `load_state_dict()` do not use
+it, and the equality of two managers does not compare it.
 
 To check if a record exists first:
 

@@ -5,11 +5,12 @@ from types import MappingProxyType
 from typing import Any
 
 import pytest
-from coola.equality import objects_are_equal
+from coola.equality import assert_objects_equal, objects_are_allclose, objects_are_equal
 from coola.equality.tester import get_default_registry
 from coola.factory import OBJECT_TARGET
 
 from minrecord import BaseRecord, MaxScalarRecord, MinScalarRecord, Record, RecordManager
+from minrecord.utils.equality import SnapshotEqualityTester
 
 NAMES = ("NAME", "my_record")
 NAN = float("nan")
@@ -135,7 +136,7 @@ def test_record_manager_get_record_does_not_exist_leaves_manager_unchanged() -> 
     manager = RecordManager({"loss": MinScalarRecord("loss")})
     with pytest.raises(KeyError, match=r"No record is registered"):
         manager.get_record("train_loss")
-    assert manager.equal(RecordManager({"loss": MinScalarRecord("loss")}))
+    assert objects_are_equal(manager, RecordManager({"loss": MinScalarRecord("loss")}))
 
 
 def test_record_manager_get_record_does_not_exist_empty_manager() -> None:
@@ -145,12 +146,12 @@ def test_record_manager_get_record_does_not_exist_empty_manager() -> None:
 
 def test_record_manager_get_record_default_factory_min_scalar_record() -> None:
     record = RecordManager(default_factory=MinScalarRecord).get_record("loss")
-    assert record.equal(MinScalarRecord("loss"))
+    assert objects_are_equal(record, MinScalarRecord("loss"))
 
 
 def test_record_manager_get_record_default_factory_record() -> None:
     record = RecordManager(default_factory=Record).get_record("loss")
-    assert record.equal(Record("loss"))
+    assert objects_are_equal(record, Record("loss"))
 
 
 def test_record_manager_get_record_default_factory_is_called_with_the_key() -> None:
@@ -207,13 +208,13 @@ def test_record_manager_default_factory_not_in_state_dict() -> None:
 
 
 def test_record_manager_equal_ignores_default_factory() -> None:
-    assert RecordManager(default_factory=Record).equal(RecordManager())
+    assert objects_are_equal(RecordManager(default_factory=Record), RecordManager())
 
 
 def test_record_manager_load_state_dict_new_key_ignores_default_factory() -> None:
     manager = RecordManager(default_factory=MinScalarRecord)
     manager.load_state_dict({"loss": Record("loss").to_dict()})
-    assert manager.get_record("loss").equal(Record("loss"))
+    assert objects_are_equal(manager.get_record("loss"), Record("loss"))
 
 
 def test_record_manager_get_records() -> None:
@@ -439,52 +440,52 @@ def test_record_manager_get_best_values_prefix_suffix() -> None:
 
 
 def test_record_manager_equal_true() -> None:
-    assert create_manager_with_values().equal(create_manager_with_values())
+    assert objects_are_equal(create_manager_with_values(), create_manager_with_values())
 
 
 def test_record_manager_equal_true_empty() -> None:
-    assert RecordManager().equal(RecordManager())
+    assert objects_are_equal(RecordManager(), RecordManager())
 
 
 def test_record_manager_equal_false_different_values() -> None:
     manager = create_manager_with_values()
     manager.get_record("loss").add_value(0.5)
-    assert not manager.equal(create_manager_with_values())
+    assert not objects_are_equal(manager, create_manager_with_values())
 
 
 def test_record_manager_equal_true_nan() -> None:
     manager1 = RecordManager({"loss": MinScalarRecord("loss", elements=[(0, 1.0), (1, NAN)])})
     manager2 = RecordManager({"loss": MinScalarRecord("loss", elements=[(0, 1.0), (1, NAN)])})
-    assert manager1.equal(manager2)
+    assert objects_are_equal(manager1, manager2, equal_nan=True)
 
 
 def test_record_manager_equal_true_nan_json_round_trip() -> None:
     manager = RecordManager({"loss": MinScalarRecord("loss", elements=[(0, 1.0), (1, NAN)])})
     new_manager = RecordManager()
     new_manager.load_state_dict(json.loads(json.dumps(manager.state_dict())))
-    assert new_manager.equal(manager)
+    assert objects_are_equal(new_manager, manager, equal_nan=True)
 
 
 def test_record_manager_equal_false_nan_and_number() -> None:
     manager1 = RecordManager({"loss": MinScalarRecord("loss", elements=[(0, 1.0), (1, NAN)])})
     manager2 = RecordManager({"loss": MinScalarRecord("loss", elements=[(0, 1.0), (1, 2.0)])})
-    assert not manager1.equal(manager2)
+    assert not objects_are_equal(manager1, manager2)
 
 
 def test_record_manager_equal_false_different_keys() -> None:
     manager = create_manager_with_values()
     manager.add_record(Record("new_record"))
-    assert not manager.equal(create_manager_with_values())
+    assert not objects_are_equal(manager, create_manager_with_values())
 
 
 def test_record_manager_equal_false_different_record_types() -> None:
-    assert not RecordManager({"loss": MinScalarRecord("loss")}).equal(
-        RecordManager({"loss": Record("loss")})
+    assert not objects_are_equal(
+        RecordManager({"loss": MinScalarRecord("loss")}), RecordManager({"loss": Record("loss")})
     )
 
 
 def test_record_manager_equal_false_different_types() -> None:
-    assert not RecordManager().equal({})
+    assert not objects_are_equal(RecordManager(), {})
 
 
 def test_record_manager_objects_are_equal_true() -> None:
@@ -499,6 +500,31 @@ def test_record_manager_equality_tester_registry_has_equality_tester() -> None:
     assert get_default_registry().has_equality_tester(RecordManager)
 
 
+def test_record_manager_equality_tester_is_the_snapshot_tester() -> None:
+    assert get_default_registry().find_equality_tester(RecordManager) == SnapshotEqualityTester(
+        "state_dict"
+    )
+
+
+def test_record_manager_objects_are_allclose_with_atol() -> None:
+    manager1 = RecordManager({"loss": MinScalarRecord("loss", elements=[(0, 1.0)])})
+    manager2 = RecordManager({"loss": MinScalarRecord("loss", elements=[(0, 1.0 + 1e-7)])})
+    assert objects_are_allclose(manager1, manager2, atol=1e-3)
+
+
+def test_record_manager_assert_objects_equal_reports_the_path() -> None:
+    manager1 = RecordManager(
+        {"a": MinScalarRecord("a", elements=[(i, float(i)) for i in range(5)])}
+    )
+    manager2 = RecordManager(
+        {"a": MinScalarRecord("a", elements=[(i, float(i + (i == 3))) for i in range(5)])}
+    )
+    with pytest.raises(
+        AssertionError, match=r"at actual\.state_dict\(\)\['a'\]\['elements'\]\[3\]\[1\]"
+    ):
+        assert_objects_equal(manager1, manager2)
+
+
 ###################################################
 #     Tests for RecordManager.load_state_dict     #
 ###################################################
@@ -507,7 +533,7 @@ def test_record_manager_equality_tester_registry_has_equality_tester() -> None:
 def test_record_manager_state_dict_round_trip() -> None:
     manager = RecordManager()
     manager.load_state_dict(create_manager_with_values().state_dict())
-    assert manager.equal(create_manager_with_values())
+    assert objects_are_equal(manager, create_manager_with_values())
 
 
 def test_record_manager_load_state_dict_known_key_keeps_record_object() -> None:
@@ -526,7 +552,9 @@ def test_record_manager_load_state_dict_known_key_loads_data() -> None:
 def test_record_manager_load_state_dict_unknown_key_creates_record() -> None:
     manager = RecordManager()
     manager.load_state_dict({"loss": MinScalarRecord("loss", elements=[(0, 0.1)]).to_dict()})
-    assert manager.get_record("loss").equal(MinScalarRecord("loss", elements=[(0, 0.1)]))
+    assert objects_are_equal(
+        manager.get_record("loss"), MinScalarRecord("loss", elements=[(0, 0.1)])
+    )
 
 
 def test_record_manager_load_state_dict_keeps_other_records() -> None:
@@ -539,7 +567,7 @@ def test_record_manager_load_state_dict_keeps_other_records_unchanged() -> None:
     manager = create_manager_with_values()
     expected = manager.get_record("accuracy").clone()
     manager.load_state_dict({"new": Record("new").to_dict()})
-    assert manager.get_record("accuracy").equal(expected)
+    assert objects_are_equal(manager.get_record("accuracy"), expected)
 
 
 def test_record_manager_load_state_dict_merge_keys() -> None:
@@ -560,7 +588,7 @@ def test_record_manager_load_state_dict_other_callable_raises() -> None:
     manager = create_manager_with_values()
     with pytest.raises(TypeError, match=r"The configuration 'collections.OrderedDict' is not"):
         manager.load_state_dict({"new": {OBJECT_TARGET: "collections.OrderedDict"}})
-    assert manager.equal(create_manager_with_values())
+    assert objects_are_equal(manager, create_manager_with_values())
 
 
 def test_record_manager_load_state_dict_message_has_the_two_types() -> None:
@@ -576,7 +604,9 @@ def test_record_manager_load_state_dict_known_key_with_nan() -> None:
     manager.load_state_dict(
         {"loss": MinScalarRecord("loss", elements=[(0, 1.0), (1, NAN)]).to_dict()}
     )
-    assert manager.get_record("loss").equal(MinScalarRecord("loss", elements=[(0, 1.0), (1, NAN)]))
+    assert objects_are_equal(
+        manager.get_record("loss"), MinScalarRecord("loss", elements=[(0, 1.0), (1, NAN)])
+    )
 
 
 def test_record_manager_load_state_dict_does_not_modify_state() -> None:
@@ -594,7 +624,7 @@ def test_record_manager_load_state_dict_invalid_new_entry_leaves_manager_unchang
         manager.load_state_dict(
             {"loss": MinScalarRecord("loss", elements=[(0, 0.1)]).to_dict(), "bad": invalid}
         )
-    assert manager.equal(create_manager_with_values())
+    assert objects_are_equal(manager, create_manager_with_values())
 
 
 def test_record_manager_load_state_dict_other_type_leaves_manager_unchanged() -> None:
@@ -606,7 +636,7 @@ def test_record_manager_load_state_dict_other_type_leaves_manager_unchanged() ->
                 "accuracy": MinScalarRecord("accuracy").to_dict(),
             }
         )
-    assert manager.equal(create_manager_with_values())
+    assert objects_are_equal(manager, create_manager_with_values())
 
 
 def test_record_manager_load_state_dict_new_entry_not_added_if_other_entry_invalid() -> None:
@@ -625,13 +655,13 @@ def test_record_manager_load_state_dict_not_a_dict_entry_leaves_manager_unchange
     manager = create_manager_with_values()
     with pytest.raises(TypeError, match=r"Expected the configuration of a BaseRecord \(a dict\)"):
         manager.load_state_dict({"loss": None})
-    assert manager.equal(create_manager_with_values())
+    assert objects_are_equal(manager, create_manager_with_values())
 
 
-def test_record_manager_objects_are_equal_nan_ignores_equal_nan() -> None:
-    manager1 = RecordManager({"loss": Record("loss", elements=[(0, NAN)])})
-    manager2 = RecordManager({"loss": Record("loss", elements=[(0, NAN)])})
-    assert objects_are_equal(manager1, manager2, equal_nan=False)
+def test_record_manager_objects_are_equal_nan_is_different_by_default() -> None:
+    manager1 = RecordManager({"loss": Record("loss", elements=[(0, float("nan"))])})
+    manager2 = RecordManager({"loss": Record("loss", elements=[(0, float("nan"))])})
+    assert not objects_are_equal(manager1, manager2)
 
 
 #############################################
@@ -701,7 +731,7 @@ def test_record_manager_load_state_dict_not_a_dict_raises(state_dict: Any) -> No
     manager = create_manager_with_values()
     with pytest.raises(TypeError, match=r"state_dict must be a dict, got"):
         manager.load_state_dict(state_dict)
-    assert manager.equal(create_manager_with_values())
+    assert objects_are_equal(manager, create_manager_with_values())
 
 
 def test_record_manager_load_state_dict_key_not_a_str_raises() -> None:
@@ -709,4 +739,4 @@ def test_record_manager_load_state_dict_key_not_a_str_raises() -> None:
     state_dict: Any = {"loss": MinScalarRecord("loss").to_dict(), 3: Record("x").to_dict()}
     with pytest.raises(TypeError, match=r"key must be a str, got int"):
         manager.load_state_dict(state_dict)
-    assert manager.equal(create_manager_with_values())
+    assert objects_are_equal(manager, create_manager_with_values())

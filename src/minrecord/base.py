@@ -11,10 +11,10 @@ __all__ = [
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, Generic, Self, TypeVar, final
 
-from coola.equality import objects_are_equal
-from coola.equality.tester import EqualEqualityTester, get_default_registry
+from coola.equality.tester import get_default_registry
 from coola.factory import OBJECT_TARGET
 
+from minrecord.utils.equality import SnapshotEqualityTester
 from minrecord.utils.factory import instantiate
 from minrecord.utils.validation import check_pair
 
@@ -47,18 +47,21 @@ class BaseRecord(ABC, Generic[T]):
         - ``is_empty``
         - ``to_dict``
 
-    The other methods are derived from them. ``clone``, ``equal``,
-    ``update``, ``from_dict`` and ``load_dict`` are ``@final``, so a
-    type checker rejects an override. A comparable record also
-    overrides ``is_comparable``, ``get_best_value``, ``get_best_step``
-    and ``has_improved``.
+    The other methods are derived from them. ``clone``, ``update``,
+    ``from_dict`` and ``load_dict`` are ``@final``, so a type checker
+    rejects an override. Two records are compared with
+    ``coola.equality.objects_are_equal``: they are equal if they have
+    the same type and equal ``to_dict`` outputs. A comparable record
+    also overrides ``is_comparable``, ``get_best_value``,
+    ``get_best_step`` and ``has_improved``.
 
     The contract of a record is:
 
         1. ``to_dict`` returns exactly the arguments of the constructor
             that rebuild the record, including its content, and the
             full name of the class with the key ``_target_``. Thus
-            ``BaseRecord.from_dict(record.to_dict()).equal(record)``.
+            ``objects_are_equal(BaseRecord.from_dict(record.to_dict()),
+            record, equal_nan=True)``.
         2. The constructor accepts what ``to_dict`` returns, validates
             its arguments and raises before any object exists. The
             whole state of the record lives in ``vars(self)`` (no
@@ -221,40 +224,6 @@ class BaseRecord(ABC, Generic[T]):
         kwargs = self.to_dict()
         del kwargs[OBJECT_TARGET]
         return type(self)(**kwargs)
-
-    @final
-    def equal(self, other: Any) -> bool:
-        r"""Indicate if two records are equal or not.
-
-        Two records are equal if they have the same type and the same
-        ``to_dict`` output: the equality of a record is the equality
-        of its snapshot. A NaN value is equal to a NaN value, also
-        when ``objects_are_equal`` is called with ``equal_nan=False``,
-        so a record that holds a NaN is equal to its copy after a JSON
-        round trip.
-
-        Args:
-            other: The object to compare.
-
-        Returns:
-            ``True`` if the records are equal, ``False`` otherwise.
-
-        Example:
-            ```pycon
-            >>> from minrecord import Record
-            >>> record1 = Record("loss")
-            >>> record2 = Record("accuracy")
-            >>> record3 = Record("loss")
-            >>> record1.equal(record2)
-            False
-            >>> record1.equal(record3)
-            True
-
-            ```
-        """
-        if type(other) is not type(self):
-            return False
-        return objects_are_equal(self.to_dict(), other.to_dict(), equal_nan=True)
 
     def get_best_value(self) -> T:
         r"""Get the best value of this record.
@@ -514,4 +483,4 @@ class NotAComparableRecordError(Exception):
     values (e.g. ``Record``)."""
 
 
-get_default_registry().register(BaseRecord, EqualEqualityTester(), exist_ok=True)
+get_default_registry().register(BaseRecord, SnapshotEqualityTester("to_dict"), exist_ok=True)

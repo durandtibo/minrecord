@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any
 
 import pytest
-from coola.equality import objects_are_equal
+from coola.equality import assert_objects_equal, objects_are_allclose, objects_are_equal
 from coola.equality.tester import get_default_registry
 from coola.factory import OBJECT_TARGET
 
@@ -13,6 +13,7 @@ from minrecord import (
     NotAComparableRecordError,
     Record,
 )
+from minrecord.utils.equality import SnapshotEqualityTester
 
 ################################
 #     Tests for BaseRecord     #
@@ -29,6 +30,41 @@ def test_base_record_abstract_members() -> None:
     )
 
 
+def test_base_record_equality_tester_is_the_snapshot_tester() -> None:
+    assert get_default_registry().find_equality_tester(BaseRecord) == SnapshotEqualityTester(
+        "to_dict"
+    )
+
+
+def test_base_record_equality_tester_of_a_subclass_is_the_snapshot_tester() -> None:
+    assert get_default_registry().find_equality_tester(MinScalarRecord) == SnapshotEqualityTester(
+        "to_dict"
+    )
+
+
+def test_base_record_objects_are_allclose_with_atol() -> None:
+    assert objects_are_allclose(
+        MinScalarRecord("loss", elements=[(0, 1.0)]),
+        MinScalarRecord("loss", elements=[(0, 1.0 + 1e-7)]),
+        atol=1e-3,
+    )
+
+
+def test_base_record_objects_are_allclose_too_far() -> None:
+    assert not objects_are_allclose(
+        MinScalarRecord("loss", elements=[(0, 1.0)]),
+        MinScalarRecord("loss", elements=[(0, 1.1)]),
+        atol=1e-3,
+    )
+
+
+def test_base_record_assert_objects_equal_reports_the_path() -> None:
+    record1 = MinScalarRecord("loss", elements=[(i, float(i)) for i in range(5)])
+    record2 = MinScalarRecord("loss", elements=[(i, float(i + (i == 3))) for i in range(5)])
+    with pytest.raises(AssertionError, match=r"at actual\.to_dict\(\)\['elements'\]\[3\]\[1\]"):
+        assert_objects_equal(record1, record2)
+
+
 def test_base_record_objects_are_equal_true() -> None:
     assert objects_are_equal(Record("loss", elements=[(0, 1)]), Record("loss", elements=[(0, 1)]))
 
@@ -42,7 +78,7 @@ def test_base_record_objects_are_equal_false() -> None:
 
 def test_base_record_clone() -> None:
     record = Record("loss", elements=((None, 35), (1, 42)), max_size=20)
-    assert record.clone().equal(record)
+    assert objects_are_equal(record.clone(), record)
 
 
 def test_base_record_clone_is_new_object() -> None:
@@ -51,7 +87,7 @@ def test_base_record_clone_is_new_object() -> None:
 
 
 def test_base_record_clone_empty() -> None:
-    assert Record("loss").clone().equal(Record("loss"))
+    assert objects_are_equal(Record("loss").clone(), Record("loss"))
 
 
 def test_base_record_clone_type() -> None:
@@ -68,35 +104,37 @@ def test_base_record_clone_is_independent() -> None:
 
 
 def test_base_record_equal_true() -> None:
-    assert Record("loss", elements=((None, 35), (1, 42))).equal(
-        Record("loss", elements=((None, 35), (1, 42)))
+    assert objects_are_equal(
+        Record("loss", elements=((None, 35), (1, 42))),
+        Record("loss", elements=((None, 35), (1, 42))),
     )
 
 
 def test_base_record_equal_true_empty() -> None:
-    assert Record("loss").equal(Record("loss"))
+    assert objects_are_equal(Record("loss"), Record("loss"))
 
 
 def test_base_record_equal_false_different_values() -> None:
-    assert not Record("loss", elements=((None, 35), (1, 42))).equal(
-        Record("loss", elements=((None, 35), (1, 50)))
+    assert not objects_are_equal(
+        Record("loss", elements=((None, 35), (1, 42))),
+        Record("loss", elements=((None, 35), (1, 50))),
     )
 
 
 def test_base_record_equal_false_different_names() -> None:
-    assert not Record("loss").equal(Record("accuracy"))
+    assert not objects_are_equal(Record("loss"), Record("accuracy"))
 
 
 def test_base_record_equal_false_different_max_sizes() -> None:
-    assert not Record("loss").equal(Record("loss", max_size=2))
+    assert not objects_are_equal(Record("loss"), Record("loss", max_size=2))
 
 
 def test_base_record_equal_false_different_types() -> None:
-    assert not Record("loss").equal(1)
+    assert not objects_are_equal(Record("loss"), 1)
 
 
 def test_base_record_equal_false_different_record_types() -> None:
-    assert not Record("loss").equal(MinScalarRecord("loss"))
+    assert not objects_are_equal(Record("loss"), MinScalarRecord("loss"))
 
 
 # --- get_best_value / has_improved / is_comparable ---
@@ -179,19 +217,22 @@ def test_base_record_update_element_not_a_pair_keeps_previous_elements() -> None
 
 
 def test_base_record_from_dict() -> None:
-    assert BaseRecord.from_dict(
-        {
-            OBJECT_TARGET: "minrecord.Record",
-            "name": "loss",
-            "max_size": 7,
-            "elements": ((0, 1), (1, 5)),
-        }
-    ).equal(Record("loss", max_size=7, elements=((0, 1), (1, 5))))
+    assert objects_are_equal(
+        BaseRecord.from_dict(
+            {
+                OBJECT_TARGET: "minrecord.Record",
+                "name": "loss",
+                "max_size": 7,
+                "elements": ((0, 1), (1, 5)),
+            }
+        ),
+        Record("loss", max_size=7, elements=((0, 1), (1, 5))),
+    )
 
 
 def test_base_record_from_dict_empty() -> None:
-    assert BaseRecord.from_dict({OBJECT_TARGET: "minrecord.Record", "name": "loss"}).equal(
-        Record("loss")
+    assert objects_are_equal(
+        BaseRecord.from_dict({OBJECT_TARGET: "minrecord.Record", "name": "loss"}), Record("loss")
     )
 
 
@@ -240,7 +281,7 @@ def test_base_record_from_dict_returns_the_class_of_the_dict(record: BaseRecord[
 def test_base_record_load_dict() -> None:
     record = Record("loss", elements=[(0, 7)])
     record.load_dict(Record("other", elements=((0, 4), (1, 5)), max_size=5).to_dict())
-    assert record.equal(Record("other", elements=((0, 4), (1, 5)), max_size=5))
+    assert objects_are_equal(record, Record("other", elements=((0, 4), (1, 5)), max_size=5))
 
 
 def test_base_record_load_dict_keeps_object() -> None:
@@ -265,14 +306,14 @@ def test_base_record_load_dict_invalid_leaves_record_unchanged() -> None:
     record = Record("loss", elements=[(0, 7)])
     with pytest.raises(ValueError, match=r"max_size must be a positive integer, got 0"):
         record.load_dict({OBJECT_TARGET: "minrecord.Record", "name": "loss", "max_size": 0})
-    assert record.equal(Record("loss", elements=[(0, 7)]))
+    assert objects_are_equal(record, Record("loss", elements=[(0, 7)]))
 
 
 def test_base_record_load_dict_not_a_record_leaves_record_unchanged() -> None:
     record = Record("loss", elements=[(0, 7)])
     with pytest.raises(TypeError, match=r"The configuration 'collections.OrderedDict' is not"):
         record.load_dict({OBJECT_TARGET: "collections.OrderedDict"})
-    assert record.equal(Record("loss", elements=[(0, 7)]))
+    assert objects_are_equal(record, Record("loss", elements=[(0, 7)]))
 
 
 def test_base_record_load_dict_other_type_leaves_record_unchanged() -> None:
@@ -281,7 +322,7 @@ def test_base_record_load_dict_other_type_leaves_record_unchanged() -> None:
         TypeError, match=r"Cannot load the data of a MinScalarRecord record in a Record record"
     ):
         record.load_dict(MinScalarRecord("loss").to_dict())
-    assert record.equal(Record("loss", elements=[(0, 7)]))
+    assert objects_are_equal(record, Record("loss", elements=[(0, 7)]))
 
 
 @pytest.mark.parametrize("config", [None, [], "minrecord.Record"])
@@ -295,9 +336,16 @@ def test_base_record_load_dict_not_a_dict_leaves_record_unchanged() -> None:
     record = Record("loss", elements=[(0, 7)])
     with pytest.raises(TypeError, match=r"Expected the configuration of a BaseRecord \(a dict\)"):
         record.load_dict(config)
-    assert record.equal(Record("loss", elements=[(0, 7)]))
+    assert objects_are_equal(record, Record("loss", elements=[(0, 7)]))
 
 
-def test_base_record_objects_are_equal_nan_ignores_equal_nan() -> None:
-    record = Record("loss", elements=[(0, float("nan"))])
-    assert objects_are_equal(record, record.clone(), equal_nan=False)
+def test_base_record_objects_are_equal_nan_is_different_by_default() -> None:
+    record1 = Record("loss", elements=[(0, float("nan"))])
+    record2 = Record("loss", elements=[(0, float("nan"))])
+    assert not objects_are_equal(record1, record2)
+
+
+def test_base_record_objects_are_equal_nan_equal_nan_true() -> None:
+    record1 = Record("loss", elements=[(0, float("nan"))])
+    record2 = Record("loss", elements=[(0, float("nan"))])
+    assert objects_are_equal(record1, record2, equal_nan=True)

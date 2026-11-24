@@ -4,6 +4,7 @@ import re
 from typing import Any
 
 import pytest
+from coola.equality import objects_are_equal
 from coola.factory import OBJECT_TARGET
 
 from minrecord import BaseComparator, BaseRecord, MinScalarComparator, MinScalarRecord, Record
@@ -15,14 +16,16 @@ from minrecord.utils.factory import instantiate
 
 
 def test_instantiate_record() -> None:
-    assert instantiate(
-        {OBJECT_TARGET: "minrecord.Record", "name": "loss", "max_size": 5}, BaseRecord
-    ).equal(Record("loss", max_size=5))
+    assert objects_are_equal(
+        instantiate({OBJECT_TARGET: "minrecord.Record", "name": "loss", "max_size": 5}, BaseRecord),
+        Record("loss", max_size=5),
+    )
 
 
 def test_instantiate_comparator() -> None:
-    assert instantiate({OBJECT_TARGET: "minrecord.MinScalarComparator"}, BaseComparator).equal(
-        MinScalarComparator()
+    assert objects_are_equal(
+        instantiate({OBJECT_TARGET: "minrecord.MinScalarComparator"}, BaseComparator),
+        MinScalarComparator(),
     )
 
 

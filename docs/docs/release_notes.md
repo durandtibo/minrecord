@@ -31,7 +31,7 @@ Records:
   `MinScalarRecord` are keyword-only.
 - `best` must be a `tuple` or a `list` of length 2 and requires `elements`, otherwise `ValueError`.
 - `BaseRecord` has 6 abstract members (`name`, `add_value`, `get_last_value`, `get_most_recent`,
-  `is_empty`, `to_dict`). `clone`, `equal`, `update`, `from_dict` and `load_dict` are `@final`.
+  `is_empty`, `to_dict`). `clone`, `update`, `from_dict` and `load_dict` are `@final`.
 - The first value of a comparable record is compared with itself, so a value that the comparator
   cannot compare (`None`, a string, `10**400`) is rejected by the `add_value` that receives it
   (`TypeError` or `OverflowError`, from the comparator) and the record stays empty.
@@ -41,9 +41,13 @@ Records:
   of two characters was accepted.
 - An invalid `max_size` (not a positive `int`, a `bool`, or larger than `sys.maxsize`) raises
   `ValueError`.
-- `equal` requires the same type. The equality of records, comparators and managers is the equality
-  of their snapshot (`to_dict`, `state_dict`), and a NaN is equal to a NaN, also with
-  `objects_are_equal(..., equal_nan=False)`.
+- `BaseRecord.equal`, `BaseComparator.equal` and `RecordManager.equal` are removed. Use
+  `coola.equality.objects_are_equal(a, b)`. The equality of records, comparators and managers is the
+  equality of their snapshot (`to_dict`, `state_dict`) by `coola`, so the types must be the same,
+  `equal_nan` and the tolerance of `objects_are_allclose` are honoured, and `assert_objects_equal`
+  reports the path of the first difference. **A NaN is different from a NaN unless
+  `equal_nan=True`**: a record that holds a NaN is equal to its JSON round trip with
+  `objects_are_equal(a, b, equal_nan=True)`.
 - `BaseRecord.from_dict` returns `Self` and raises `TypeError` if `_target_` is missing or is not the
   class (or a subclass of the class) that it is called on. `load_dict` and
   `RecordManager.load_state_dict` raise `TypeError` for a dict that is not the dict of a record, or
@@ -52,7 +56,7 @@ Records:
 Comparators:
 
 - `BaseComparator` has one abstract method, `is_better(*, new_value, old_value)`, which is
-  keyword-only. `to_dict` and `equal` are concrete: a comparator with arguments overrides `to_dict`.
+  keyword-only. `to_dict` is concrete: a comparator with arguments overrides `to_dict`.
 - The comparison must be reflexive: `is_better(new_value=x, old_value=x)` is `True` for every `x`. **A
   custom comparator that is strict (`>` or `<`) breaks this contract**: use `>=` or `<=`.
 - A NaN is never better than a number, and a NaN best value is replaced by any value.
@@ -93,7 +97,10 @@ Manager and functions:
 
 - `get_best_step()` returns the step of the best value (the latest step among the ties), also if the
   pair is not in the recent values anymore.
-- `RecordManager.get_last_values` and `RecordManager.equal`.
+- `RecordManager.get_last_values`.
+- `minrecord.utils.equality.SnapshotEqualityTester(method)`, the tester of `coola` that compares two
+  objects through their snapshot. It is registered for `BaseRecord`, `BaseComparator` (`to_dict`) and
+  `RecordManager` (`state_dict`), so a custom record gets it too.
 - `reset_max_size` is exported at the root of the package.
 - `minrecord.utils.validation.check_max_size` and `check_name`, and
   `minrecord.utils.factory.instantiate(config, cls)`.

@@ -4,11 +4,12 @@ import json
 from typing import Any
 
 import pytest
-from coola.equality import objects_are_equal
+from coola.equality import objects_are_allclose, objects_are_equal
 from coola.factory import OBJECT_TARGET
 
 from minrecord import (
     BaseComparator,
+    BaseRecord,
     ComparableRecord,
     MaxScalarRecord,
     MinScalarRecord,
@@ -50,6 +51,31 @@ def test_state_dict_json_round_trip_keeps_the_keys() -> None:
     assert list(new_manager.get_records()) == list(manager.get_records())
 
 
+def test_json_round_trip_record_equal_nan() -> None:
+    record = MinScalarRecord("loss", elements=[(0, 1.0), (1, float("nan"))])
+    new_record = BaseRecord.from_dict(json.loads(json.dumps(record.to_dict())))
+    assert objects_are_equal(new_record, record, equal_nan=True)
+
+
+def test_json_round_trip_manager_equal_nan() -> None:
+    manager = RecordManager({"loss": MinScalarRecord("loss", elements=[(0, float("nan"))])})
+    new_manager = RecordManager()
+    new_manager.load_state_dict(json.loads(json.dumps(manager.state_dict())))
+    assert objects_are_equal(new_manager, manager, equal_nan=True)
+
+
+def test_record_float32_precision_loss_is_allclose() -> None:
+    record = MinScalarRecord("loss", elements=[(0, 0.1), (1, 0.2)])
+    lossy = MinScalarRecord("loss", elements=[(0, 0.1), (1, 0.20000000298023224)])
+    assert objects_are_allclose(lossy, record, rtol=1e-6)
+
+
+def test_record_float32_precision_loss_is_not_equal() -> None:
+    record = MinScalarRecord("loss", elements=[(0, 0.1), (1, 0.2)])
+    lossy = MinScalarRecord("loss", elements=[(0, 0.1), (1, 0.20000000298023224)])
+    assert not objects_are_equal(lossy, record)
+
+
 def test_state_dict_json_round_trip_best_values() -> None:
     manager = create_manager()
     new_manager = RecordManager()
@@ -87,7 +113,7 @@ def test_clone_resume_training() -> None:
     clone = record.clone()
     clone.add_value(0.0, step=NUM_STEPS)
     record.add_value(0.0, step=NUM_STEPS)
-    assert clone.equal(record)
+    assert objects_are_equal(clone, record)
 
 
 class ToleranceComparator(BaseComparator[float]):
@@ -157,7 +183,7 @@ def test_state_dict_json_round_trip_nan_objects_are_equal() -> None:
     manager = create_nan_manager(range(5))
     new_manager = RecordManager()
     new_manager.load_state_dict(json.loads(json.dumps(manager.state_dict())))
-    assert objects_are_equal(new_manager, manager)
+    assert objects_are_equal(new_manager, manager, equal_nan=True)
 
 
 def test_state_dict_json_round_trip_nan_resume_training() -> None:
@@ -175,7 +201,7 @@ def test_state_dict_json_round_trip_nan_resume_training_is_equal() -> None:
     resumed = RecordManager()
     resumed.load_state_dict(json.loads(json.dumps(manager.state_dict())))
     run_training_with_nan(resumed, range(5, 10))
-    assert resumed.equal(expected)
+    assert objects_are_equal(resumed, expected, equal_nan=True)
 
 
 def train_with_missing_metric(record: MinScalarRecord, metrics: list[Any]) -> None:

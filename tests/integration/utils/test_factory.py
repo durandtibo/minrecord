@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from typing import Any
 
+from coola.equality import objects_are_equal
 from coola.factory import OBJECT_TARGET
 
 from minrecord import BaseComparator, BaseRecord, ComparableRecord, Record
@@ -25,23 +26,24 @@ class UnitRecord(Record[float]):
 
 def test_instantiate_record_defined_in_a_test_module() -> None:
     record = UnitRecord("loss", unit="ms", elements=[(0, 1.0)])
-    assert instantiate(record.to_dict(), BaseRecord).equal(record)
+    assert objects_are_equal(instantiate(record.to_dict(), BaseRecord), record)
 
 
 def test_instantiate_comparator_defined_in_a_test_module() -> None:
     comparator = ToleranceComparator(0.5)
-    assert instantiate(comparator.to_dict(), BaseComparator).equal(comparator)
+    assert objects_are_equal(instantiate(comparator.to_dict(), BaseComparator), comparator)
 
 
 def test_instantiate_target_is_the_real_import() -> None:
-    assert instantiate({OBJECT_TARGET: f"{__name__}.UnitRecord", "name": "loss"}, BaseRecord).equal(
-        UnitRecord("loss")
+    assert objects_are_equal(
+        instantiate({OBJECT_TARGET: f"{__name__}.UnitRecord", "name": "loss"}, BaseRecord),
+        UnitRecord("loss"),
     )
 
 
 def test_comparable_record_comparator_dict_defined_in_a_test_module() -> None:
     record = ComparableRecord("loss", ToleranceComparator(0.5).to_dict())
-    assert record.equal(ComparableRecord("loss", ToleranceComparator(0.5)))
+    assert objects_are_equal(record, ComparableRecord("loss", ToleranceComparator(0.5)))
 
 
 def test_target_in_a_stored_value_is_data_after_json_round_trip() -> None:

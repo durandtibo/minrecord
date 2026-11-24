@@ -256,13 +256,14 @@ values are numbers or strings.
 ```pycon
 
 >>> import json
+>>> from coola.equality import objects_are_equal
 >>> from minrecord import BaseRecord, MinScalarRecord
 >>> record = MinScalarRecord("loss", max_size=2)
 >>> record.update([(0, 1.0), (1, 5.0), (2, 6.0)])
 >>> record.to_dict()
 {'_target_': 'minrecord.comparable.MinScalarRecord', 'name': 'loss', 'max_size': 2, 'elements': ((1, 5.0), (2, 6.0)), 'best': (0, 1.0)}
 >>> new_record = BaseRecord.from_dict(json.loads(json.dumps(record.to_dict())))
->>> new_record.equal(record)
+>>> objects_are_equal(new_record, record)
 True
 >>> new_record.get_best_value()
 1.0
@@ -299,8 +300,8 @@ The state of a manager is a dict of records dicts, so it can be written to JSON.
 merges the state into the manager: the data of a known key is loaded in the existing record (the
 objects that you hold are updated), the records of the new keys are created, and a record of the
 manager that the state does not mention is kept. It does not change the manager if one entry is
-invalid (the entries are built and checked first, then loaded). Two
-managers can be compared with `manager1.equal(manager2)` or `coola.equality.objects_are_equal`.
+invalid (the entries are built and checked first, then loaded). Two managers can be compared with
+`coola.equality.objects_are_equal(manager1, manager2)`.
 
 The dict is not compatible with the one of the versions before 0.4.0 (`{"config": ..., "state": ...}`),
 see the [release notes](release_notes.md). The [design page](design.md) explains the trade-offs of
@@ -328,11 +329,23 @@ print(f"Number of stored values: {len(record)}")
 
 ### Verify record equality
 
+Records, comparators and managers are compared with the functions of `coola`, which compare their
+snapshots (`to_dict`, `state_dict`). A NaN is different from a NaN unless `equal_nan=True`, the
+tolerance of `objects_are_allclose` is honoured, and `assert_objects_equal` reports where two
+objects differ.
+
 ```python
+from coola.equality import assert_objects_equal, objects_are_allclose, objects_are_equal
+
 # Useful for testing
 record1 = MinScalarRecord("loss", elements=[(0, 1.5), (1, 1.3)])
 record2 = MinScalarRecord("loss", elements=[(0, 1.5), (1, 1.3)])
-assert record1.equal(record2)
+assert objects_are_equal(record1, record2)
+# The same check, with the location of the first difference when it fails.
+assert_objects_equal(record1, record2)
+# A record that holds a NaN needs equal_nan=True, as any other object of coola.
+# A tolerance is possible, for example after a loss of precision.
+assert objects_are_allclose(record1, record2, atol=1e-3)
 ```
 
 ## See Also
