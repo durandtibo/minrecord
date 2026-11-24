@@ -18,6 +18,10 @@ def check_imports() -> None:
         "minrecord.MaxScalarRecord",
         "minrecord.MinScalarRecord",
         "minrecord.RecordManager",
+        "minrecord.get_best_values",
+        "minrecord.get_last_values",
+        "minrecord.get_max_size",
+        "minrecord.set_max_size",
         "minrecord.utils",
     ]
     for a in objects_to_import:

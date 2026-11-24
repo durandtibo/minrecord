@@ -1,64 +1,119 @@
 name: Nightly Package Tests
 on:
   schedule:
-    - cron: '40 8 * * *' # run at 8:40 AM UTC
-  workflow_dispatch:  # to trigger manually
+    - cron: "30 10 * * *" # run at 10:30 AM UTC
+  workflow_dispatch: # to trigger manually
 
-permissions:
-  contents: read
+permissions: {}
 
 jobs:
-  get-versions:
-    uses: ./.github/workflows/get-versions.yaml
+  # Read the name of the package from pyproject.toml.
+  get-metadata:
+    permissions:
+      contents: read
+    uses: ./.github/workflows/lib-get-package-metadata.yaml
+
+  # Get the extra names from pyproject.toml, and their version bounds from
+  # dev/config/package_versions.json.
+  get-deps:
+    permissions:
+      contents: read
+    uses: ./.github/workflows/lib-get-package-deps.yaml
+  # Load the shared python-version/OS matrix from the default config of
+  # durandtibo/workflow-config-action
+  # once, and pass it down to every job below that needs it.
+  get-matrix:
+    permissions:
+      contents: read
+    uses: ./.github/workflows/lib-get-test-matrix.yaml
 
   stable:
-    uses: ./.github/workflows/test-package.yaml
+    permissions:
+      contents: read
+    needs: [get-matrix, get-metadata]
+    uses: ./.github/workflows/nightly-test-package.yaml
     with:
-      install-cmd: 'uv pip install minrecord'
+      install-cmd: "uv pip install ${{ needs.get-metadata.outputs.name }}"
+      test-matrix: ${{ needs.get-matrix.outputs.test_matrix }}
 
   stable-all:
-    uses: ./.github/workflows/test-package.yaml
+    permissions:
+      contents: read
+    needs: [get-matrix, get-metadata]
+    uses: ./.github/workflows/nightly-test-package.yaml
     with:
-      install-cmd: 'uv pip install "minrecord[all]"'
+      install-cmd: 'uv pip install "${{ needs.get-metadata.outputs.name }}[all]"' # "all" installs everything
+      test-matrix: ${{ needs.get-matrix.outputs.test_matrix }}
 
   stable-extras:
-    uses: ./.github/workflows/test-package-extras.yaml
+    permissions:
+      contents: read
+    needs: [get-matrix, get-metadata]
+    uses: ./.github/workflows/nightly-test-package-extras.yaml
+    with:
+      package-name: ${{ needs.get-metadata.outputs.name }}
+      test-matrix: ${{ needs.get-matrix.outputs.test_matrix }}
 
   latest:
-    uses: ./.github/workflows/test-package.yaml
+    permissions:
+      contents: read
+    needs: [get-matrix, get-metadata]
+    uses: ./.github/workflows/nightly-test-package.yaml
     with:
-      install-cmd: 'uv pip install --pre minrecord'
+      install-cmd: "uv pip install --pre ${{ needs.get-metadata.outputs.name }}"
+      test-matrix: ${{ needs.get-matrix.outputs.test_matrix }}
 
   latest-all:
-    uses: ./.github/workflows/test-package.yaml
+    permissions:
+      contents: read
+    needs: [get-matrix, get-metadata]
+    uses: ./.github/workflows/nightly-test-package.yaml
     with:
-      install-cmd: 'uv pip install --pre "minrecord[all]"'
+      install-cmd: 'uv pip install --pre "${{ needs.get-metadata.outputs.name }}[all]"' # "all" installs everything
+      test-matrix: ${{ needs.get-matrix.outputs.test_matrix }}
 
   latest-extras:
-    uses: ./.github/workflows/test-package-extras.yaml
+    permissions:
+      contents: read
+    needs: [get-matrix, get-metadata]
+    uses: ./.github/workflows/nightly-test-package-extras.yaml
     with:
-      install-args: '--pre'
-
-
-  ########################
-  #     Dependencies     #
-  ########################
-
-  coola:
-    needs: get-versions
-    uses: ./.github/workflows/test-package-dep.yaml
-    with:
-      package-name: coola
-      package-versions: ${{ toJson(fromJson(needs.get-versions.outputs.package_versions).coola) }}
-
+      package-name: ${{ needs.get-metadata.outputs.name }}
+      install-args: "--pre"
+      test-matrix: ${{ needs.get-matrix.outputs.test_matrix }}
 
   #################################
   #     Optional dependencies     #
   #################################
 
-  objectory:
-    needs: get-versions
-    uses: ./.github/workflows/test-package-dep.yaml
+  # One job per optional dependency, driven by get-deps instead of a
+  # hardcoded list, so a new optional dependency only needs to be added to
+  # pyproject.toml (and dev/config/package_versions.json, kept up to date by
+  # bot-generate-package-versions.yaml).
+  test-dep:
+    permissions:
+      contents: read
+    needs: [get-deps, get-matrix, get-metadata]
+    strategy:
+      fail-fast: false
+      matrix:
+        package-name: ${{ fromJson(needs.get-deps.outputs.extras) }}
+    uses: ./.github/workflows/nightly-test-package-dep.yaml
     with:
-      package-name: objectory
-      package-versions: ${{ toJson(fromJson(needs.get-versions.outputs.package_versions).objectory) }}
+      project-name: ${{ needs.get-metadata.outputs.name }}
+      package-name: ${{ matrix.package-name }}
+      package-versions: ${{ toJson(fromJson(needs.get-deps.outputs.package_versions)[matrix.package-name]) }}
+      test-matrix: ${{ needs.get-matrix.outputs.test_matrix }}
+
+  # Test the required dependency (coola) with each supported version. It is not an
+  # extra, so it is not in the matrix of test-dep above.
+  test-required-dep:
+    permissions:
+      contents: read
+    needs: [get-deps, get-matrix, get-metadata]
+    uses: ./.github/workflows/nightly-test-package-dep.yaml
+    with:
+      project-name: ${{ needs.get-metadata.outputs.name }}
+      package-name: coola
+      package-versions: ${{ toJson(fromJson(needs.get-deps.outputs.package_versions).coola) }}
+      test-matrix: ${{ needs.get-matrix.outputs.test_matrix }}

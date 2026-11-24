@@ -119,7 +119,7 @@ install only some specific dependencies or other alternatives to install the lib
 The following is the corresponding `minrecord` versions and tested dependencies.
 
 | `minrecord` | `coola`        | `objectory`              | `python`      |
-|-------------|----------------|--------------------------|---------------|
+| ----------- | -------------- | ------------------------ | ------------- |
 | `main`      | `>=1.0,<2.0`   | `>=0.3,<1.0`<sup>*</sup> | `>=3.11`      |
 | `0.3.0`     | `>=1.0,<2.0`   | `>=0.3,<1.0`<sup>*</sup> | `>=3.10`      |
 | `0.2.0`     | `>=0.10,<1.0`  | `>=0.3,<1.0`<sup>*</sup> | `>=3.10`      |
