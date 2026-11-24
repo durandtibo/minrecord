@@ -420,7 +420,7 @@ PR number.
 | 2    | **One equality rule.** `utils/equality.py` and the three registrations; the three `equal` methods removed; the `.equal(` call sites of the tests, the docs and `package_checks.py` move to `objects_are_equal`; the NaN tests pass `equal_nan=True`; new tests for the tolerance, the path and the registration; the property rows (Exact round trip, Consistent with `coola`); the release notes. | F2         | yes (`equal` removed, NaN default) |
 | 3    | **Documentation and `__version__`.** The contract of `step`, the FAQ memory figure, `_get_version`, the `pragma` removed.                                                                                                                                                                                                                                                                          | F4, F5, F6 | no                                 |
 
-Status: step 1 done (#562, open), step 2 done (#563, open, stacked on #562), step 3 in progress.
+Status: step 1 done (#562, open), step 2 done (#563, open, stacked on #562), step 3 done (#564, open, stacked on #563).
 
 Steps 1 and 2 change what a caller observes, and nothing else does: release them together with the
 notes of the new checks and of the removed method. Step 3 changes no behaviour. Step 2 is the
