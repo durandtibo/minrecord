@@ -163,12 +163,23 @@ RecordManager provides:
 
 ### Does RecordManager create records automatically?
 
-Yes, `get_record()` creates a default `Record` if the name doesn't exist:
+No, not by default. `get_record()` raises a `KeyError` for a key that nobody registered, so a typo
+in a metric name is reported instead of storing the values in a record that nobody reads. To create
+the missing records on demand, pass a `default_factory` (as for `collections.defaultdict`). It is
+called with the key and returns the record:
 
 ```python
-manager = RecordManager()
-record = manager.get_record("new_metric")  # Auto-created
+from minrecord import MinScalarRecord, Record, RecordManager
+
+manager = RecordManager(default_factory=Record)
+record = manager.get_record("new_metric")  # A Record named "new_metric"
+
+# A best value for every new metric:
+manager = RecordManager(default_factory=MinScalarRecord)
 ```
+
+The `default_factory` is not part of the state: `state_dict()`, `equal()` and `load_state_dict()` do
+not use it.
 
 To check if a record exists first:
 
@@ -245,10 +256,10 @@ Yes, but each process needs its own records. After training:
 
 ```python
 from torch.utils.tensorboard import SummaryWriter
-from minrecord import RecordManager
+from minrecord import Record, RecordManager
 
 writer = SummaryWriter()
-manager = RecordManager()
+manager = RecordManager(default_factory=Record)
 
 for epoch in range(epochs):
     # Training...
@@ -267,10 +278,10 @@ for epoch in range(epochs):
 
 ```python
 import wandb
-from minrecord import RecordManager
+from minrecord import Record, RecordManager
 
 wandb.init(project="my-project")
-manager = RecordManager()
+manager = RecordManager(default_factory=Record)
 
 for epoch in range(epochs):
     # Training...
@@ -341,15 +352,18 @@ best_values = manager.get_best_values()  # Only comparable records
 
 ### Record not found errors
 
+`get_record()` raises a `KeyError` that lists the known keys when no record is registered for the key.
 Check that record names match exactly:
 
 ```python
 manager.add_record(MinScalarRecord("train/loss"))  # Note the "/"
 # Wrong name:
-manager.get_record("train_loss").add_value(1.5, step=0)  # Creates a new empty record
+manager.get_record("train_loss").add_value(1.5, step=0)  # KeyError: No record is registered ...
 # Correct:
 manager.get_record("train/loss").add_value(1.5, step=0)
 ```
+
+If you want the records to be created on demand, use `RecordManager(default_factory=...)`.
 
 ## Need More Help?
 

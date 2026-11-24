@@ -47,9 +47,10 @@ def test_set_max_size_max_scalar_record() -> None:
     assert MaxScalarRecord("accuracy").max_size == 3
 
 
-def test_set_max_size_manager_creates_record_with_new_size() -> None:
+def test_set_max_size_manager_default_factory_creates_record_with_new_size() -> None:
     set_max_size(3)
-    assert repr(RecordManager().get_record("loss")) == "Record(name=loss, max_size=3, size=0)"
+    manager = RecordManager(default_factory=Record)
+    assert repr(manager.get_record("loss")) == "Record(name=loss, max_size=3, size=0)"
 
 
 def test_set_max_size_record_drops_oldest_values() -> None:
