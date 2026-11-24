@@ -12,7 +12,7 @@ only-include = ["src", "tests"]
 
 [project]
 name = "minrecord"
-version = "0.3.0"
+version = "0.4.0a0"
 description = "Minimalist library to record values in a ML workflow"
 readme = "README.md"
 authors = [{ name = "Thibaut Durand", email = "durand.tibo+gh@gmail.com" }]
