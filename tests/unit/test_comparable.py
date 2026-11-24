@@ -334,6 +334,16 @@ def test_comparable_record_init_comparator_dict() -> None:
     assert record.equal(create_max_record(elements=[(0, 1.0), (1, 3.0), (2, 2.0)]))
 
 
+def test_comparable_record_init_comparator_dict_other_callable_raises() -> None:
+    with pytest.raises(TypeError, match=r"The configuration 'collections.OrderedDict' is not"):
+        ComparableRecord[float]("accuracy", {OBJECT_TARGET: "collections.OrderedDict"})
+
+
+def test_comparable_record_init_comparator_dict_record_raises() -> None:
+    with pytest.raises(TypeError, match=r"is not a configuration of BaseComparator"):
+        ComparableRecord[float]("accuracy", {OBJECT_TARGET: "minrecord.Record", "name": "a"})
+
+
 def test_comparable_record_init_comparator_dict_does_not_modify_data() -> None:
     comparator = {OBJECT_TARGET: "minrecord.comparator.MaxScalarComparator"}
     ComparableRecord[float]("accuracy", comparator)
@@ -341,7 +351,9 @@ def test_comparable_record_init_comparator_dict_does_not_modify_data() -> None:
 
 
 def test_comparable_record_init_comparator_invalid_dict() -> None:
-    with pytest.raises(TypeError, match=r"missing 1 required positional argument: '_target_'"):
+    with pytest.raises(
+        TypeError, match=r"The configuration None is not a configuration of BaseComparator"
+    ):
         ComparableRecord[float]("accuracy", {})
 
 

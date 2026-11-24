@@ -57,6 +57,17 @@ Configuration and utilities:
 - `minrecord.utils.value.MutableValue` is removed.
 - An invalid `max_size` (not a positive `int`, or a `bool`) raises `ValueError`.
 
+Loading:
+
+- `BaseRecord.from_dict` returns `Self` and raises `TypeError` if `_target_` is missing or is not the
+  class (or a subclass of the class) that it is called on: `from_dict` does not call an arbitrary
+  importable function any more, and `MinScalarRecord.from_dict(Record("x").to_dict())` raises
+  instead of returning a `Record`. `load_dict` and the manager `load_state_dict` raise `TypeError`
+  for a dict that is not the dict of a record.
+- The comparator dict of `ComparableRecord` must be the dict of a `BaseComparator`, otherwise
+  `TypeError` (it was `TypeError` for a missing `_target_`, with another message, and any callable
+  was accepted otherwise).
+
 ### Fixes
 
 - `set_max_size` changes the maximum size of the records created after the call. The default was
@@ -80,6 +91,8 @@ Configuration and utilities:
   `coola.equality.objects_are_equal`).
 - `reset_max_size` is exported at the root of the package.
 - `minrecord.utils.validation.check_max_size`.
+- `minrecord.utils.factory.instantiate(config, cls)`: builds an object from its dict if the
+  object named by `_target_` is `cls` or a subclass of `cls`.
 - `ComparableRecord` accepts the comparator as an object or as its dict.
 
 ### Documentation

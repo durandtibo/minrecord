@@ -13,7 +13,9 @@ from typing import TYPE_CHECKING, Any, Generic, Self, TypeVar
 
 from coola.equality import objects_are_equal
 from coola.equality.tester import EqualEqualityTester, get_default_registry
-from coola.factory import OBJECT_TARGET, factory
+from coola.factory import OBJECT_TARGET
+
+from minrecord.utils.factory import instantiate
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -354,12 +356,15 @@ class BaseRecord(ABC, Generic[T]):
             self.add_value(value, step)
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> BaseRecord[T]:
+    def from_dict(cls, data: dict[str, Any]) -> Self:
         r"""Instantiate a record from a dictionary.
 
         This method is equivalent to ``coola.factory.factory(**data)``,
-        so the constructor validates the arguments. The dictionary is
-        not modified.
+        so the constructor validates the arguments, but the object
+        named by ``_target_`` must be ``cls`` or a subclass of ``cls``,
+        and it is checked before it is called. ``BaseRecord.from_dict``
+        accepts every record, ``MinScalarRecord.from_dict`` only a
+        ``MinScalarRecord``. The dictionary is not modified.
 
         Args:
             data: The dictionary that is used to instantiate the
@@ -368,6 +373,11 @@ class BaseRecord(ABC, Generic[T]):
 
         Returns:
             The instantiated record.
+
+        Raises:
+            TypeError: if the dictionary is not the dictionary of a
+                ``cls`` record (``_target_`` is missing, or it is not
+                ``cls`` or a subclass of ``cls``).
 
         Example:
             ```pycon
@@ -386,13 +396,13 @@ class BaseRecord(ABC, Generic[T]):
 
             ```
         """
-        return factory(**data)
+        return instantiate(data, cls)
 
     def load_dict(self, data: dict[str, Any]) -> None:
         r"""Load a dictionary in the current record, in place.
 
         The new record is built first from the dictionary (with
-        ``from_dict``), so the record is not modified if the
+        ``BaseRecord.from_dict``), so the record is not modified if the
         dictionary is invalid.
 
         Args:
@@ -402,7 +412,8 @@ class BaseRecord(ABC, Generic[T]):
 
         Raises:
             TypeError: if the dictionary is the dictionary of a
-                record of another type.
+                record of another type, or if it is not the dictionary
+                of a record.
 
         Example:
             ```pycon
@@ -414,7 +425,7 @@ class BaseRecord(ABC, Generic[T]):
 
             ```
         """
-        other = self.from_dict(data)
+        other = BaseRecord.from_dict(data)
         if type(other) is not type(self):
             msg = (
                 f"Cannot load the data of a {type(other).__qualname__} record in a "

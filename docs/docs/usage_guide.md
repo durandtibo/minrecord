@@ -65,8 +65,9 @@ These properties are guaranteed by the base classes, so every record has them.
 | NaN never wins     | A NaN value is never better than a number. A NaN best value is replaced by any value (a number, or another NaN as a tie).                                                                  |
 | One snapshot       | `to_dict()` returns the arguments of the constructor, content included (the recent values as `elements`, the best pair as `best`). `improved` is derived from the values, it is not stored. |
 | Round trip         | `BaseRecord.from_dict(r.to_dict()).equal(r)`, `r.clone().equal(r)`, and `r.load_dict(r2.to_dict())` makes `r` equal to `r2`, also after a JSON round trip and when `r` holds a NaN (`equal` treats NaN as equal to NaN). The clone has the same `has_improved()` and the same best pair. A clone is independent: adding values to it does not change `r`. |
+| Safe to load       | `from_dict` and the comparator dict only build objects of the expected type (a record, a comparator): a dict that names any other importable callable raises `TypeError` before it is called. `MinScalarRecord.from_dict(d)` only accepts the dict of a `MinScalarRecord`. |
 | Atomic             | An operation that raises (a comparator that fails, an invalid dict given to `load_dict` or to the manager `load_state_dict`) leaves the record, or the manager, as it was.                 |
-| Typed errors       | `EmptyRecordError` for a value asked from an empty record, `NotAComparableRecordError` for a best value asked from a record that cannot compare, `ValueError` for an invalid `max_size`.  |
+| Typed errors       | `EmptyRecordError` for a value asked from an empty record, `NotAComparableRecordError` for a best value asked from a record that cannot compare, `ValueError` for an invalid `max_size`, `TypeError` for a dict of the wrong type. |
 | No hidden global   | The default `max_size` is read when a record is **created**. It is the only global setting (`get_max_size`, `set_max_size`, `reset_max_size`).                                             |
 | Extensible         | A new record type implements the 6 abstract members of `BaseRecord`. A new notion of "better" implements the one method `BaseComparator.is_better`. No registry is needed.               |
 
@@ -280,6 +281,12 @@ record of another type:
 ```python
 record.load_dict(state)
 ```
+
+Loading only builds records and comparators: a dict whose `_target_` names another importable
+callable (for example `collections.OrderedDict`) raises `TypeError` before the callable is called.
+`BaseRecord.from_dict` accepts every record, and `MinScalarRecord.from_dict` only a `MinScalarRecord`
+(or a subclass). The module that `_target_` names is still imported, so do not load a dict from an
+untrusted source without checking `_target_` first.
 
 For `RecordManager`:
 

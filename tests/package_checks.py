@@ -27,6 +27,7 @@ def check_imports() -> None:
         "minrecord.reset_max_size",
         "minrecord.set_max_size",
         "minrecord.utils",
+        "minrecord.utils.factory.instantiate",
         "minrecord.utils.validation.check_max_size",
     ]
     for a in objects_to_import:
@@ -52,6 +53,7 @@ def check_comparable_record() -> None:
     assert record.get_most_recent() == ((1, 5.0), (2, 6.0))
     assert record.clone().equal(record)
     assert BaseRecord.from_dict(record.to_dict()).equal(record)
+    assert type(MinScalarRecord.from_dict(record.to_dict())) is MinScalarRecord
     assert MinScalarComparator().is_better(new_value=float("nan"), old_value=1.0) is False
 
 
