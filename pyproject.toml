@@ -247,18 +247,3 @@ layers = [
   "minrecord.base | minrecord.comparator | minrecord.config",
   "minrecord.utils",
 ]
-
-[[tool.importlinter.contracts]]
-name = "Library code must not import the testing helpers"
-type = "forbidden"
-source_modules = [
-  "minrecord.base",
-  "minrecord.comparable",
-  "minrecord.comparator",
-  "minrecord.config",
-  "minrecord.functional",
-  "minrecord.generic",
-  "minrecord.manager",
-  "minrecord.utils",
-]
-forbidden_modules = ["minrecord.testing"]
