@@ -24,12 +24,10 @@ classes (Python 3.14, `coola` 2.0.0a5, scripts kept outside the repository). Ite
 2. **Major release.** Breaking changes are fine and compatibility is not a design input: no adapter,
    no alias, no deprecation period. The release notes list the changes. The package says so itself
    (`index.md`, "API stability").
-3. **Keep the names that users import.** The downstream packages (`astrotech`, `karbonn`) import
-   `BaseRecord`, `Record`, `MinScalarRecord`, `MaxScalarRecord` and `RecordManager` from the root
-   and call `add_record`, `get_record`, `get_records`, `get_best_values`, `add_value`, `update`,
-   `get_last_value`, `get_best_value`, `has_improved`, and `state_dict`/`load_state_dict` (on the
-   manager) **[verified by grep]**. They stay. The breaking changes are on the construction side
-   (arguments) and on the extension side (comparators), not on this daily API.
+3. **Downstream code is not a design input.** The dependents (`astrotech`, `karbonn`) will be
+   updated later, so no choice below is kept for them. The daily names (`BaseRecord`, `Record`,
+   `MinScalarRecord`, `MaxScalarRecord`, `RecordManager`, `add_value`, `get_best_value`, ...) stay
+   only because they are the natural API of the package, not for compatibility.
 4. **One dependency.** `coola` is the only dependency and `minrecord` has no optional one. Equality,
    formatting and object creation come from `coola` (`objects_are_equal`, `str_mapping`, `factory`);
    nothing is re-implemented.
@@ -96,7 +94,7 @@ What is already right and must not regress: the `deque(maxlen=...)` window; the 
 apart from the window; the split between `config_dict` and `state_dict`; `EmptyRecordError` and
 `NotAComparableRecordError` as dedicated types; registering the record and comparator classes in the
 `coola` equality registry; `RecordManager.get_record` creating a default `Record` (documented
-behaviour that `astrotech` relies on); the doctests on every public function; the root exports.
+behaviour); the doctests on every public function; the root exports.
 
 ## 3. Architecture
 
@@ -156,8 +154,8 @@ record.load_dict(data)                  # same data, in place (atomic)
   changed if it raises), checks that the type is the same, then swaps the attributes. It is
   implemented once, in `BaseRecord` (3 lines), so no subclass writes it.
 - `RecordManager.state_dict()` is `{key: record.to_dict()}` and `load_state_dict` is the loop of
-  `load_dict`/`from_dict`: the **manager** keeps these two names, because `astrotech` calls them.
-  The records do not need them any more.
+  `load_dict`/`from_dict`: the **manager** keeps these two names (it is the object that is
+  checkpointed). The records do not need them any more.
 
 ### 3.1 The record contract
 
@@ -254,7 +252,7 @@ class ComparableRecord(Record[T]):
   nothing to test for truthiness: `is None` is the only test, so `0.0` is a legal best.
 - **`improved` is derived.** It is the result of the last `add_value`, so it is recomputed by the
   replay and never stored. The prototype checks that `clone()` gives the same flag for ties, a worse
-  last value and an evicted best (section 6).
+  last value and an evicted best (section 5).
 - **No sentinel** (F5): the best pair is `None` until the first value, and the first value is then
   the best by `self._best is None`. A window can no more be non-empty without a best.
 - **As a bonus the best step is known.** `best[0]` is the step of the best value, so
@@ -347,8 +345,8 @@ class RecordManager:
   `objects_are_equal(m1, m2)` works and the checkpoint pattern is testable.
 - `load_state_dict` is atomic at the manager level too: it builds every new record first, then
   swaps, so a bad entry leaves the manager as it was.
-- `exist_ok` becomes keyword-only. `prefix` and `suffix` stay positional-or-keyword: `astrotech`
-  calls `get_best_values(prefix, suffix)` positionally (decision D4).
+- `exist_ok`, `prefix` and `suffix` become keyword-only, on the manager and on the functions of
+  `functional` (decision D4).
 - `functional.get_best_values` / `get_last_values` use `if record.is_empty(): continue` instead of
   `contextlib.suppress` (F15), and `RecordManager`'s docstrings point to the functions instead of
   repeating the 14 lines.
@@ -374,8 +372,8 @@ side effect of the package.
 | `MinScalarRecord`, `MaxScalarRecord`                              | `(name, *, elements, max_size, best)`; `clone` works; `from_elements` removed                                                                                                                          | **breaking** (keyword-only), fixes F2        |
 | `BaseComparator`                                                  | one abstract method `is_better(*, new_value, old_value)`; `to_dict` and `equal` concrete                                                                                                               | **breaking** for custom comparators          |
 | `MinScalarComparator`, `MaxScalarComparator`                      | NaN rule; `get_initial_best_value` removed                                                                                                                                                             | **breaking**, behaviour change (NaN)         |
-| `RecordManager`                                                   | copies its input; `get_last_values` and `equal` added; `state_dict`/`load_state_dict` keep their names and are atomic; `exist_ok` keyword-only                                                         | additive + small break                       |
-| `get_best_values`, `get_last_values`                              | unchanged signatures; same skipping rules                                                                                                                                                              | none                                         |
+| `RecordManager`                                                   | copies its input; `get_last_values` and `equal` added; `state_dict`/`load_state_dict` keep their names and are atomic; `exist_ok`, `prefix`, `suffix` keyword-only                                     | additive + small break                       |
+| `get_best_values`, `get_last_values`                              | `prefix` and `suffix` keyword-only; same skipping rules                                                                                                                                                | **breaking** (keyword-only)                  |
 | `get_max_size`, `set_max_size`                                    | unchanged; `reset_max_size` also exported at the root                                                                                                                                                  | additive                                     |
 | `minrecord.config.Config`, `get_default_config`                   | removed                                                                                                                                                                                                | **breaking** (no known user)                 |
 | `minrecord.utils.value.MutableValue`                              | removed; `minrecord.utils.validation.check_max_size` added                                                                                                                                             | **breaking** (no known user)                 |
@@ -383,29 +381,10 @@ side effect of the package.
 
 The serialized format changes: a record is one flat dict (`_target_`, `name`, `max_size`,
 `elements`, and for a comparable record `comparator` and `best`) instead of
-`{"config": ..., "state": ...}`, and the empty record no longer stores `inf`/`-inf`.
-`BaseRecord.from_dict` accepts the old `{"config", "state"}` shape for one release, by converting it
-to the new one (about 6 lines), so a checkpoint written by the current version loads (decision D5).
+`{"config": ..., "state": ...}`, and the empty record no longer stores `inf`/`-inf`. Old checkpoints
+are not read: there is no compatibility shim (decision D5).
 
-## 5. Dependents
-
-- **`astrotech`** (`engine/state/vanilla.py`) wraps `RecordManager` and calls
-  `add_record(record=, key=)`, `get_record`, `get_records`, `get_best_values(prefix, suffix)`,
-  `state_dict`, `load_state_dict`. It keeps working unchanged (the positional `prefix`/`suffix` is
-  the reason for D4). Its tests build `MinScalarRecord("x")` and `Record("x")`: unchanged.
-- **`karbonn`** (tests only) builds `MinScalarRecord(name)` and `MaxScalarRecord(name)` and checks
-  the best value: unchanged. Any `MinScalarRecord(name, elements, ...)` positional call would break
-  (keyword-only); a grep of both repositories finds none.
-- **Custom comparators** (in user code): must drop `get_initial_best_value` and `equal`, swap to the
-  keyword-only `is_better`. The migration is mechanical and in the release notes.
-- **Custom `BaseRecord` subclasses**: must drop their `clone`/`equal`/`_get_best_value`/
-  `_has_improved`/`config_dict`/`state_dict`/`load_state_dict`, and write one `to_dict` that matches
-  their constructor (the contract test shows how).
-- **Doctests and docs**: `index.md`, `faq.md`, `usage_guide.md`, `quickstart.md` and the module
-  docstrings use `from_elements`, `best_value=`, `get_initial_best_value`, `get_last_values` on the
-  manager and `Config`. They are rewritten in the same step as the API they describe.
-
-## 6. Evidence: a prototype
+## 5. Evidence: a prototype
 
 A prototype of `Record`, `ComparableRecord`, `MinScalarRecord`, `BaseComparator` and a min
 comparator, with the one-snapshot reconstruction of section 3.0 (about 60 lines of classes, no
@@ -433,28 +412,28 @@ none of the fixes needs a special case; each one is a consequence of "the base c
 subclass describes". The one-snapshot design removes a whole method pair (`state_dict`,
 `load_state_dict`) and the failure mode where the constructor and the loader disagree.
 
-## 7. Changes to reach the target state
+## 6. Changes to reach the target state
 
 One branch and one pull request per step (`CLAUDE.md`, stacked when a step needs the previous one).
 The order keeps every step releasable and puts the bug fixes first, so they can ship without the
 redesign.
 
-| Step | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | Findings        |
-| ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------- |
-| 1    | **Fix the docs that promise missing code.** Remove `[all]`, the `examples/` link and the "batch updates" claim; mark `get_last_values` of the manager as upcoming or add it (step 6); fix the `get_last_values` docstring (its `Returns:` says "best").                                                                                                                                                                                                                         | F13, F15        |
-| 2    | **Fix `max_size` default.** `max_size: int \| None = None`, read `get_max_size()` in the constructor; regression test that fails on `main` (`git stash push src`); integration test with the real `Record` and manager.                                                                                                                                                                                                                                                         | F1              |
-| 3    | **Fix `clone` of the scalar records.** Regression test first. (Superseded by step 5, but it is a bug that can ship alone as a patch release.)                                                                                                                                                                                                                                                                                                                                   | F2              |
-| 4    | **Delete the dead code.** `MutableValue`, the three unused loggers, the `Config` class and the cache singleton (module global), `check_max_size` in `utils.validation`, return type `T` of `get_last_value`.                                                                                                                                                                                                                                                                    | F9, F10, F14    |
-| 5    | **Record contract.** `to_dict` as the one snapshot; move `clone`/`equal`/`update`/`from_dict`/`load_dict` and the `get_best_value`/`has_improved` defaults to `BaseRecord`; remove the hooks and the `config_dict`/`state_dict`/`load_state_dict` triple; `ComparableRecord` without sentinel, `best_value`, `improved` and `from_elements`, with `best`; scalar records deduplicated; `elements` replays; legacy `{"config", "state"}` accepted by `from_dict`; contract test. | F2–F5, F7, F8   |
-| 6    | **Comparator.** One abstract method, keyword-only, `to_dict`/`equal` in the base class, NaN rule, comparator as a dict in the record data; remove `ComparableRecord.is_better`.                                                                                                                                                                                                                                                                                                 | F5, F6, F8, F11 |
-| 7    | **Manager and functional.** Copy the input, add `get_last_values` and `equal`, atomic `state_dict`/`load_state_dict` built on `to_dict`/`load_dict`, register in `coola`, `exist_ok` keyword-only, `is_empty()` instead of `suppress`, shorter docstrings.                                                                                                                                                                                                                      | F12, F13, F15   |
-| 8    | **Documentation and tracking.** Rewrite the custom comparator example, the "Why does the constructor behave differently" FAQ entry (deleted), the serialization section; add the properties of section 1 to `usage_guide.md`; `tests/package_checks.py`; release notes with the breaking changes.                                                                                                                                                                               | all             |
+| Step | Change                                                                                                                                                                                                                                                                                                                                                                                                                    | Findings        |
+| ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------- |
+| 1    | **Fix the docs that promise missing code.** Remove `[all]`, the `examples/` link and the "batch updates" claim; mark `get_last_values` of the manager as upcoming or add it (step 6); fix the `get_last_values` docstring (its `Returns:` says "best").                                                                                                                                                                   | F13, F15        |
+| 2    | **Fix `max_size` default.** `max_size: int \| None = None`, read `get_max_size()` in the constructor; regression test that fails on `main` (`git stash push src`); integration test with the real `Record` and manager.                                                                                                                                                                                                   | F1              |
+| 3    | **Fix `clone` of the scalar records.** Regression test first. (Superseded by step 5, but it is a bug that can ship alone as a patch release.)                                                                                                                                                                                                                                                                             | F2              |
+| 4    | **Delete the dead code.** `MutableValue`, the three unused loggers, the `Config` class and the cache singleton (module global), `check_max_size` in `utils.validation`, return type `T` of `get_last_value`.                                                                                                                                                                                                              | F9, F10, F14    |
+| 5    | **Record contract.** `to_dict` as the one snapshot; move `clone`/`equal`/`update`/`from_dict`/`load_dict` and the `get_best_value`/`has_improved` defaults to `BaseRecord`; remove the hooks and the `config_dict`/`state_dict`/`load_state_dict` triple; `ComparableRecord` without sentinel, `best_value`, `improved` and `from_elements`, with `best`; scalar records deduplicated; `elements` replays; contract test. | F2–F5, F7, F8   |
+| 6    | **Comparator.** One abstract method, keyword-only, `to_dict`/`equal` in the base class, NaN rule, comparator as a dict in the record data; remove `ComparableRecord.is_better`.                                                                                                                                                                                                                                           | F5, F6, F8, F11 |
+| 7    | **Manager and functional.** Copy the input, add `get_last_values` and `equal`, atomic `state_dict`/`load_state_dict` built on `to_dict`/`load_dict`, register in `coola`, `exist_ok`/`prefix`/`suffix` keyword-only, `is_empty()` instead of `suppress`, shorter docstrings.                                                                                                                                              | F12, F13, F15   |
+| 8    | **Documentation and tracking.** Rewrite the custom comparator example, the "Why does the constructor behave differently" FAQ entry (deleted), the serialization section; add the properties of section 1 to `usage_guide.md`; `tests/package_checks.py`; release notes with the breaking changes.                                                                                                                         | all             |
 
 Steps 5 and 6 are the redesign; steps 1 to 4 and 7 are independent small changes. Each step updates
 the docs, the `tests/package_checks.py` and the tracking document it touches (`CLAUDE.md`,
 "Workflow").
 
-## 8. Tests and gates
+## 7. Tests and gates
 
 Unit tests mirror the source tree; the conventions of `CLAUDE.md` apply (one behaviour per test,
 literal expected values, a regression test for every bug that fails without the fix, no local
@@ -468,7 +447,7 @@ imports, 100 % coverage of what changes).
   (`json.dumps` with the stored values being numbers); `factory(**to_dict())` works; `load_dict`
   makes another record equal to the sample, and leaves it unchanged when the dict is invalid (the
   constructor raises, by reading: not covered by the prototype) or of another type; the input dict
-  of `from_dict` is not modified; the legacy `{"config", "state"}` shape loads.
+  of `from_dict` is not modified.
 - **`Record`**: typical, empty, single element; `max_size` boundary (1, equal to the number of
   elements, smaller); the default read at call time (regression F1: `set_max_size(3)` then a new
   record, with `reset_max_size` in a fixture); `max_size` of `0`, `-1`, `2.5` and `True` raise
@@ -476,7 +455,7 @@ imports, 100 % coverage of what changes).
   iterable is not consumed twice; the whole `to_dict()` asserted against a literal.
 - **`ComparableRecord`**: the first value is the best and an improvement; a tie improves; a worse
   value does not; the best pair outlives the eviction of its element (the 3-line scenario of
-  section 6) and `best` is the pair `(step, value)`; the `improved` flag survives `clone` for a tie,
+  section 5) and `best` is the pair `(step, value)`; the `improved` flag survives `clone` for a tie,
   a worse last value and a new best; `elements` gives the same state as a loop of `add_value`
   (property test, seeded); a falsy best value (`0.0`) is kept (regression F3, `best=(None, 0.0)`); a
   comparator that raises leaves the record unchanged (regression: atomic); `get_best_value` and
@@ -489,10 +468,11 @@ imports, 100 % coverage of what changes).
   positional; `to_dict` and `equal` of the base class (same type, different type, subclass with an
   argument).
 - **Manager**: the input dict is copied (regression F12, both the empty and the non-empty case);
-  `get_last_values` skips the empty records and applies `prefix`/`suffix`; `equal` (same state,
-  different state, different type); `load_state_dict` with an unknown key creates the record and
-  with a known key loads into the existing record (the record object that a caller holds is the same
-  object afterwards), and a bad entry leaves the manager unchanged; `add_record` with `exist_ok`.
+  `get_last_values` skips the empty records and applies the keyword-only `prefix`/`suffix` (a
+  positional call raises `TypeError`); `equal` (same state, different state, different type);
+  `load_state_dict` with an unknown key creates the record and with a known key loads into the
+  existing record (the record object that a caller holds is the same object afterwards), and a bad
+  entry leaves the manager unchanged; `add_record` with `exist_ok`.
 - **Integration** (`tests/integration/`): no patching. A full training loop (a `MinScalarRecord` and
   a `MaxScalarRecord` in a `RecordManager`, 100 steps, `max_size=5`) whose `state_dict` is written
   to JSON, read back and loaded into a new manager, then compared with `objects_are_equal`; the same
@@ -508,7 +488,7 @@ imports, 100 % coverage of what changes).
   the target does not add a per-call allocation (`improved` is a local bool); a regression is not
   plausible, so no benchmark job is added.
 
-## 9. Decisions for the maintainers
+## 8. Decisions for the maintainers
 
 **D1. Replay `elements` through `add_value`, or take the whole state in the constructor?**
 _Recommended: replay, with an optional `best=(step, value)` seed._ `elements` is replayed through
@@ -516,7 +496,7 @@ _Recommended: replay, with an optional `best=(step, value)` seed._ `elements` is
 warning disappear. The only thing that cannot be replayed is a best pair that left the window, and
 `best` is that pair: **one** argument that is either `None` or a real element, not two independent
 values that can disagree, as `best_value`/`improved` did. `improved` is never stored: the replay
-recomputes it and it equals the original flag (checked over the cases of section 6, ties included).
+recomputes it and it equals the original flag (checked over the cases of section 5, ties included).
 The cost is O(n) at construction, the cost of building the window anyway.
 
 **D2. Is the first value always the best value?** _Recommended: yes, expressed as `best is None`._
@@ -527,22 +507,18 @@ in its own `is_better`; the record does not need to know. The alternative (a com
 an initial value) is the current design and is the source of F5.
 
 **D3. Keep `RecordManager.get_record` creating a missing record?** _Recommended: keep._ It is
-documented, tested and relied on by `astrotech`. The price is that a typo creates a silent empty
-`Record` (the FAQ even has a troubleshooting entry for it). If the maintainers prefer a strict
-manager, the change is `get_record` raising `KeyError` and a new `get_or_create`; `astrotech` then
-needs one line. Not worth a break now.
+documented and tested. The price is that a typo creates a silent empty `Record` (the FAQ even has a
+troubleshooting entry for it). If the maintainers prefer a strict manager, the change is
+`get_record` raising `KeyError` and a new `get_or_create`. Not needed by the properties, so not part
+of the target.
 
-**D4. Make `prefix` and `suffix` keyword-only?** _Recommended: not yet._ `CLAUDE.md` asks for
-keyword-only options, but `astrotech` calls them positionally. Make them keyword-only in the same
-release as the update of `astrotech`.
+**D4. Make `prefix` and `suffix` keyword-only?** **Decided: yes.** `CLAUDE.md` asks for keyword-only
+options. `get_best_values` and `get_last_values` (manager and `functional`) take `prefix` and
+`suffix` as keyword-only arguments, like `exist_ok`.
 
-**D5. Accept the legacy `{"config", "state"}` dict in `from_dict` and `load_state_dict`?**
-_Recommended: yes, for one release._ Checkpoints written by the current version have the old shape
-and the sentinel for the empty records. The shim converts the old shape (the state's `record`
-becomes `elements`; a stored `best_value` becomes `best` only for a non-empty record; the empty
-record ignores the sentinel) and is removed in the next release. A non-empty record always has a
-real best value, so the old checkpoints of a started run are exact, except that the best step is
-unknown (`None`) for them.
+**D5. Read the legacy `{"config", "state"}` dict?** **Decided: no.** Breaking changes are accepted,
+so there is no shim: `from_dict` reads only the flat `to_dict()` shape, and the old checkpoints are
+not loaded. This removes the conversion code and its tests.
 
 **D6. NaN: ignore, replace, or raise?** _Recommended: never better, and replaced by the first
 number._ It never hides a number behind a NaN and never raises in a training loop where a loss can
@@ -557,7 +533,7 @@ _Recommended: keep the classes._ Their names are in the downstream code, in the 
 step, so the method costs nothing and removes a copy that checkpoint code keeps today. It is not
 needed by the target; if the maintainers want the smallest API, drop it and keep `best` private.
 
-## 10. Not covered
+## 9. Not covered
 
 - **Other record kinds.** A record of the whole history (no `max_size`), a windowed mean, or a
   record of vectors are possible `BaseRecord` subclasses, but nothing in the documentation asks for
