@@ -108,7 +108,13 @@ Not guaranteed, and documented as such in `design.md` (the last two items are ne
    re-implemented (`CLAUDE.md`). The pin is `coola >=2.0.0a5,<3.0`: the tester API that section 4.1
    uses (`BaseEqualityTester`, the child-pair iterator, `AttributeName`) is in `2.0.0a5`
    **[verified]**.
-5. **Fast enough by construction.** `add_value` is not touched. The equality tester has the cost of
+5. **NumPy and PyTorch compatibility is out of scope.** `minrecord` has no optional dependency and
+   never imports `numpy` or `torch` (not even in the tests: neither is installed in the project
+   environment). The records store the values as given and the comparators compare what `<=` and
+   `isnan` accept. Nothing in this review adds, tests or promises support for an array, a tensor
+   or a NumPy scalar (JSON-serializable snapshots, detaching a tensor, `numpy.int64` as
+   `max_size`). The caller converts (`float(x)`, `x.item()`, `int(n)`): see D3 and D5.
+6. **Fast enough by construction.** `add_value` is not touched. The equality tester has the cost of
    today's `equal`: 1.36 ms against 1.35 ms for a window of 1,000 pairs, and 21.9 µs against 21.2 µs
    for the default window of 10 **[verified]**.
 
@@ -565,6 +571,10 @@ independent error classes (`EmptyRecordError`, `NotAComparableRecordError`).
 - **Other record kinds.** A record of the whole history (no `max_size`), a windowed mean, a record
   of vectors: each is a possible `BaseRecord` subclass (6 members), and nothing in the documentation
   asks for them.
+- **NumPy and PyTorch compatibility.** Out of scope (section 2, item 5): no conversion, no
+  special case for arrays, tensors or NumPy scalars, and no test that needs either library. A
+  future support would be a separate design (an optional dependency, loaded lazily with a
+  fallback, as `CLAUDE.md` requires) and not a change to the records.
 - **Thread safety and multi-process aggregation.** The FAQ answer ("one record per process, gather
   after") stays the answer.
 - **A strict `load_state_dict(strict=...)`**: the merge (unknown records kept, known ones loaded in
