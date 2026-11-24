@@ -1848,13 +1848,14 @@ full name of the class, the name, <code>max_size</code>, the recent values as <c
 record, the <code>comparator</code> and the best pair as <code>best</code>). The dict can be written to JSON, if the
 values are numbers or strings.</p>
 <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">coola.equality</span><span class="w"> </span><span class="kn">import</span> <span class="n">objects_are_equal</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">minrecord</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseRecord</span><span class="p">,</span> <span class="n">MinScalarRecord</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">record</span> <span class="o">=</span> <span class="n">MinScalarRecord</span><span class="p">(</span><span class="s2">"loss"</span><span class="p">,</span> <span class="n">max_size</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">update</span><span class="p">([(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mf">6.0</span><span class="p">)])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
 <span class="go">{'_target_': 'minrecord.comparable.MinScalarRecord', 'name': 'loss', 'max_size': 2, 'elements': ((1, 5.0), (2, 6.0)), 'best': (0, 1.0)}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">new_record</span> <span class="o">=</span> <span class="n">BaseRecord</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">to_dict</span><span class="p">())))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">new_record</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">objects_are_equal</span><span class="p">(</span><span class="n">new_record</span><span class="p">,</span> <span class="n">record</span><span class="p">)</span>
 <span class="go">True</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">new_record</span><span class="o">.</span><span class="n">get_best_value</span><span class="p">()</span>
 <span class="go">1.0</span>
@@ -1882,8 +1883,8 @@ untrusted source without checking <code>_target_</code> first.</p>
 merges the state into the manager: the data of a known key is loaded in the existing record (the
 objects that you hold are updated), the records of the new keys are created, and a record of the
 manager that the state does not mention is kept. It does not change the manager if one entry is
-invalid (the entries are built and checked first, then loaded). Two
-managers can be compared with <code>manager1.equal(manager2)</code> or <code>coola.equality.objects_are_equal</code>.</p>
+invalid (the entries are built and checked first, then loaded). Two managers can be compared with
+<code>coola.equality.objects_are_equal(manager1, manager2)</code>.</p>
 <p>The dict is not compatible with the one of the versions before 0.4.0 (<code>{"config": ..., "state": ...}</code>),
 see the <a href="../release_notes/">release notes</a>. The <a href="../design/">design page</a> explains the trade-offs of
 <code>from_dict</code>, <code>load_dict</code> and <code>load_state_dict</code>.</p>
@@ -1901,10 +1902,21 @@ see the <a href="../release_notes/">release notes</a>. The <a href="../design/">
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Number of stored values: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">record</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 </code></pre></div>
 <h3 id="verify-record-equality">Verify record equality<a class="headerlink" href="#verify-record-equality" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="c1"># Useful for testing</span>
+<p>Records, comparators and managers are compared with the functions of <code>coola</code>, which compare their
+snapshots (<code>to_dict</code>, <code>state_dict</code>). A NaN is different from a NaN unless <code>equal_nan=True</code>, the
+tolerance of <code>objects_are_allclose</code> is honoured, and <code>assert_objects_equal</code> reports where two
+objects differ.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">coola.equality</span><span class="w"> </span><span class="kn">import</span> <span class="n">assert_objects_equal</span><span class="p">,</span> <span class="n">objects_are_allclose</span><span class="p">,</span> <span class="n">objects_are_equal</span>
+
+<span class="c1"># Useful for testing</span>
 <span class="n">record1</span> <span class="o">=</span> <span class="n">MinScalarRecord</span><span class="p">(</span><span class="s2">"loss"</span><span class="p">,</span> <span class="n">elements</span><span class="o">=</span><span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">1.3</span><span class="p">)])</span>
 <span class="n">record2</span> <span class="o">=</span> <span class="n">MinScalarRecord</span><span class="p">(</span><span class="s2">"loss"</span><span class="p">,</span> <span class="n">elements</span><span class="o">=</span><span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">1.3</span><span class="p">)])</span>
-<span class="k">assert</span> <span class="n">record1</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span><span class="n">record2</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">objects_are_equal</span><span class="p">(</span><span class="n">record1</span><span class="p">,</span> <span class="n">record2</span><span class="p">)</span>
+<span class="c1"># The same check, with the location of the first difference when it fails.</span>
+<span class="n">assert_objects_equal</span><span class="p">(</span><span class="n">record1</span><span class="p">,</span> <span class="n">record2</span><span class="p">)</span>
+<span class="c1"># A record that holds a NaN needs equal_nan=True, as any other object of coola.</span>
+<span class="c1"># A tolerance is possible, for example after a loss of precision.</span>
+<span class="k">assert</span> <span class="n">objects_are_allclose</span><span class="p">(</span><span class="n">record1</span><span class="p">,</span> <span class="n">record2</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">)</span>
 </code></pre></div>
 <h2 id="see-also">See Also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
 <ul>

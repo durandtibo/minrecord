@@ -1403,8 +1403,9 @@ all of them.</p>
 RecordManager: {key: BaseRecord}
 </code></pre></div>
 <p>Every record is rebuilt from one <strong>snapshot</strong>: <code>to_dict()</code> returns the arguments of the constructor
-(and the full name of the class under <code>_target_</code>), content included. <code>from_dict</code>, <code>clone</code>, <code>equal</code>
-and <code>load_dict</code> are all defined from this snapshot.</p>
+(and the full name of the class under <code>_target_</code>), content included. <code>from_dict</code>, <code>clone</code> and
+<code>load_dict</code> are all defined from this snapshot, and so is the equality: two records are equal if
+they have the same type and equal snapshots, as <code>coola</code> compares them.</p>
 <h2 id="guarantees">Guarantees<a class="headerlink" href="#guarantees" title="Permanent link">&para;</a></h2>
 <p>These guarantees come from the base classes, so every record has them.</p>
 <table>
@@ -1437,7 +1438,7 @@ and <code>load_dict</code> are all defined from this snapshot.</p>
 </tr>
 <tr>
 <td>Exact round trip</td>
-<td>For every record <code>r</code>, also after a JSON round trip and when it holds NaN: <code>BaseRecord.from_dict(r.to_dict()).equal(r)</code> and <code>r.clone().equal(r)</code>. The clone has the same <code>has_improved()</code> and the same best pair, and it is independent.</td>
+<td>For every record <code>r</code>, also after a JSON round trip and when it holds NaN: <code>objects_are_equal(BaseRecord.from_dict(r.to_dict()), r, equal_nan=True)</code> and <code>objects_are_equal(r.clone(), r, equal_nan=True)</code>. The clone has the same <code>has_improved()</code> and the same best pair, and it is independent.</td>
 </tr>
 <tr>
 <td>Consistent state</td>
@@ -1465,7 +1466,7 @@ and <code>load_dict</code> are all defined from this snapshot.</p>
 </tr>
 <tr>
 <td>Consistent with <code>coola</code></td>
-<td>Records, comparators and managers work with <code>objects_are_equal</code>, and <code>to_dict</code> works with <code>coola.factory.factory</code>.</td>
+<td>The comparison of records, comparators and managers is the comparison of <code>coola</code>: <code>objects_are_equal</code> and <code>objects_are_allclose</code> honour <code>equal_nan</code> and the tolerance, and <code>assert_objects_equal</code> reports the path of the first difference. <code>to_dict</code> works with <code>coola.factory.factory</code>.</td>
 </tr>
 <tr>
 <td>Minimal</td>
@@ -1501,14 +1502,13 @@ its optimum keeps improving, and a checkpoint is saved at each step of the plate
 <p><code>to_dict()</code> is exactly the arguments of the constructor. There is no separate configuration and
 state, and no registry: the class is found from <code>_target_</code>.</p>
 <ul>
-<li><strong>Benefit</strong>: <code>clone</code>, <code>equal</code>, <code>from_dict</code> and <code>load_dict</code> are final methods of the base class, so
+<li><strong>Benefit</strong>: <code>clone</code>, <code>update</code>, <code>from_dict</code> and <code>load_dict</code> are final methods of the base class, so
   a custom record only implements six members and gets them right. <code>improved</code> is derived from the
   values and never stored, so a snapshot cannot be inconsistent.</li>
-<li><strong>Cost</strong>: <code>equal</code> is the equality of the snapshots, so it needs the values to be comparable by
-  <code>coola</code>, and a NaN is equal to a NaN even with <code>objects_are_equal(..., equal_nan=False)</code>. This is
-  the one deliberate difference with <code>coola</code>: it lets a record that holds a NaN be equal to its JSON
-  round trip. The state of a custom record must live in <code>vars(self)</code> (no <code>__slots__</code>), because
-  <code>load_dict</code> replaces it.</li>
+<li><strong>Cost</strong>: the equality is the equality of the snapshots, so it needs the values to be comparable
+  by <code>coola</code>, and a record that holds a NaN is equal to its copy only with
+  <code>objects_are_equal(..., equal_nan=True)</code>, as for every other object. The state of a custom record
+  must live in <code>vars(self)</code> (no <code>__slots__</code>), because <code>load_dict</code> replaces it.</li>
 </ul>
 <h3 id="the-first-value-is-compared-with-itself">The first value is compared with itself<a class="headerlink" href="#the-first-value-is-compared-with-itself" title="Permanent link">&para;</a></h3>
 <p>The first value of a comparable record is the best value, and it goes through the comparator like
@@ -1548,7 +1548,7 @@ the key and returns the record.</p>
   record that nobody reads. The factory also chooses the type, so on-demand records can have a best
   value (<code>RecordManager(default_factory=MinScalarRecord)</code>).</li>
 <li><strong>Cost</strong>: one more line of setup when you want on-demand records. The factory is not part of the
-  state: <code>state_dict</code>, <code>equal</code> and <code>load_state_dict</code> do not use it.</li>
+  state: <code>state_dict</code> and <code>load_state_dict</code> do not use it, and it is not compared.</li>
 </ul>
 <h3 id="load_state_dict-merges"><code>load_state_dict</code> merges<a class="headerlink" href="#load_state_dict-merges" title="Permanent link">&para;</a></h3>
 <p>The state of a manager is merged into it: the data of a known key is loaded in the existing record,
@@ -1583,6 +1583,8 @@ not affect the existing records.</p>
   share the value objects with the original. Store scalars or immutable objects.</li>
 <li><strong>Order of the steps.</strong> <code>step</code> is a label: it is not checked to increase, nor to be a number.
   Early stopping with <code>get_best_step</code> needs a numeric step.</li>
+<li><strong><code>==</code> and <code>hash</code>.</strong> A record, a comparator and a manager have no <code>__eq__</code>, so <code>==</code> is the identity:
+  <code>MinScalarRecord("a") == MinScalarRecord("a")</code> is <code>False</code>. Use <code>coola.equality.objects_are_equal</code>.</li>
 <li><strong>Truthiness.</strong> <code>Record</code> and <code>RecordManager</code> define <code>__len__</code>, so an empty one is falsy: write
   <code>record.is_empty()</code>, not <code>if record:</code>.</li>
 <li><strong><code>copy.copy(record)</code> is not a clone.</strong> A shallow copy shares the recent values, so <code>add_value</code> on

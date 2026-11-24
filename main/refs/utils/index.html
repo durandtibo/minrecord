@@ -981,6 +981,34 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#minrecord.utils.equality" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        equality
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="equality">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.utils.equality.SnapshotEqualityTester" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SnapshotEqualityTester
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#minrecord.utils.factory" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1148,6 +1176,34 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#minrecord.utils.equality" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        equality
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="equality">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.utils.equality.SnapshotEqualityTester" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SnapshotEqualityTester
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#minrecord.utils.factory" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1290,6 +1346,155 @@
 
 
 
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-module">
+
+
+
+<h2 id="minrecord.utils.equality" class="doc doc-heading">
+            <span class="doc doc-object-name doc-module-name">minrecord.utils.equality</span>
+
+
+<a href="#minrecord.utils.equality" class="headerlink" title="Permanent link">&para;</a></h2>
+
+    <div class="doc doc-contents first">
+
+        <p>Contain the equality tester of the objects that have a snapshot.</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="minrecord.utils.equality.SnapshotEqualityTester" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">minrecord.utils.equality.SnapshotEqualityTester</span>
+
+
+<a href="#minrecord.utils.equality.SnapshotEqualityTester" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="coola.equality.tester.BaseEqualityTester">BaseEqualityTester</span>[<span title="typing.Any">Any</span>]</code></p>
+
+
+
+        <p>Implement an equality tester that compares the snapshots of two
+objects.</p>
+<p>The tester does not compare the objects: it gives the engine of
+<code>coola</code> the snapshot of each object (the output of a method such
+as <code>to_dict</code>), so the comparison of the two objects is the
+comparison of their snapshots by <code>coola</code>. The engine checks that
+the two objects have the same type, applies <code>equal_nan</code> and the
+tolerance of the caller, and reports the location of the first
+difference.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>method</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The name of the method that returns the snapshot of an
+object. It is called without argument.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<details class="example" open>
+  <summary>Example</summary>
+  <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">coola.equality</span><span class="w"> </span><span class="kn">import</span> <span class="n">objects_are_equal</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">coola.equality.tester</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_default_registry</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">minrecord.utils.equality</span><span class="w"> </span><span class="kn">import</span> <span class="n">SnapshotEqualityTester</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span><span class="w"> </span><span class="nc">Point</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="gp">... </span>        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span>
+<span class="gp">... </span>    <span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="gp">... </span>        <span class="k">return</span> <span class="p">{</span><span class="s2">"x"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">}</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">get_default_registry</span><span class="p">()</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">Point</span><span class="p">,</span> <span class="n">SnapshotEqualityTester</span><span class="p">(</span><span class="s2">"to_dict"</span><span class="p">),</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">objects_are_equal</span><span class="p">(</span><span class="n">Point</span><span class="p">(</span><span class="mf">1.0</span><span class="p">),</span> <span class="n">Point</span><span class="p">(</span><span class="mf">1.0</span><span class="p">))</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">objects_are_equal</span><span class="p">(</span><span class="n">Point</span><span class="p">(</span><span class="mf">1.0</span><span class="p">),</span> <span class="n">Point</span><span class="p">(</span><span class="mf">2.0</span><span class="p">))</span>
+<span class="go">False</span>
+</code></pre></div>
+</details>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
 
 
 

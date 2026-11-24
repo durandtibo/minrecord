@@ -983,17 +983,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#minrecord.manager.RecordManager.equal" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        equal
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#minrecord.manager.RecordManager.get_best_values" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1213,17 +1202,6 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#minrecord.manager.RecordManager.equal" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        equal
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#minrecord.manager.RecordManager.get_best_values" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1435,7 +1413,7 @@ not change it.</p>
 key that is not registered. It is called with the key and
 must return a record. If <code>None</code>, <code>get_record</code> raises
 <code>KeyError</code> for an unknown key. The factory is not part
-of the state of the manager (<code>state_dict</code>, <code>equal</code>).</p>
+of the state of the manager (<code>state_dict</code>).</p>
               </div>
             </td>
             <td>
@@ -1640,98 +1618,6 @@ key and <code>exist_ok=False</code>.</p>
 <span class="go">  (loss): MinScalarRecord(name=loss, max_size=10, size=0)</span>
 <span class="go">  (my key): MinScalarRecord(name=loss, max_size=10, size=0)</span>
 <span class="go">)</span>
-</code></pre></div>
-</details>
-
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="minrecord.manager.RecordManager.equal" class="doc doc-heading">
-            <span class="doc doc-object-name doc-function-name">minrecord.manager.RecordManager.equal</span>
-
-
-<a href="#minrecord.manager.RecordManager.equal" class="headerlink" title="Permanent link">&para;</a></h4>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">equal</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n"><span title="typing.Any">Any</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="bool">bool</span></span>
-</code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Indicate if two managers are equal or not.</p>
-<p>Two managers are equal if they have the same type and the same
-records (same keys and equal <code>to_dict</code> output): the equality
-of a manager is the equality of its <code>state_dict</code>. A NaN value
-is equal to a NaN value, also when <code>objects_are_equal</code> is
-called with <code>equal_nan=False</code>, as for <code>BaseRecord.equal</code>.
-The <code>default_factory</code> is not compared.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>other</code>
-            </td>
-            <td>
-                  <code><span title="typing.Any">Any</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The object to compare.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                  <code><span title="bool">bool</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p><code>True</code> if the managers are equal, <code>False</code> otherwise.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-<details class="example" open>
-  <summary>Example</summary>
-  <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">minrecord</span><span class="w"> </span><span class="kn">import</span> <span class="n">RecordManager</span><span class="p">,</span> <span class="n">MinScalarRecord</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">manager1</span> <span class="o">=</span> <span class="n">RecordManager</span><span class="p">({</span><span class="s2">"loss"</span><span class="p">:</span> <span class="n">MinScalarRecord</span><span class="p">(</span><span class="s2">"loss"</span><span class="p">)})</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">manager2</span> <span class="o">=</span> <span class="n">RecordManager</span><span class="p">({</span><span class="s2">"loss"</span><span class="p">:</span> <span class="n">MinScalarRecord</span><span class="p">(</span><span class="s2">"loss"</span><span class="p">)})</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">manager1</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span><span class="n">manager2</span><span class="p">)</span>
-<span class="go">True</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">manager1</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span><span class="n">RecordManager</span><span class="p">())</span>
-<span class="go">False</span>
 </code></pre></div>
 </details>
 

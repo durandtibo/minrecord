@@ -1250,7 +1250,7 @@ compatibility layer. The <a href="../design/">design page</a> explains the curre
   <code>MinScalarRecord</code> are keyword-only.</li>
 <li><code>best</code> must be a <code>tuple</code> or a <code>list</code> of length 2 and requires <code>elements</code>, otherwise <code>ValueError</code>.</li>
 <li><code>BaseRecord</code> has 6 abstract members (<code>name</code>, <code>add_value</code>, <code>get_last_value</code>, <code>get_most_recent</code>,
-  <code>is_empty</code>, <code>to_dict</code>). <code>clone</code>, <code>equal</code>, <code>update</code>, <code>from_dict</code> and <code>load_dict</code> are <code>@final</code>.</li>
+  <code>is_empty</code>, <code>to_dict</code>). <code>clone</code>, <code>update</code>, <code>from_dict</code> and <code>load_dict</code> are <code>@final</code>.</li>
 <li>The first value of a comparable record is compared with itself, so a value that the comparator
   cannot compare (<code>None</code>, a string, <code>10**400</code>) is rejected by the <code>add_value</code> that receives it
   (<code>TypeError</code> or <code>OverflowError</code>, from the comparator) and the record stays empty.</li>
@@ -1260,9 +1260,13 @@ compatibility layer. The <a href="../design/">design page</a> explains the curre
   of two characters was accepted.</li>
 <li>An invalid <code>max_size</code> (not a positive <code>int</code>, a <code>bool</code>, or larger than <code>sys.maxsize</code>) raises
   <code>ValueError</code>.</li>
-<li><code>equal</code> requires the same type. The equality of records, comparators and managers is the equality
-  of their snapshot (<code>to_dict</code>, <code>state_dict</code>), and a NaN is equal to a NaN, also with
-  <code>objects_are_equal(..., equal_nan=False)</code>.</li>
+<li><code>BaseRecord.equal</code>, <code>BaseComparator.equal</code> and <code>RecordManager.equal</code> are removed. Use
+  <code>coola.equality.objects_are_equal(a, b)</code>. The equality of records, comparators and managers is the
+  equality of their snapshot (<code>to_dict</code>, <code>state_dict</code>) by <code>coola</code>, so the types must be the same,
+  <code>equal_nan</code> and the tolerance of <code>objects_are_allclose</code> are honoured, and <code>assert_objects_equal</code>
+  reports the path of the first difference. <strong>A NaN is different from a NaN unless
+  <code>equal_nan=True</code></strong>: a record that holds a NaN is equal to its JSON round trip with
+  <code>objects_are_equal(a, b, equal_nan=True)</code>.</li>
 <li><code>BaseRecord.from_dict</code> returns <code>Self</code> and raises <code>TypeError</code> if <code>_target_</code> is missing or is not the
   class (or a subclass of the class) that it is called on. <code>load_dict</code> and
   <code>RecordManager.load_state_dict</code> raise <code>TypeError</code> for a dict that is not the dict of a record, or
@@ -1271,7 +1275,7 @@ compatibility layer. The <a href="../design/">design page</a> explains the curre
 <p>Comparators:</p>
 <ul>
 <li><code>BaseComparator</code> has one abstract method, <code>is_better(*, new_value, old_value)</code>, which is
-  keyword-only. <code>to_dict</code> and <code>equal</code> are concrete: a comparator with arguments overrides <code>to_dict</code>.</li>
+  keyword-only. <code>to_dict</code> is concrete: a comparator with arguments overrides <code>to_dict</code>.</li>
 <li>The comparison must be reflexive: <code>is_better(new_value=x, old_value=x)</code> is <code>True</code> for every <code>x</code>. <strong>A
   custom comparator that is strict (<code>&gt;</code> or <code>&lt;</code>) breaks this contract</strong>: use <code>&gt;=</code> or <code>&lt;=</code>.</li>
 <li>A NaN is never better than a number, and a NaN best value is replaced by any value.</li>
@@ -1312,7 +1316,10 @@ compatibility layer. The <a href="../design/">design page</a> explains the curre
 <ul>
 <li><code>get_best_step()</code> returns the step of the best value (the latest step among the ties), also if the
   pair is not in the recent values anymore.</li>
-<li><code>RecordManager.get_last_values</code> and <code>RecordManager.equal</code>.</li>
+<li><code>RecordManager.get_last_values</code>.</li>
+<li><code>minrecord.utils.equality.SnapshotEqualityTester(method)</code>, the tester of <code>coola</code> that compares two
+  objects through their snapshot. It is registered for <code>BaseRecord</code>, <code>BaseComparator</code> (<code>to_dict</code>) and
+  <code>RecordManager</code> (<code>state_dict</code>), so a custom record gets it too.</li>
 <li><code>reset_max_size</code> is exported at the root of the package.</li>
 <li><code>minrecord.utils.validation.check_max_size</code> and <code>check_name</code>, and
   <code>minrecord.utils.factory.instantiate(config, cls)</code>.</li>
