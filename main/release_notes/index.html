@@ -1258,6 +1258,10 @@ compatibility layer.</p>
   <code>coola.equality.objects_are_equal</code>).</li>
 <li><code>reset_max_size</code> is exported at the root of the package.</li>
 <li><code>minrecord.utils.validation.check_max_size</code>.</li>
+<li><code>get_best_step()</code> returns the step of the best value of a comparable record (the latest step among
+  the ties), also if the pair is not in the recent values anymore. It raises <code>EmptyRecordError</code> for an
+  empty record and <code>NotAComparableRecordError</code> for a record that cannot compare. The code that
+  needs "which epoch was the best" does not need its own copy any more.</li>
 <li><code>minrecord.utils.factory.instantiate(config, cls)</code>: builds an object from its dict if the
   object named by <code>_target_</code> is <code>cls</code> or a subclass of <code>cls</code>.</li>
 <li><code>ComparableRecord</code> accepts the comparator as an object or as its dict.</li>

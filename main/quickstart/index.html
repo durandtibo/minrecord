@@ -1316,7 +1316,17 @@ Below is an example where the record's maximum size is set to 3.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">get_best_value</span><span class="p">()</span>
 <span class="go">42</span>
 </code></pre></div>
-<p>Calling <code>get_best_value</code> on an empty record raises an <code>EmptyRecordError</code> exception.
+<p>The <code>get_best_step</code> method returns the step of the best value, even if the pair that produced it is
+not in the recent values anymore. If several values are equal to the best value, it is the latest
+step. It is useful to know which epoch was the best one, for example to load the best checkpoint.</p>
+<div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">minrecord</span><span class="w"> </span><span class="kn">import</span> <span class="n">MinScalarRecord</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span> <span class="o">=</span> <span class="n">MinScalarRecord</span><span class="p">(</span><span class="s2">"loss"</span><span class="p">,</span> <span class="n">max_size</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">update</span><span class="p">([(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">42</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">45</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">46</span><span class="p">),</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">50</span><span class="p">)])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">get_best_step</span><span class="p">()</span>
+<span class="go">0</span>
+</code></pre></div>
+<p>Calling <code>get_best_value</code> or <code>get_best_step</code> on an empty record raises an <code>EmptyRecordError</code>
+exception.
 It is possible to know if the last value added improved the best value or not by calling the
 <code>has_improved</code> method.</p>
 <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">minrecord</span><span class="w"> </span><span class="kn">import</span> <span class="n">MinScalarRecord</span>
@@ -1346,7 +1356,7 @@ shown in the example below.</p>
 <span class="go">True</span>
 </code></pre></div>
 <p><img alt="⚠" class="twemoji" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/26a0.svg" title=":warning:" /> Calling <code>has_improved</code> or <code>get_best_value</code> on non-comparable record raises
-a <code>NotAComparableRecordError</code> exception.</p>
+a <code>NotAComparableRecordError</code> exception. This is also the case for <code>get_best_step</code>.</p>
 <p>The <code>elements</code> argument of the constructor adds the values with <code>add_value</code>, so the best value and
 <code>has_improved</code> are correct when a record is created from some elements.</p>
 <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">minrecord</span><span class="w"> </span><span class="kn">import</span> <span class="n">MinScalarRecord</span>
