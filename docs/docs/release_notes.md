@@ -33,6 +33,11 @@ Records:
   `is_empty`, `to_dict`). `clone`, `equal`, `update`, `from_dict`, `load_dict`, `is_comparable`,
   `get_best_value` and `has_improved` are concrete, and the hooks `_get_best_value` and
   `_has_improved` are removed. A custom record writes fewer methods.
+- The first value of a comparable record is compared with itself, so a value that the comparator
+  cannot compare (`None`, a string, `10**400`) is rejected by the `add_value` that receives it
+  (`TypeError` or `OverflowError`, from the comparator) and the record stays empty. It was stored
+  and became the best value, and every later `add_value` raised. A comparator that is not reflexive
+  (`>` instead of `>=`) now gives `has_improved() is False` for the first value.
 - `equal` requires the same type.
 - `equal` of the records and of the manager treats NaN as equal to NaN, so a record that holds a NaN
   is equal to its copy after a JSON round trip.

@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from typing import Any
 
+import pytest
 from coola.equality import objects_are_equal
 from coola.factory import OBJECT_TARGET
 
@@ -168,3 +169,58 @@ def test_state_dict_json_round_trip_nan_resume_training_is_equal() -> None:
     resumed.load_state_dict(json.loads(json.dumps(manager.state_dict())))
     run_training_with_nan(resumed, range(5, 10))
     assert resumed.equal(expected)
+
+
+def train_with_missing_metric(record: MinScalarRecord, metrics: list[Any]) -> None:
+    """Add the metrics, and skip the epoch of a metric that is rejected."""
+    for epoch, metric in enumerate(metrics):
+        try:
+            record.add_value(metric, step=epoch)
+        except TypeError:
+            continue
+
+
+def test_missing_metric_at_first_epoch_raises_at_that_epoch() -> None:
+    record = MinScalarRecord("loss")
+    value: Any = None
+    with pytest.raises(TypeError, match=r"must be real number, not NoneType"):
+        record.add_value(value, step=0)
+
+
+def test_missing_metric_at_first_epoch_loop_continues_with_the_best_step() -> None:
+    record = MinScalarRecord("loss")
+    train_with_missing_metric(record, [None, 3.0, 2.0, 2.5])
+    assert record.get_best_step() == 2
+
+
+def test_missing_metric_at_first_epoch_best_step_after_json_round_trip() -> None:
+    record = MinScalarRecord("loss")
+    train_with_missing_metric(record, [None, 3.0, 2.0, 2.5])
+    resumed = MinScalarRecord.from_dict(json.loads(json.dumps(record.to_dict())))
+    assert resumed.get_best_step() == 2
+
+
+LOSSES = [5.0, 4.0, 3.0, 3.5, 3.4, 3.6, 3.7, 3.8, 3.9]
+PATIENCE = 3
+
+
+def find_stopping_epoch(record: MinScalarRecord, start: int) -> int | None:
+    """Return the first epoch at which the early stopping triggers."""
+    for epoch in range(start, len(LOSSES)):
+        record.add_value(LOSSES[epoch], step=epoch)
+        best_step = record.get_best_step()
+        if best_step is not None and epoch - best_step >= PATIENCE:
+            return epoch
+    return None
+
+
+def test_early_stopping_epoch() -> None:
+    assert find_stopping_epoch(MinScalarRecord("loss"), 0) == 5
+
+
+def test_early_stopping_epoch_after_json_round_trip() -> None:
+    record = MinScalarRecord("loss")
+    for epoch in range(4):
+        record.add_value(LOSSES[epoch], step=epoch)
+    resumed = MinScalarRecord.from_dict(json.loads(json.dumps(record.to_dict())))
+    assert find_stopping_epoch(resumed, 4) == 5

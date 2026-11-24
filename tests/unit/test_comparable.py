@@ -8,6 +8,7 @@ import pytest
 from coola.factory import OBJECT_TARGET
 
 from minrecord import (
+    BaseComparator,
     BaseRecord,
     ComparableRecord,
     EmptyRecordError,
@@ -25,6 +26,25 @@ if TYPE_CHECKING:
     from collections.abc import Generator, Iterable
 
 NAN = float("nan")
+
+
+class RecordingComparator(MinScalarComparator):
+    r"""Define a comparator that records its calls."""
+
+    def __init__(self) -> None:
+        self.calls: list[tuple[float, float]] = []
+
+    def is_better(self, *, new_value: float, old_value: float) -> bool:
+        self.calls.append((new_value, old_value))
+        return super().is_better(new_value=new_value, old_value=old_value)
+
+
+class StrictComparator(BaseComparator[float]):
+    r"""Define a comparator that breaks the contract: a value is not
+    better than itself."""
+
+    def is_better(self, *, new_value: float, old_value: float) -> bool:
+        return new_value > old_value
 
 
 @pytest.fixture
@@ -89,6 +109,63 @@ def test_comparable_record_add_value_first_value_is_best() -> None:
 def test_comparable_record_add_value_first_value_has_improved() -> None:
     record = create_max_record()
     record.add_value(-5.0)
+    assert record.has_improved()
+
+
+@pytest.mark.parametrize(
+    ("value", "error", "message"),
+    [
+        (None, TypeError, r"must be real number, not NoneType"),
+        ("a", TypeError, r"must be real number, not str"),
+        (10**400, OverflowError, r"int too large to convert to float"),
+    ],
+)
+def test_comparable_record_add_value_first_value_not_comparable_is_rejected(
+    value: Any, error: type[Exception], message: str
+) -> None:
+    record = MinScalarRecord("loss")
+    with pytest.raises(error, match=message):
+        record.add_value(value, step=0)
+    assert record.is_empty()
+
+
+def test_comparable_record_add_value_first_value_not_comparable_does_not_poison_record() -> None:
+    record = MinScalarRecord("loss")
+    value: Any = None
+    with pytest.raises(TypeError, match=r"must be real number, not NoneType"):
+        record.add_value(value, step=0)
+    record.add_value(2.0, step=1)
+    assert record.to_dict()["best"] == (1, 2.0)
+
+
+def test_comparable_record_add_value_first_value_is_compared_with_itself() -> None:
+    comparator = RecordingComparator()
+    record = ComparableRecord("recording", comparator)
+    record.add_value(3.0, step=0)
+    assert comparator.calls == [(3.0, 3.0)]
+
+
+def test_comparable_record_add_value_second_value_is_compared_with_best() -> None:
+    comparator = RecordingComparator()
+    record = ComparableRecord("recording", comparator)
+    record.add_value(3.0, step=0)
+    record.add_value(5.0, step=1)
+    assert comparator.calls == [(3.0, 3.0), (5.0, 3.0)]
+
+
+def test_comparable_record_add_value_first_value_strict_comparator_is_not_an_improvement() -> None:
+    record = ComparableRecord("strict", StrictComparator())
+    record.add_value(1.0, step=0)
+    assert not record.has_improved()
+
+
+def test_comparable_record_init_elements_set_the_best_pair() -> None:
+    record = ComparableRecord("c", MinScalarComparator(), elements=[(0, 1.0)])
+    assert record.to_dict()["best"] == (0, 1.0)
+
+
+def test_comparable_record_init_elements_set_has_improved() -> None:
+    record = ComparableRecord("c", MinScalarComparator(), elements=[(0, 1.0)])
     assert record.has_improved()
 
 

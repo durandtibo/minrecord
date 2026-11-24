@@ -345,3 +345,16 @@ def test_contract_comparator_to_dict_has_target(comparator: BaseComparator[float
 @pytest.mark.parametrize("cls", [MaxScalarComparator, MinScalarComparator, ToleranceComparator])
 def test_contract_comparator_equal_for_two_instances(cls: type[BaseComparator[float]]) -> None:
     assert cls().equal(cls())
+
+
+@pytest.mark.parametrize(
+    "comparator", [MaxScalarComparator(), MinScalarComparator(), ToleranceComparator(0.5)]
+)
+def test_contract_comparable_record_rejects_value_that_cannot_be_compared(
+    comparator: BaseComparator[float],
+) -> None:
+    record = ComparableRecord("c", comparator)
+    value: Any = None
+    with pytest.raises(TypeError, match=r"NoneType"):
+        record.add_value(value, step=0)
+    assert record.is_empty()
