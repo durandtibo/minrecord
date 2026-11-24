@@ -86,7 +86,8 @@ record = MinScalarRecord("loss", elements=[(0, 1.5), (1, 1.3)])
 ```
 
 If the best value is not in the elements anymore (for example when a record is resumed), pass it
-with `best=(step, value)`. Use `to_dict()` and `BaseRecord.from_dict()` to save and resume a
+with `best=(step, value)`. `best` must be a pair and it requires at least one element (`ValueError`
+otherwise), because a record has a best value if and only if it has a value. Use `to_dict()` and `BaseRecord.from_dict()` to save and resume a
 record: the best value is included.
 
 ## Comparators & Improvements

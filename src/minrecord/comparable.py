@@ -23,6 +23,34 @@ if TYPE_CHECKING:
 T = TypeVar("T")
 
 
+def _check_pair(best: Any) -> tuple[Any, Any]:
+    r"""Check that the best value is a pair ``(step, value)``.
+
+    Args:
+        best: The best pair to check.
+
+    Returns:
+        The pair as a tuple.
+
+    Raises:
+        ValueError: if ``best`` is not a pair ``(step, value)``.
+
+    Example:
+        ```pycon
+        >>> from minrecord.comparable import _check_pair
+        >>> _check_pair([1, 2.0])
+        (1, 2.0)
+
+        ```
+    """
+    try:
+        step, value = best
+    except (TypeError, ValueError):
+        msg = f"best must be a pair (step, value), got {best!r}"
+        raise ValueError(msg) from None
+    return (step, value)
+
+
 class ComparableRecord(Record[T]):
     r"""Implement a record of comparable values.
 
@@ -46,13 +74,17 @@ class ComparableRecord(Record[T]):
         best: The best pair ``(step, value)`` before the ``elements``
             are added. It is useful when the best value is not in the
             ``elements`` anymore, because it has been removed from the
-            recent values. ``None`` means there is no value yet.
+            recent values. It requires at least one element, because a
+            record has a best value if and only if it has a value.
+            ``None`` means there is no value yet.
 
     Raises:
         TypeError: if ``comparator`` is a dictionary that is not the
             dictionary of a comparator (``_target_`` is missing, or it
             is not a ``BaseComparator``).
-        ValueError: if ``max_size`` is not a positive integer.
+        ValueError: if ``max_size`` is not a positive integer, if
+            ``best`` is not a pair ``(step, value)``, or if ``best``
+            is given without ``elements``.
 
     Example:
         ```pycon
@@ -85,9 +117,12 @@ class ComparableRecord(Record[T]):
             if isinstance(comparator, BaseComparator)
             else instantiate(comparator, BaseComparator)
         )
-        self._best: tuple[float | None, T] | None = None if best is None else (best[0], best[1])
+        self._best: tuple[float | None, T] | None = None if best is None else _check_pair(best)
         self._improved = False
         super().__init__(name, elements=elements, max_size=max_size)
+        if self._best is not None and self.is_empty():
+            msg = "best requires at least one element, but no element was given"
+            raise ValueError(msg)
 
     def __str__(self) -> str:
         args = str_indent(
@@ -152,10 +187,13 @@ class MaxScalarRecord(ComparableRecord[float]):
             If ``None``, the default maximum size (see ``get_max_size``)
             at the time of the creation of the record is used.
         best: The best pair ``(step, value)`` before the ``elements``
-            are added. ``None`` means there is no value yet.
+            are added. It requires at least one element. ``None``
+            means there is no value yet.
 
     Raises:
-        ValueError: if ``max_size`` is not a positive integer.
+        ValueError: if ``max_size`` is not a positive integer, if
+            ``best`` is not a pair ``(step, value)``, or if ``best``
+            is given without ``elements``.
 
     Example:
         ```pycon
@@ -211,10 +249,13 @@ class MinScalarRecord(ComparableRecord[float]):
             If ``None``, the default maximum size (see ``get_max_size``)
             at the time of the creation of the record is used.
         best: The best pair ``(step, value)`` before the ``elements``
-            are added. ``None`` means there is no value yet.
+            are added. It requires at least one element. ``None``
+            means there is no value yet.
 
     Raises:
-        ValueError: if ``max_size`` is not a positive integer.
+        ValueError: if ``max_size`` is not a positive integer, if
+            ``best`` is not a pair ``(step, value)``, or if ``best``
+            is given without ``elements``.
 
     Example:
         ```pycon

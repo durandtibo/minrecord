@@ -17,6 +17,7 @@ from minrecord import (
     MinScalarRecord,
     set_max_size,
 )
+from minrecord.comparable import _check_pair
 from minrecord.config import reset_max_size
 from tests.unit.helpers import ToleranceComparator
 
@@ -178,7 +179,7 @@ def test_comparable_record_init_elements_same_state_as_add_value() -> None:
 
 
 def test_comparable_record_init_best_zero_is_kept() -> None:
-    assert create_max_record(best=(None, 0.0)).get_best_value() == 0.0
+    assert create_max_record(best=(None, 0.0), elements=[(1, -1.0)]).get_best_value() == 0.0
 
 
 def test_comparable_record_init_best_zero_not_replaced_by_worse() -> None:
@@ -193,17 +194,43 @@ def test_comparable_record_init_best_outside_window() -> None:
 
 def test_comparable_record_init_best_list_is_converted_to_tuple() -> None:
     best: Any = [1, 2.0]
-    assert ComparableRecord[float]("accuracy", MaxScalarComparator(), best=best).to_dict()[
-        "best"
-    ] == (1, 2.0)
+    assert create_max_record(best=best, elements=[(2, 1.0)]).to_dict()["best"] == (1, 2.0)
 
 
-def test_comparable_record_init_best_without_elements_is_empty() -> None:
-    assert create_max_record(best=(0, 9.0)).is_empty()
+def test_comparable_record_init_best_without_elements_raises() -> None:
+    with pytest.raises(ValueError, match=r"best requires at least one element"):
+        create_max_record(best=(0, 9.0))
 
 
-def test_comparable_record_init_best_without_elements_get_best_value() -> None:
-    assert create_max_record(best=(0, 9.0)).get_best_value() == 9.0
+def test_comparable_record_init_best_with_empty_generator_raises() -> None:
+    with pytest.raises(ValueError, match=r"best requires at least one element"):
+        create_max_record(best=(0, 9.0), elements=iter(()))
+
+
+def test_comparable_record_init_best_with_elements_is_not_empty() -> None:
+    assert not create_max_record(best=(0, 9.0), elements=[(1, 2.0)]).is_empty()
+
+
+def test_comparable_record_init_best_none_without_elements_is_empty() -> None:
+    assert create_max_record(best=None).is_empty()
+
+
+@pytest.mark.parametrize("best", [("a", "b", "c"), (1,), (), [1, 2, 3]])
+def test_comparable_record_init_best_wrong_length_raises(best: Any) -> None:
+    with pytest.raises(ValueError, match=r"best must be a pair \(step, value\), got"):
+        create_max_record(best=best, elements=[(1, 2.0)])
+
+
+@pytest.mark.parametrize("best", [5, 1.5, "a"])
+def test_comparable_record_init_best_not_a_sequence_raises(best: Any) -> None:
+    with pytest.raises(ValueError, match=r"best must be a pair \(step, value\), got"):
+        create_max_record(best=best, elements=[(1, 2.0)])
+
+
+def test_comparable_record_init_best_message_has_the_value() -> None:
+    best: Any = (1, 2, 3)
+    with pytest.raises(ValueError, match=r"got \(1, 2, 3\)"):
+        create_max_record(best=best, elements=[(1, 2.0)])
 
 
 def test_comparable_record_clone() -> None:
@@ -776,3 +803,48 @@ def test_min_scalar_record_clone_is_independent() -> None:
 
 def test_min_scalar_record_clone_empty() -> None:
     assert MinScalarRecord("loss").clone().is_empty()
+
+
+##################################
+#     Tests for _check_pair      #
+##################################
+
+
+def test_check_pair_tuple() -> None:
+    assert _check_pair((1, 2.0)) == (1, 2.0)
+
+
+def test_check_pair_list_is_converted_to_tuple() -> None:
+    assert _check_pair([1, 2.0]) == (1, 2.0)
+
+
+def test_check_pair_step_none() -> None:
+    assert _check_pair((None, 0.0)) == (None, 0.0)
+
+
+@pytest.mark.parametrize("best", [(), (1,), (1, 2, 3), 5, None, 1.5])
+def test_check_pair_invalid_raises(best: Any) -> None:
+    with pytest.raises(ValueError, match=r"best must be a pair \(step, value\), got"):
+        _check_pair(best)
+
+
+##############################################
+#     Tests for the best of scalar records   #
+##############################################
+
+
+@pytest.mark.parametrize("cls", [MaxScalarRecord, MinScalarRecord])
+def test_scalar_record_init_best_without_elements_raises(cls: Any) -> None:
+    with pytest.raises(ValueError, match=r"best requires at least one element"):
+        cls("loss", best=(0, 1.0))
+
+
+@pytest.mark.parametrize("cls", [MaxScalarRecord, MinScalarRecord])
+def test_scalar_record_init_best_wrong_length_raises(cls: Any) -> None:
+    with pytest.raises(ValueError, match=r"best must be a pair"):
+        cls("loss", best=("a", "b", "c"), elements=[(0, 1.0)])
+
+
+@pytest.mark.parametrize("cls", [MaxScalarRecord, MinScalarRecord])
+def test_scalar_record_init_best_with_elements(cls: Any) -> None:
+    assert cls("loss", best=(0, 1.0), elements=[(1, 1.0)]).to_dict()["best"] == (1, 1.0)
