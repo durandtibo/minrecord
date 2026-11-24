@@ -218,7 +218,9 @@ class BaseRecord(ABC, Generic[T]):
         r"""Indicate if two records are equal or not.
 
         Two records are equal if they have the same type and the same
-        ``to_dict`` output.
+        ``to_dict`` output. A NaN value is equal to a NaN value, so a
+        record that holds a NaN is equal to its copy after a JSON round
+        trip.
 
         Args:
             other: The object to compare.
@@ -241,7 +243,7 @@ class BaseRecord(ABC, Generic[T]):
         """
         if type(other) is not type(self):
             return False
-        return objects_are_equal(self.to_dict(), other.to_dict())
+        return objects_are_equal(self.to_dict(), other.to_dict(), equal_nan=True)
 
     def get_best_value(self) -> T:
         r"""Get the best value of this record.

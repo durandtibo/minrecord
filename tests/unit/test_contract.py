@@ -7,10 +7,12 @@ import pytest
 from coola.factory import OBJECT_TARGET, factory
 
 from minrecord import (
+    BaseComparator,
     BaseRecord,
     ComparableRecord,
     MaxScalarComparator,
     MaxScalarRecord,
+    MinScalarComparator,
     MinScalarRecord,
     Record,
 )
@@ -36,6 +38,15 @@ class UnitRecord(Record[float]):
         return {**super().to_dict(), "unit": self._unit}
 
 
+class StrictComparator(BaseComparator[float]):
+    r"""Define a comparator that breaks the contract: a value is not
+    better than itself."""
+
+    def is_better(self, *, new_value: float, old_value: float) -> bool:
+        return new_value > old_value
+
+
+NAN = float("nan")
 ELEMENTS = [(0, 5.0), (1, 9.0), (2, 1.0), (3, 7.0), (4, 3.0)]
 
 
@@ -55,6 +66,30 @@ def create_record(cls: str) -> BaseRecord[Any]:
     return MinScalarRecord("loss", elements=ELEMENTS, max_size=3)
 
 
+# The records that hold a NaN: a diverged loss, and a NaN as the first value.
+
+
+NAN_RECORD_FACTORIES = {
+    "RecordNaN": lambda: Record("loss", elements=[(0, 1.0), (1, NAN)]),
+    "MaxScalarRecordNaNFirst": lambda: MaxScalarRecord("loss", elements=[(0, NAN), (1, 1.0)]),
+    "MaxScalarRecordNaNLast": lambda: MaxScalarRecord("loss", elements=[(0, 1.0), (1, NAN)]),
+    "MinScalarRecordNaNFirst": lambda: MinScalarRecord("loss", elements=[(0, NAN), (1, 1.0)]),
+    "MinScalarRecordNaNLast": lambda: MinScalarRecord("loss", elements=[(0, 1.0), (1, NAN)]),
+    "MinScalarRecordNaNOnly": lambda: MinScalarRecord("loss", elements=[(0, NAN)]),
+    "MinScalarRecordNaNTwice": lambda: MinScalarRecord(
+        "loss", max_size=1, elements=[(0, NAN), (1, NAN)]
+    ),
+}
+
+
+NAN_RECORDS = list(NAN_RECORD_FACTORIES)
+COMPARABLE_NAN_RECORDS = NAN_RECORDS[1:]
+
+
+def create_nan_record(cls: str) -> BaseRecord[Any]:
+    return NAN_RECORD_FACTORIES[cls]()
+
+
 COMPARABLE_RECORDS = ["ComparableRecord", "ToleranceRecord", "MaxScalarRecord", "MinScalarRecord"]
 RECORDS = ["Record", "UnitRecord", *COMPARABLE_RECORDS]
 
@@ -67,6 +102,20 @@ def record(request: pytest.FixtureRequest) -> BaseRecord[Any]:
 @pytest.fixture(params=COMPARABLE_RECORDS)
 def comparable_record(request: pytest.FixtureRequest) -> BaseRecord[Any]:
     return create_record(request.param)
+
+
+@pytest.fixture(params=NAN_RECORDS)
+def nan_record(request: pytest.FixtureRequest) -> BaseRecord[Any]:
+    return create_nan_record(request.param)
+
+
+@pytest.fixture(params=COMPARABLE_NAN_RECORDS)
+def comparable_nan_record(request: pytest.FixtureRequest) -> BaseRecord[Any]:
+    return create_nan_record(request.param)
+
+
+def is_reflexive(comparator: BaseComparator[float], value: float) -> bool:
+    return comparator.is_better(new_value=value, old_value=value)
 
 
 def test_contract_from_dict_to_dict_is_equal(record: BaseRecord[Any]) -> None:
@@ -182,3 +231,108 @@ def test_contract_load_dict_other_type_leaves_record_unchanged(cls: str, foreign
 def test_contract_comparable_best_survives_from_dict(comparable_record: BaseRecord[Any]) -> None:
     data = comparable_record.to_dict()
     assert BaseRecord.from_dict(data).get_best_value() == comparable_record.get_best_value()
+
+
+#######################################
+#     Tests for records with NaN      #
+#######################################
+
+
+def test_contract_nan_from_dict_to_dict_is_equal(nan_record: BaseRecord[Any]) -> None:
+    assert BaseRecord.from_dict(nan_record.to_dict()).equal(nan_record)
+
+
+def test_contract_nan_json_round_trip_is_equal(nan_record: BaseRecord[Any]) -> None:
+    assert BaseRecord.from_dict(json.loads(json.dumps(nan_record.to_dict()))).equal(nan_record)
+
+
+def test_contract_nan_clone_is_equal(nan_record: BaseRecord[Any]) -> None:
+    assert nan_record.clone().equal(nan_record)
+
+
+def test_contract_nan_clone_same_has_improved(comparable_nan_record: BaseRecord[Any]) -> None:
+    assert comparable_nan_record.clone().has_improved() == comparable_nan_record.has_improved()
+
+
+def test_contract_nan_json_round_trip_same_has_improved(
+    comparable_nan_record: BaseRecord[Any],
+) -> None:
+    new_record = BaseRecord.from_dict(json.loads(json.dumps(comparable_nan_record.to_dict())))
+    assert new_record.has_improved() == comparable_nan_record.has_improved()
+
+
+def test_contract_nan_clone_same_best_step(comparable_nan_record: BaseRecord[Any]) -> None:
+    assert (
+        comparable_nan_record.clone().to_dict()["best"][0]
+        == comparable_nan_record.to_dict()["best"][0]
+    )
+
+
+def test_contract_nan_record_is_not_equal_to_a_record_with_a_number() -> None:
+    assert not create_nan_record("RecordNaN").equal(Record("loss", elements=[(0, 1.0), (1, 2.0)]))
+
+
+@pytest.mark.parametrize("max_size", [1, 2, 3])
+@pytest.mark.parametrize(
+    "values",
+    [
+        (NAN,),
+        (NAN, NAN),
+        (NAN, 1.0),
+        (1.0, NAN),
+        (2.0, NAN, NAN),
+        (NAN, NAN, 1.0),
+        (NAN, 2.0, 1.0),
+        (1.0, NAN, 2.0),
+    ],
+)
+def test_contract_nan_sequences_clone_has_same_flag_and_best_step(
+    values: tuple[float, ...], max_size: int
+) -> None:
+    record = MinScalarRecord("loss", max_size=max_size)
+    for step, value in enumerate(values):
+        record.add_value(value, step=step)
+    clone = BaseRecord.from_dict(json.loads(json.dumps(record.to_dict())))
+    assert (clone.has_improved(), clone.to_dict()["best"][0]) == (
+        record.has_improved(),
+        record.to_dict()["best"][0],
+    )
+
+
+#######################################
+#     Tests for the comparators       #
+#######################################
+
+REFLEXIVE_VALUES = [-float("inf"), -1.0, 0.0, 1.0, float("inf"), NAN]
+
+
+@pytest.mark.parametrize("value", REFLEXIVE_VALUES)
+def test_contract_max_scalar_comparator_is_reflexive(value: float) -> None:
+    assert is_reflexive(MaxScalarComparator(), value)
+
+
+@pytest.mark.parametrize("value", REFLEXIVE_VALUES)
+def test_contract_min_scalar_comparator_is_reflexive(value: float) -> None:
+    assert is_reflexive(MinScalarComparator(), value)
+
+
+@pytest.mark.parametrize("value", [-1.0, 0.0, 1.0])
+def test_contract_tolerance_comparator_is_reflexive(value: float) -> None:
+    assert is_reflexive(ToleranceComparator(0.5), value)
+
+
+@pytest.mark.parametrize("value", [-1.0, 0.0, 1.0])
+def test_contract_strict_comparator_is_not_reflexive(value: float) -> None:
+    assert not is_reflexive(StrictComparator(), value)
+
+
+@pytest.mark.parametrize(
+    "comparator", [MaxScalarComparator(), MinScalarComparator(), ToleranceComparator(0.5)]
+)
+def test_contract_comparator_to_dict_has_target(comparator: BaseComparator[float]) -> None:
+    assert OBJECT_TARGET in comparator.to_dict()
+
+
+@pytest.mark.parametrize("cls", [MaxScalarComparator, MinScalarComparator, ToleranceComparator])
+def test_contract_comparator_equal_for_two_instances(cls: type[BaseComparator[float]]) -> None:
+    assert cls().equal(cls())

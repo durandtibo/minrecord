@@ -112,7 +112,8 @@ class RecordManager:
         r"""Indicate if two managers are equal or not.
 
         Two managers are equal if they have the same type and the same
-        records (same keys and equal records).
+        records (same keys and equal records). A NaN value is equal to
+        a NaN value, as for ``BaseRecord.equal``.
 
         Args:
             other: The object to compare.
@@ -134,7 +135,7 @@ class RecordManager:
         """
         if type(other) is not type(self):
             return False
-        return objects_are_equal(self.state_dict(), other.state_dict())
+        return objects_are_equal(self.state_dict(), other.state_dict(), equal_nan=True)
 
     def get_best_values(self, *, prefix: str = "", suffix: str = "") -> dict[str, Any]:
         r"""Get the best value of each record.

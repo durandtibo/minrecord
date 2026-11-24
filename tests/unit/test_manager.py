@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from types import MappingProxyType
 from typing import Any
 
@@ -11,6 +12,7 @@ from coola.factory import OBJECT_TARGET
 from minrecord import BaseRecord, MaxScalarRecord, MinScalarRecord, Record, RecordManager
 
 NAMES = ("NAME", "my_record")
+NAN = float("nan")
 
 
 ###################################
@@ -357,6 +359,25 @@ def test_record_manager_equal_false_different_values() -> None:
     manager = create_manager_with_values()
     manager.get_record("loss").add_value(0.5)
     assert not manager.equal(create_manager_with_values())
+
+
+def test_record_manager_equal_true_nan() -> None:
+    manager1 = RecordManager({"loss": MinScalarRecord("loss", elements=[(0, 1.0), (1, NAN)])})
+    manager2 = RecordManager({"loss": MinScalarRecord("loss", elements=[(0, 1.0), (1, NAN)])})
+    assert manager1.equal(manager2)
+
+
+def test_record_manager_equal_true_nan_json_round_trip() -> None:
+    manager = RecordManager({"loss": MinScalarRecord("loss", elements=[(0, 1.0), (1, NAN)])})
+    new_manager = RecordManager()
+    new_manager.load_state_dict(json.loads(json.dumps(manager.state_dict())))
+    assert new_manager.equal(manager)
+
+
+def test_record_manager_equal_false_nan_and_number() -> None:
+    manager1 = RecordManager({"loss": MinScalarRecord("loss", elements=[(0, 1.0), (1, NAN)])})
+    manager2 = RecordManager({"loss": MinScalarRecord("loss", elements=[(0, 1.0), (1, 2.0)])})
+    assert not manager1.equal(manager2)
 
 
 def test_record_manager_equal_false_different_keys() -> None:

@@ -30,14 +30,19 @@ Records:
   `get_best_value` and `has_improved` are concrete, and the hooks `_get_best_value` and
   `_has_improved` are removed. A custom record writes fewer methods.
 - `equal` requires the same type.
+- `equal` of the records and of the manager treats NaN as equal to NaN, so a record that holds a NaN
+  is equal to its copy after a JSON round trip.
 
 Comparators:
 
 - `BaseComparator` has one abstract method, `is_better(*, new_value, old_value)`, which is
   keyword-only. `get_initial_best_value` is removed: the first value of a record is the best value.
   `to_dict` and `equal` are concrete, a comparator with arguments overrides `to_dict`.
-- A NaN value is never better than another value, and a NaN best value is replaced by the first
-  number.
+- A NaN value is never better than a number, and a NaN best value is replaced by any value (a
+  number, or another NaN as a tie). The comparison is reflexive: `is_better(new_value=x,
+  old_value=x)` is `True` for every `x`, NaN included. **A custom comparator that is strict (`>`
+  or `<`) breaks this contract**: a record rebuilt from `to_dict` or `clone` would report a wrong
+  `has_improved()`. Use `>=` or `<=`.
 
 Manager and functions:
 
@@ -65,6 +70,9 @@ Configuration and utilities:
   comparator can be written to JSON.
 - A comparator that raises in `add_value` leaves the record unchanged.
 - `RecordManager.load_state_dict` does not change the manager if an entry is invalid.
+- `has_improved()` of a record that is rebuilt (`from_dict`, `clone`) is the one of the original,
+  also when its first value is NaN. A NaN equal to the best NaN is a tie.
+- A record that holds a NaN is equal to its JSON round trip.
 
 ### New
 
