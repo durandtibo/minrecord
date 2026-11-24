@@ -279,6 +279,72 @@ def test_comparable_record_clone_is_independent() -> None:
     assert record.get_best_value() == 1.0
 
 
+def test_comparable_record_get_best_step() -> None:
+    assert create_max_record(elements=[(0, 1.0), (1, 3.0), (2, 2.0)]).get_best_step() == 1
+
+
+def test_comparable_record_get_best_step_first_value() -> None:
+    assert create_max_record(elements=[(4, 1.0)]).get_best_step() == 4
+
+
+def test_comparable_record_get_best_step_none() -> None:
+    assert create_max_record(elements=[(None, 3.0), (1, 2.0)]).get_best_step() is None
+
+
+def test_comparable_record_get_best_step_zero() -> None:
+    assert create_max_record(elements=[(0, 3.0), (1, 2.0)]).get_best_step() == 0
+
+
+def test_comparable_record_get_best_step_outside_window() -> None:
+    record = create_max_record(max_size=1, elements=[(0, 9.0), (1, 2.0), (2, 3.0)])
+    assert record.get_best_step() == 0
+
+
+def test_comparable_record_get_best_step_tie_is_the_latest_step() -> None:
+    assert create_max_record(elements=[(0, 3.0), (1, 2.0), (2, 3.0)]).get_best_step() == 2
+
+
+def test_comparable_record_get_best_step_from_best_argument() -> None:
+    assert create_max_record(best=(7, 9.0), elements=[(8, 1.0)]).get_best_step() == 7
+
+
+def test_comparable_record_get_best_step_after_json_round_trip() -> None:
+    record = create_max_record(max_size=1, elements=[(0, 9.0), (1, 2.0)])
+    assert BaseRecord.from_dict(json.loads(json.dumps(record.to_dict()))).get_best_step() == 0
+
+
+def test_comparable_record_get_best_step_clone() -> None:
+    record = create_max_record(max_size=1, elements=[(0, 9.0), (1, 2.0)])
+    assert record.clone().get_best_step() == 0
+
+
+def test_comparable_record_get_best_step_updated_by_add_value() -> None:
+    record = create_max_record(elements=[(0, 1.0)])
+    record.add_value(5.0, step=3)
+    assert record.get_best_step() == 3
+
+
+def test_comparable_record_get_best_step_not_updated_by_worse_value() -> None:
+    record = create_max_record(elements=[(0, 5.0)])
+    record.add_value(1.0, step=3)
+    assert record.get_best_step() == 0
+
+
+def test_comparable_record_get_best_step_nan_never_replaces_number() -> None:
+    assert create_max_record(elements=[(0, 1.0), (1, NAN)]).get_best_step() == 0
+
+
+def test_comparable_record_get_best_step_empty() -> None:
+    with pytest.raises(EmptyRecordError, match=r"not possible to get the best step"):
+        create_max_record().get_best_step()
+
+
+def test_comparable_record_get_best_step_does_not_change_record() -> None:
+    record = create_max_record(elements=[(0, 1.0), (1, 3.0)])
+    record.get_best_step()
+    assert record.equal(create_max_record(elements=[(0, 1.0), (1, 3.0)]))
+
+
 def test_comparable_record_get_best_value_empty() -> None:
     with pytest.raises(EmptyRecordError, match=r"The record is empty."):
         create_max_record().get_best_value()
@@ -913,3 +979,10 @@ def test_scalar_record_subclass_best_without_elements_raises() -> None:
 )
 def test_scalar_record_target_is_the_public_class(cls: Any, target: str) -> None:
     assert cls("loss").to_dict()[OBJECT_TARGET] == target
+
+
+@pytest.mark.parametrize(("cls", "expected"), [(MaxScalarRecord, 1), (MinScalarRecord, 0)])
+def test_scalar_record_get_best_step(cls: Any, expected: int) -> None:
+    assert (
+        cls("loss", max_size=1, elements=[(0, 1.0), (1, 4.0), (2, 3.0)]).get_best_step() == expected
+    )

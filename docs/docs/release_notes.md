@@ -102,6 +102,10 @@ Loading:
   `coola.equality.objects_are_equal`).
 - `reset_max_size` is exported at the root of the package.
 - `minrecord.utils.validation.check_max_size`.
+- `get_best_step()` returns the step of the best value of a comparable record (the latest step among
+  the ties), also if the pair is not in the recent values anymore. It raises `EmptyRecordError` for an
+  empty record and `NotAComparableRecordError` for a record that cannot compare. The code that
+  needs "which epoch was the best" does not need its own copy any more.
 - `minrecord.utils.factory.instantiate(config, cls)`: builds an object from its dict if the
   object named by `_target_` is `cls` or a subclass of `cls`.
 - `ComparableRecord` accepts the comparator as an object or as its dict.

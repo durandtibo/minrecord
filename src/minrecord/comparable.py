@@ -156,6 +156,12 @@ class ComparableRecord(Record[T]):
             raise EmptyRecordError(msg)
         return self._best[1]
 
+    def get_best_step(self) -> float | None:
+        if self._best is None:
+            msg = "The record is empty so it is not possible to get the best step."
+            raise EmptyRecordError(msg)
+        return self._best[0]
+
     def has_improved(self) -> bool:
         if self.is_empty():
             msg = "The record is empty."

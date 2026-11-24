@@ -216,7 +216,22 @@ Below is an example where the record's maximum size is set to 3.
 
 ```
 
-Calling `get_best_value` on an empty record raises an `EmptyRecordError` exception.
+The `get_best_step` method returns the step of the best value, even if the pair that produced it is
+not in the recent values anymore. If several values are equal to the best value, it is the latest
+step. It is useful to know which epoch was the best one, for example to load the best checkpoint.
+
+```pycon
+
+>>> from minrecord import MinScalarRecord
+>>> record = MinScalarRecord("loss", max_size=2)
+>>> record.update([(0, 42), (1, 45), (2, 46), (3, 50)])
+>>> record.get_best_step()
+0
+
+```
+
+Calling `get_best_value` or `get_best_step` on an empty record raises an `EmptyRecordError`
+exception.
 It is possible to know if the last value added improved the best value or not by calling the
 `has_improved` method.
 
@@ -257,7 +272,7 @@ True
 ```
 
 :warning: Calling `has_improved` or `get_best_value` on non-comparable record raises
-a `NotAComparableRecordError` exception.
+a `NotAComparableRecordError` exception. This is also the case for `get_best_step`.
 
 The `elements` argument of the constructor adds the values with `add_value`, so the best value and
 `has_improved` are correct when a record is created from some elements.
