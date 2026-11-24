@@ -13,9 +13,37 @@ from coola.formatting.structure import repr_indent, repr_mapping, str_indent, st
 
 from minrecord.base import BaseRecord
 from minrecord.functional import get_best_values, get_last_values
+from minrecord.utils.validation import check_key
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Mapping
+
+
+def _check_record(record: Any) -> BaseRecord[Any]:
+    r"""Check that an object is a record.
+
+    Args:
+        record: The object to check.
+
+    Returns:
+        The record.
+
+    Raises:
+        TypeError: If ``record`` is not a ``BaseRecord``.
+
+    Example:
+        ```pycon
+        >>> from minrecord import Record
+        >>> from minrecord.manager import _check_record
+        >>> _check_record(Record("loss"))
+        Record(name=loss, max_size=10, size=0)
+
+        ```
+    """
+    if not isinstance(record, BaseRecord):
+        msg = f"record must be a BaseRecord, got {type(record).__qualname__}"
+        raise TypeError(msg)
+    return record
 
 
 class RecordManager:
@@ -42,6 +70,10 @@ class RecordManager:
             ``KeyError`` for an unknown key. The factory is not part
             of the state of the manager (``state_dict``, ``equal``).
 
+    Raises:
+        TypeError: if a value of ``records`` is not a ``BaseRecord``
+            or if a key is not a ``str``.
+
     Example:
         ```pycon
         >>> from minrecord import RecordManager, MinScalarRecord
@@ -62,7 +94,9 @@ class RecordManager:
         *,
         default_factory: Callable[[str], BaseRecord[Any]] | None = None,
     ) -> None:
-        self._records = dict(records or {})
+        self._records: dict[str, BaseRecord[Any]] = {}
+        for key, record in (records or {}).items():
+            self.add_record(record, key)
         self._default_factory = default_factory
 
     def __len__(self) -> int:
@@ -94,6 +128,8 @@ class RecordManager:
                 to ``True`` to overwrite the record for this key.
 
         Raises:
+            TypeError: if ``record`` is not a ``BaseRecord`` or if the
+                key is not a ``str``.
             RuntimeError: if a record is already registered for the
                 key and ``exist_ok=False``.
 
@@ -115,8 +151,8 @@ class RecordManager:
 
             ```
         """
-        if key is None:
-            key = record.name
+        record = _check_record(record)
+        key = record.name if key is None else check_key(key)
         if key in self._records and not exist_ok:
             msg = (
                 f"A record ({self._records[key]!r}) is already registered for the key "
@@ -235,8 +271,10 @@ class RecordManager:
 
         Raises:
             KeyError: if no record is registered for the key and the
-                manager has no ``default_factory``. The manager is not
-                modified (also if the factory raises).
+                manager has no ``default_factory``.
+            TypeError: if the factory does not return a ``BaseRecord``.
+                The manager is not modified (also if the factory
+                raises).
 
         Example:
             ```pycon
@@ -262,7 +300,7 @@ class RecordManager:
                     f"Known keys: {list(self._records)}"
                 )
                 raise KeyError(msg)
-            self._records[key] = self._default_factory(key)
+            self._records[key] = _check_record(self._default_factory(key))
         return self._records[key]
 
     def get_records(self) -> dict[str, BaseRecord[Any]]:
@@ -334,9 +372,10 @@ class RecordManager:
                 structure of the output of ``state_dict``.
 
         Raises:
-            TypeError: if the data of a key is the data of a record
-                of another type than the existing record, or if it is
-                not the data of a record.
+            TypeError: if ``state_dict`` is not a dict, if a key is
+                not a ``str``, if the data of a key is the data of a
+                record of another type than the existing record, or if
+                it is not the data of a record.
 
         Example:
             ```pycon
@@ -358,6 +397,11 @@ class RecordManager:
 
             ```
         """
+        if not isinstance(state_dict, dict):
+            msg = f"state_dict must be a dict, got {type(state_dict).__qualname__}"
+            raise TypeError(msg)
+        for key in state_dict:
+            check_key(key)
         # Phase 1: all the entries are built and checked before the first
         # change, so the manager is not modified if an entry is invalid.
         new_records = {key: BaseRecord.from_dict(data) for key, data in state_dict.items()}

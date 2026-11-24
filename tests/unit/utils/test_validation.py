@@ -5,7 +5,7 @@ from typing import Any
 
 import pytest
 
-from minrecord.utils.validation import check_max_size, check_name
+from minrecord.utils.validation import check_key, check_max_size, check_name, check_pair
 
 ####################################
 #     Tests for check_max_size     #
@@ -69,3 +69,60 @@ def test_check_name_not_a_str(name: Any) -> None:
 def test_check_name_message_names_the_type() -> None:
     with pytest.raises(TypeError, match=r"name must be a str, got NoneType"):
         check_name(None)
+
+
+################################
+#     Tests for check_key      #
+################################
+
+
+@pytest.mark.parametrize("key", ["loss", "my key", ""])
+def test_check_key(key: str) -> None:
+    assert check_key(key) == key
+
+
+@pytest.mark.parametrize("key", [None, 3, b"x", ("a",)])
+def test_check_key_not_a_str(key: Any) -> None:
+    with pytest.raises(TypeError, match=r"key must be a str, got"):
+        check_key(key)
+
+
+def test_check_key_error_message() -> None:
+    with pytest.raises(TypeError, match=r"^key must be a str, got int$"):
+        check_key(3)
+
+
+################################
+#     Tests for check_pair     #
+################################
+
+
+def test_check_pair_tuple() -> None:
+    assert check_pair((1, 2.0), "best") == (1, 2.0)
+
+
+def test_check_pair_list_is_converted_to_tuple() -> None:
+    assert check_pair([1, 2.0], "best") == (1, 2.0)
+
+
+def test_check_pair_step_none() -> None:
+    assert check_pair((None, 0.0), "best") == (None, 0.0)
+
+
+def test_check_pair_does_not_modify_the_input() -> None:
+    pair = [1, 2.0]
+    check_pair(pair, "best")
+    assert pair == [1, 2.0]
+
+
+@pytest.mark.parametrize(
+    "pair", [(), (1,), (1, 2, 3), [1], [1, 2, 3], {1, 2}, "ab", {"a": 1, "b": 2}, 5, None, 1.5]
+)
+def test_check_pair_invalid_raises(pair: Any) -> None:
+    with pytest.raises(ValueError, match=r"best must be a pair \(step, value\), got"):
+        check_pair(pair, "best")
+
+
+def test_check_pair_uses_the_name_in_the_message() -> None:
+    with pytest.raises(ValueError, match=r"^element must be a pair \(step, value\), got \(1,\)$"):
+        check_pair((1,), "element")

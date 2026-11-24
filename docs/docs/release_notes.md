@@ -36,6 +36,9 @@ Records:
   cannot compare (`None`, a string, `10**400`) is rejected by the `add_value` that receives it
   (`TypeError` or `OverflowError`, from the comparator) and the record stays empty.
 - `Record(name)` raises `TypeError` if `name` is not a `str`.
+- An element of `elements` or of `update` that is not a `tuple` or a `list` of length 2 raises
+  `ValueError` (`element must be a pair (step, value)`). It was a raw unpacking error, and a string
+  of two characters was accepted.
 - An invalid `max_size` (not a positive `int`, a `bool`, or larger than `sys.maxsize`) raises
   `ValueError`.
 - `equal` requires the same type. The equality of records, comparators and managers is the equality
@@ -62,6 +65,12 @@ Manager and functions:
 - `exist_ok` (`RecordManager.add_record`), and `prefix` and `suffix` (`RecordManager.get_best_values`,
   `get_best_values`, `get_last_values`) are keyword-only.
 - `RecordManager(records)` copies the mapping.
+- The manager validates what it receives and `TypeError` is raised, before anything is stored, for a
+  value that is not a `BaseRecord` (`RecordManager(records)`, `add_record`, and the result of the
+  `default_factory`), for a key that is not a `str` (`RecordManager(records)`, `add_record`,
+  `load_state_dict`) and for a `state_dict` that is not a dict (`load_state_dict`).
+- `minrecord.utils.validation` has two new public helpers, `check_key` and `check_pair` (the latter
+  was the private `_check_pair` of `minrecord.comparable`).
 - `RecordManager.get_record(key)` raises `KeyError` for a key that nobody registered. The new
   keyword-only `default_factory` argument creates the records on demand. The factory is not part of
   the state.

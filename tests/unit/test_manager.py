@@ -632,3 +632,81 @@ def test_record_manager_objects_are_equal_nan_ignores_equal_nan() -> None:
     manager1 = RecordManager({"loss": Record("loss", elements=[(0, NAN)])})
     manager2 = RecordManager({"loss": Record("loss", elements=[(0, NAN)])})
     assert objects_are_equal(manager1, manager2, equal_nan=False)
+
+
+#############################################
+#     Tests for RecordManager validation    #
+#############################################
+
+
+@pytest.mark.parametrize("record", [3, None, "loss", {"name": "loss"}])
+def test_record_manager_init_not_a_record_raises(record: Any) -> None:
+    with pytest.raises(TypeError, match=r"record must be a BaseRecord, got"):
+        RecordManager({"a": record})
+
+
+def test_record_manager_init_key_not_a_str_raises() -> None:
+    records: Any = {3: Record("loss")}
+    with pytest.raises(TypeError, match=r"key must be a str, got int"):
+        RecordManager(records)
+
+
+def test_record_manager_add_record_not_a_record_raises() -> None:
+    manager = RecordManager()
+    record: Any = 3
+    with pytest.raises(TypeError, match=r"record must be a BaseRecord, got int"):
+        manager.add_record(record)
+    assert len(manager) == 0
+
+
+def test_record_manager_add_record_not_a_record_with_key_raises() -> None:
+    manager = RecordManager()
+    record: Any = 3
+    with pytest.raises(TypeError, match=r"record must be a BaseRecord, got int"):
+        manager.add_record(record, "a")
+    assert len(manager) == 0
+
+
+@pytest.mark.parametrize("key", [3, b"x", ("a",)])
+def test_record_manager_add_record_key_not_a_str_raises(key: Any) -> None:
+    manager = RecordManager()
+    with pytest.raises(TypeError, match=r"key must be a str, got"):
+        manager.add_record(Record("loss"), key)
+    assert len(manager) == 0
+
+
+def test_record_manager_add_record_empty_key() -> None:
+    manager = RecordManager()
+    manager.add_record(Record("loss"), "")
+    assert manager.has_record("")
+
+
+def test_record_manager_get_record_default_factory_not_a_record_raises() -> None:
+    def factory(key: str) -> Any:
+        return key
+
+    manager = RecordManager(default_factory=factory)
+    with pytest.raises(TypeError, match=r"record must be a BaseRecord, got str"):
+        manager.get_record("a")
+    assert len(manager) == 0
+
+
+def test_record_manager_get_record_default_factory_other_name_is_accepted() -> None:
+    manager = RecordManager(default_factory=lambda key: Record(f"prefix/{key}"))
+    assert manager.get_record("a").name == "prefix/a"
+
+
+@pytest.mark.parametrize("state_dict", [None, [], (), "loss", 3])
+def test_record_manager_load_state_dict_not_a_dict_raises(state_dict: Any) -> None:
+    manager = create_manager_with_values()
+    with pytest.raises(TypeError, match=r"state_dict must be a dict, got"):
+        manager.load_state_dict(state_dict)
+    assert manager.equal(create_manager_with_values())
+
+
+def test_record_manager_load_state_dict_key_not_a_str_raises() -> None:
+    manager = create_manager_with_values()
+    state_dict: Any = {"loss": MinScalarRecord("loss").to_dict(), 3: Record("x").to_dict()}
+    with pytest.raises(TypeError, match=r"key must be a str, got int"):
+        manager.load_state_dict(state_dict)
+    assert manager.equal(create_manager_with_values())

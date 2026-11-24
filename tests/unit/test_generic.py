@@ -115,6 +115,17 @@ def test_record_init_elements_equal_to_max_size() -> None:
     )
 
 
+@pytest.mark.parametrize("elements", [[(0, 1, 2)], [5], ["ab"], [None]])
+def test_record_init_element_not_a_pair_raises(elements: Any) -> None:
+    with pytest.raises(ValueError, match=r"element must be a pair \(step, value\), got"):
+        Record("loss", elements=elements)
+
+
+def test_record_init_elements_lists_of_length_two() -> None:
+    elements: Any = [[0, 1], [1, 2]]
+    assert Record("loss", elements=elements).get_most_recent() == ((0, 1), (1, 2))
+
+
 def test_record_init_max_size_one() -> None:
     assert Record("loss", max_size=1, elements=[(0, 1), (1, 2)]).get_most_recent() == ((1, 2),)
 

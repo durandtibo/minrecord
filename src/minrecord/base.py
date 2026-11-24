@@ -16,6 +16,7 @@ from coola.equality.tester import EqualEqualityTester, get_default_registry
 from coola.factory import OBJECT_TARGET
 
 from minrecord.utils.factory import instantiate
+from minrecord.utils.validation import check_pair
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -397,6 +398,10 @@ class BaseRecord(ABC, Generic[T]):
                 has the following structure ``(step, value)``.
                 The step can be ``None`` if there is no step.
 
+        Raises:
+            ValueError: if an element is not a ``tuple`` or a ``list``
+                of length 2.
+
         Example:
             ```pycon
             >>> from minrecord import Record
@@ -407,7 +412,8 @@ class BaseRecord(ABC, Generic[T]):
 
             ```
         """
-        for step, value in elements:
+        for element in elements:
+            step, value = check_pair(element, "element")
             self.add_value(value, step)
 
     @final

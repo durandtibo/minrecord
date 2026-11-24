@@ -16,38 +16,12 @@ from minrecord.comparator import (
 )
 from minrecord.generic import Record
 from minrecord.utils.factory import instantiate
+from minrecord.utils.validation import check_pair
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
 T = TypeVar("T")
-
-
-def _check_pair(best: Any) -> tuple[Any, Any]:
-    r"""Check that the best value is a pair ``(step, value)``.
-
-    Args:
-        best: The best pair to check.
-
-    Returns:
-        The pair as a tuple.
-
-    Raises:
-        ValueError: if ``best`` is not a ``tuple`` or a ``list`` of
-            length 2.
-
-    Example:
-        ```pycon
-        >>> from minrecord.comparable import _check_pair
-        >>> _check_pair([1, 2.0])
-        (1, 2.0)
-
-        ```
-    """
-    if not isinstance(best, (tuple, list)) or len(best) != 2:
-        msg = f"best must be a pair (step, value), got {best!r}"
-        raise ValueError(msg)
-    return (best[0], best[1])
 
 
 class ComparableRecord(Record[T]):
@@ -85,9 +59,9 @@ class ComparableRecord(Record[T]):
             is a dictionary that is not the dictionary of a comparator
             (``_target_`` is missing, or it is not a
             ``BaseComparator``).
-        ValueError: if ``max_size`` is not a positive integer, if
-            ``best`` is not a pair ``(step, value)``, or if ``best``
-            is given without ``elements``.
+        ValueError: if ``max_size`` is not a positive integer, if an
+            element or ``best`` is not a pair ``(step, value)``, or if
+            ``best`` is given without ``elements``.
 
     Example:
         ```pycon
@@ -122,7 +96,9 @@ class ComparableRecord(Record[T]):
             if isinstance(comparator, BaseComparator)
             else instantiate(comparator, BaseComparator)
         )
-        self._best: tuple[float | None, T] | None = None if best is None else _check_pair(best)
+        self._best: tuple[float | None, T] | None = (
+            None if best is None else check_pair(best, "best")
+        )
         self._improved = False
         super().__init__(name, elements=elements, max_size=max_size)
         if self._best is not None and self.is_empty():
@@ -199,9 +175,9 @@ class _ScalarRecord(ComparableRecord[float]):
 
     Raises:
         TypeError: if ``name`` is not a ``str``.
-        ValueError: if ``max_size`` is not a positive integer, if
-            ``best`` is not a pair ``(step, value)``, or if ``best``
-            is given without ``elements``.
+        ValueError: if ``max_size`` is not a positive integer, if an
+            element or ``best`` is not a pair ``(step, value)``, or if
+            ``best`` is given without ``elements``.
     """
 
     _comparator_type: ClassVar[type[BaseComparator[float]]]
@@ -255,9 +231,9 @@ class MaxScalarRecord(_ScalarRecord):
 
     Raises:
         TypeError: if ``name`` is not a ``str``.
-        ValueError: if ``max_size`` is not a positive integer, if
-            ``best`` is not a pair ``(step, value)``, or if ``best``
-            is given without ``elements``.
+        ValueError: if ``max_size`` is not a positive integer, if an
+            element or ``best`` is not a pair ``(step, value)``, or if
+            ``best`` is given without ``elements``.
 
     Example:
         ```pycon
@@ -304,9 +280,9 @@ class MinScalarRecord(_ScalarRecord):
 
     Raises:
         TypeError: if ``name`` is not a ``str``.
-        ValueError: if ``max_size`` is not a positive integer, if
-            ``best`` is not a pair ``(step, value)``, or if ``best``
-            is given without ``elements``.
+        ValueError: if ``max_size`` is not a positive integer, if an
+            element or ``best`` is not a pair ``(step, value)``, or if
+            ``best`` is given without ``elements``.
 
     Example:
         ```pycon

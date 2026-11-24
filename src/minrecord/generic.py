@@ -48,7 +48,8 @@ class Record(BaseRecord[T]):
     Raises:
         TypeError: if ``name`` is not a ``str``.
         ValueError: if ``max_size`` is not a positive integer or is
-            larger than ``sys.maxsize``.
+            larger than ``sys.maxsize``, or if an element is not a
+            ``tuple`` or a ``list`` of length 2.
 
     Example:
         ```pycon

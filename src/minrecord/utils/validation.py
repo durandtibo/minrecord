@@ -2,10 +2,37 @@ r"""Contain utility functions to validate arguments."""
 
 from __future__ import annotations
 
-__all__ = ["check_max_size", "check_name"]
+__all__ = ["check_key", "check_max_size", "check_name", "check_pair"]
 
 import sys
 from typing import Any
+
+
+def check_key(key: Any) -> str:
+    r"""Check that the key of a record in a manager is valid.
+
+    Args:
+        key: The key to check. It must be a ``str``. An empty string
+            is valid.
+
+    Returns:
+        The key.
+
+    Raises:
+        TypeError: If ``key`` is not a ``str``.
+
+    Example:
+        ```pycon
+        >>> from minrecord.utils.validation import check_key
+        >>> check_key("loss")
+        'loss'
+
+        ```
+    """
+    if not isinstance(key, str):
+        msg = f"key must be a str, got {type(key).__qualname__}"
+        raise TypeError(msg)
+    return key
 
 
 def check_max_size(max_size: Any) -> int:
@@ -66,3 +93,32 @@ def check_name(name: Any) -> str:
         msg = f"name must be a str, got {type(name).__qualname__}"
         raise TypeError(msg)
     return name
+
+
+def check_pair(pair: Any, name: str) -> tuple[Any, Any]:
+    r"""Check that an object is a pair ``(step, value)``.
+
+    Args:
+        pair: The pair to check. It must be a ``tuple`` or a ``list``
+            of length 2.
+        name: The name of the argument, used in the error message.
+
+    Returns:
+        The pair as a tuple.
+
+    Raises:
+        ValueError: If ``pair`` is not a ``tuple`` or a ``list`` of
+            length 2.
+
+    Example:
+        ```pycon
+        >>> from minrecord.utils.validation import check_pair
+        >>> check_pair([1, 2.0], "best")
+        (1, 2.0)
+
+        ```
+    """
+    if not isinstance(pair, (tuple, list)) or len(pair) != 2:
+        msg = f"{name} must be a pair (step, value), got {pair!r}"
+        raise ValueError(msg)
+    return (pair[0], pair[1])
