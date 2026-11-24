@@ -4,7 +4,7 @@ from __future__ import annotations
 
 __all__ = ["ComparableRecord", "MaxScalarRecord", "MinScalarRecord"]
 
-from typing import TYPE_CHECKING, Any, TypeVar
+from typing import TYPE_CHECKING, Any, ClassVar, TypeVar
 
 from coola.formatting.structure import str_indent, str_mapping
 
@@ -169,7 +169,56 @@ class ComparableRecord(Record[T]):
         return {**super().to_dict(), "comparator": self._comparator.to_dict(), "best": self._best}
 
 
-class MaxScalarRecord(ComparableRecord[float]):
+class _ScalarRecord(ComparableRecord[float]):
+    r"""Define the base class of the records of scalars that use a
+    comparator without argument.
+
+    A subclass only sets the class attribute ``_comparator_type`` and
+    documents its constructor arguments. The comparator is not an
+    argument of the constructor, so it is not in ``to_dict``.
+
+    Args:
+        name: The name of the record.
+        elements: The initial elements. See ``ComparableRecord``.
+        max_size: The maximum number of elements to store in the
+            record. See ``ComparableRecord``.
+        best: The best pair ``(step, value)`` before the ``elements``
+            are added. See ``ComparableRecord``.
+
+    Raises:
+        ValueError: if ``max_size`` is not a positive integer, if
+            ``best`` is not a pair ``(step, value)``, or if ``best``
+            is given without ``elements``.
+    """
+
+    _comparator_type: ClassVar[type[BaseComparator[float]]]
+
+    def __init__(
+        self,
+        name: str,
+        *,
+        elements: Iterable[tuple[float | None, float]] = (),
+        max_size: int | None = None,
+        best: tuple[float | None, float] | None = None,
+    ) -> None:
+        super().__init__(
+            name, self._comparator_type(), elements=elements, max_size=max_size, best=best
+        )
+
+    def to_dict(self) -> dict[str, Any]:
+        r"""Export the record to a dictionary.
+
+        The comparator is not exported: it is given by the class.
+
+        Returns:
+            A dictionary with the arguments of the constructor.
+        """
+        data = super().to_dict()
+        del data["comparator"]
+        return data
+
+
+class MaxScalarRecord(_ScalarRecord):
     r"""A specific implementation to track the max value of a scalar
     record.
 
@@ -213,25 +262,10 @@ class MaxScalarRecord(ComparableRecord[float]):
         ```
     """
 
-    def __init__(
-        self,
-        name: str,
-        *,
-        elements: Iterable[tuple[float | None, float]] = (),
-        max_size: int | None = None,
-        best: tuple[float | None, float] | None = None,
-    ) -> None:
-        super().__init__(
-            name, MaxScalarComparator(), elements=elements, max_size=max_size, best=best
-        )
-
-    def to_dict(self) -> dict[str, Any]:
-        data = super().to_dict()
-        del data["comparator"]
-        return data
+    _comparator_type = MaxScalarComparator
 
 
-class MinScalarRecord(ComparableRecord[float]):
+class MinScalarRecord(_ScalarRecord):
     r"""A specific implementation to track the min value of a scalar
     record.
 
@@ -275,19 +309,4 @@ class MinScalarRecord(ComparableRecord[float]):
         ```
     """
 
-    def __init__(
-        self,
-        name: str,
-        *,
-        elements: Iterable[tuple[float | None, float]] = (),
-        max_size: int | None = None,
-        best: tuple[float | None, float] | None = None,
-    ) -> None:
-        super().__init__(
-            name, MinScalarComparator(), elements=elements, max_size=max_size, best=best
-        )
-
-    def to_dict(self) -> dict[str, Any]:
-        data = super().to_dict()
-        del data["comparator"]
-        return data
+    _comparator_type = MinScalarComparator

@@ -89,6 +89,9 @@ Loading:
   existing records before), and its merge semantics is documented: a record that the state does not
   mention is kept.
 - `minrecord.config` has no `global` statement, and `src` has no `noqa`.
+- `MaxScalarRecord` and `MinScalarRecord` share a private base class (`_ScalarRecord`) that builds
+  the comparator from a class attribute, so a new scalar record is a docstring and one line. Their
+  signatures and their `_target_` (`minrecord.comparable.MaxScalarRecord`) do not change.
 - `has_improved()` of a record that is rebuilt (`from_dict`, `clone`) is the one of the original,
   also when its first value is NaN. A NaN equal to the best NaN is a tie.
 - A record that holds a NaN is equal to its JSON round trip.

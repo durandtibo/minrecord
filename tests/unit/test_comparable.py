@@ -17,7 +17,7 @@ from minrecord import (
     MinScalarRecord,
     set_max_size,
 )
-from minrecord.comparable import _check_pair
+from minrecord.comparable import _check_pair, _ScalarRecord
 from minrecord.config import reset_max_size
 from tests.unit.helpers import ToleranceComparator
 
@@ -848,3 +848,68 @@ def test_scalar_record_init_best_wrong_length_raises(cls: Any) -> None:
 @pytest.mark.parametrize("cls", [MaxScalarRecord, MinScalarRecord])
 def test_scalar_record_init_best_with_elements(cls: Any) -> None:
     assert cls("loss", best=(0, 1.0), elements=[(1, 1.0)]).to_dict()["best"] == (1, 1.0)
+
+
+###################################
+#     Tests for _ScalarRecord     #
+###################################
+
+
+class AbsMinScalarComparator(MinScalarComparator):
+    r"""Define a comparator without argument for the tests."""
+
+    def is_better(self, *, new_value: float, old_value: float) -> bool:
+        return abs(new_value) <= abs(old_value)
+
+
+class AbsMinScalarRecord(_ScalarRecord):
+    r"""Define a third scalar record that only sets the comparator."""
+
+    _comparator_type = AbsMinScalarComparator
+
+
+def test_scalar_record_subclass_uses_the_comparator_type() -> None:
+    record = AbsMinScalarRecord("error", elements=[(0, -3.0), (1, 2.0), (2, -2.5)])
+    assert record.get_best_value() == 2.0
+
+
+def test_scalar_record_subclass_to_dict() -> None:
+    assert AbsMinScalarRecord("error", elements=[(0, -3.0)]).to_dict() == {
+        OBJECT_TARGET: "tests.unit.test_comparable.AbsMinScalarRecord",
+        "name": "error",
+        "max_size": 10,
+        "elements": ((0, -3.0),),
+        "best": (0, -3.0),
+    }
+
+
+def test_scalar_record_subclass_round_trip() -> None:
+    record = AbsMinScalarRecord("error", max_size=2, elements=[(0, -1.0), (1, 2.0), (2, -2.5)])
+    assert BaseRecord.from_dict(json.loads(json.dumps(record.to_dict()))).equal(record)
+
+
+def test_scalar_record_subclass_clone() -> None:
+    record = AbsMinScalarRecord("error", elements=[(0, -3.0), (1, 2.0)])
+    assert record.clone().equal(record)
+
+
+def test_scalar_record_subclass_options_keyword_only() -> None:
+    record_class: Any = AbsMinScalarRecord
+    with pytest.raises(TypeError, match=r"takes 2 positional arguments but 3 were given"):
+        record_class("error", [(0, 1.0)])
+
+
+def test_scalar_record_subclass_best_without_elements_raises() -> None:
+    with pytest.raises(ValueError, match=r"best requires at least one element"):
+        AbsMinScalarRecord("error", best=(0, 1.0))
+
+
+@pytest.mark.parametrize(
+    ("cls", "target"),
+    [
+        (MaxScalarRecord, "minrecord.comparable.MaxScalarRecord"),
+        (MinScalarRecord, "minrecord.comparable.MinScalarRecord"),
+    ],
+)
+def test_scalar_record_target_is_the_public_class(cls: Any, target: str) -> None:
+    assert cls("loss").to_dict()[OBJECT_TARGET] == target
