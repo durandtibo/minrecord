@@ -167,8 +167,9 @@ not affect the existing records.
   a lock.
 - **Values are stored by reference.** `add_value` does not copy the value, and `to_dict` and `clone`
   share the value objects with the original. Store scalars or immutable objects.
-- **Order of the steps.** `step` is a label: it is not checked to increase, nor to be a number.
-  Early stopping with `get_best_step` needs a numeric step.
+- **The `step`.** Its type is `float | None`, so a type checker rejects a label such as `"epoch1"`,
+  but nothing checks it at run time: it is not checked to increase, nor to be a number. Early
+  stopping with `get_best_step` needs a numeric step.
 - **`==` and `hash`.** A record, a comparator and a manager have no `__eq__`, so `==` is the identity:
   `MinScalarRecord("a") == MinScalarRecord("a")` is `False`. Use `coola.equality.objects_are_equal`.
 - **Truthiness.** `Record` and `RecordManager` define `__len__`, so an empty one is falsy: write

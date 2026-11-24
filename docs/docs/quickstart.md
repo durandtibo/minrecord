@@ -67,7 +67,9 @@ Record(name=loss, max_size=10, size=1)
 
 ```
 
-The step can be a number or `None`. `None` means no valid step to track.
+The type of a step is `float | None`: a number, or `None` when there is no step to track. It is not
+checked at run time, so a label such as `"epoch1"` works but a type checker rejects it, and
+`get_best_step` (early stopping) needs a number.
 It is possible to get the last value added by using the `get_last_value` method.
 
 ```pycon
