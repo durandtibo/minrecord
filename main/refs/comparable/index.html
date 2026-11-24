@@ -1193,7 +1193,10 @@
 <p>The best value is stored apart from the recent values: it is kept
 when the pair <code>(step, value)</code> that produced it leaves the recent
 values. The first value added to the record is the best value. A
-value that is equal to the best value counts as an improvement.</p>
+value that is equal to the best value counts as an improvement.
+The first value is compared with itself, so a value that the
+comparator cannot compare is rejected by <code>add_value</code> and the
+record stays empty.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>

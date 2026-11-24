@@ -1189,6 +1189,11 @@ compatibility layer.</p>
   <code>is_empty</code>, <code>to_dict</code>). <code>clone</code>, <code>equal</code>, <code>update</code>, <code>from_dict</code>, <code>load_dict</code>, <code>is_comparable</code>,
   <code>get_best_value</code> and <code>has_improved</code> are concrete, and the hooks <code>_get_best_value</code> and
   <code>_has_improved</code> are removed. A custom record writes fewer methods.</li>
+<li>The first value of a comparable record is compared with itself, so a value that the comparator
+  cannot compare (<code>None</code>, a string, <code>10**400</code>) is rejected by the <code>add_value</code> that receives it
+  (<code>TypeError</code> or <code>OverflowError</code>, from the comparator) and the record stays empty. It was stored
+  and became the best value, and every later <code>add_value</code> raised. A comparator that is not reflexive
+  (<code>&gt;</code> instead of <code>&gt;=</code>) now gives <code>has_improved() is False</code> for the first value.</li>
 <li><code>equal</code> requires the same type.</li>
 <li><code>equal</code> of the records and of the manager treats NaN as equal to NaN, so a record that holds a NaN
   is equal to its copy after a JSON round trip.</li>

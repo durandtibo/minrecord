@@ -1694,6 +1694,10 @@ with comparison logic:</p>
 <td><code>from_dict</code> and the comparator dict only build objects of the expected type (a record, a comparator): a dict that names any other importable callable raises <code>TypeError</code> before it is called. <code>MinScalarRecord.from_dict(d)</code> only accepts the dict of a <code>MinScalarRecord</code>.</td>
 </tr>
 <tr>
+<td>Fails early</td>
+<td>A value that the comparator cannot compare (<code>None</code>, a string, ...) is rejected by the <code>add_value</code> that receives it, and never stored: the first value is compared with itself. A record is never left in a state where every later <code>add_value</code> raises.</td>
+</tr>
+<tr>
 <td>Atomic</td>
 <td><code>add_value</code>, <code>load_dict</code> and the manager <code>load_state_dict</code> leave the record, or the manager, as it was if they raise. <code>update</code> is a loop of <code>add_value</code>: the elements before the failing one are kept (use <code>clone().update(...)</code> to keep the original).</td>
 </tr>
