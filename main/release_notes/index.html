@@ -1194,6 +1194,13 @@ compatibility layer.</p>
   (<code>TypeError</code> or <code>OverflowError</code>, from the comparator) and the record stays empty. It was stored
   and became the best value, and every later <code>add_value</code> raised. A comparator that is not reflexive
   (<code>&gt;</code> instead of <code>&gt;=</code>) now gives <code>has_improved() is False</code> for the first value.</li>
+<li><code>clone</code>, <code>equal</code>, <code>update</code>, <code>from_dict</code> and <code>load_dict</code> of <code>BaseRecord</code> are <code>@final</code>: a type
+  checker rejects a subclass that overrides one.</li>
+<li><code>best</code> must be a <code>tuple</code> or a <code>list</code> of length 2. A <code>set</code> or a <code>str</code> of two items was accepted as a
+  pair and now raises <code>ValueError</code>.</li>
+<li><code>BaseComparator.equal</code> treats NaN as equal to NaN, as the records do.</li>
+<li><code>BaseComparator</code> has a <code>repr</code> built from <code>to_dict</code> (<code>ToleranceComparator(tolerance=0.1)</code>), so
+  <code>str(record)</code> no longer contains a memory address.</li>
 <li><code>equal</code> requires the same type.</li>
 <li><code>equal</code> of the records and of the manager treats NaN as equal to NaN, so a record that holds a NaN
   is equal to its copy after a JSON round trip.</li>

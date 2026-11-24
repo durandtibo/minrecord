@@ -1687,7 +1687,7 @@ with comparison logic:</p>
 </tr>
 <tr>
 <td>Consistent state</td>
-<td>A comparable record has a best pair if and only if it has a value. <code>best</code> must be a pair <code>(step, value)</code>, and it requires <code>elements</code>: <code>MinScalarRecord("loss", best=(0, 1.0))</code> raises <code>ValueError</code>.</td>
+<td>A comparable record has a best pair if and only if it has a value. <code>best</code> must be a pair <code>(step, value)</code> (a <code>tuple</code> or a <code>list</code> of length 2), and it requires <code>elements</code>: <code>MinScalarRecord("loss", best=(0, 1.0))</code> raises <code>ValueError</code>.</td>
 </tr>
 <tr>
 <td>Safe to load</td>
@@ -1708,6 +1708,14 @@ with comparison logic:</p>
 <tr>
 <td>No hidden global</td>
 <td>The default <code>max_size</code> is read when a record is <strong>created</strong>. It is the only global setting (<code>get_max_size</code>, <code>set_max_size</code>, <code>reset_max_size</code>).</td>
+</tr>
+<tr>
+<td>Contract is enforced</td>
+<td><code>clone</code>, <code>equal</code>, <code>update</code>, <code>from_dict</code> and <code>load_dict</code> are <code>@final</code>: a type checker rejects an override.</td>
+</tr>
+<tr>
+<td>Readable text</td>
+<td><code>repr</code> and <code>str</code> of a record and of a comparator are deterministic and show the arguments, without a memory address: <code>MinScalarComparator()</code>, <code>ToleranceComparator(tolerance=0.1)</code>.</td>
 </tr>
 <tr>
 <td>Extensible</td>

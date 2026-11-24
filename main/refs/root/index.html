@@ -2196,7 +2196,7 @@ relies on it to rebuild itself from <code>to_dict</code>.</p>
 
         <p>Indicate if two comparators are equal or not.</p>
 <p>Two comparators are equal if they have the same type and the
-same <code>to_dict</code> output.</p>
+same <code>to_dict</code> output. A NaN value is equal to a NaN value.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2478,9 +2478,9 @@ following members:</p>
 - ``is_empty``
 - ``to_dict``
 </code></pre></div>
-<p>The other methods are derived from them and must not be overridden
-(<code>clone</code>, <code>equal</code>, <code>update</code>, <code>from_dict</code> and <code>load_dict</code>),
-except by a comparable record that overrides <code>is_comparable</code>,
+<p>The other methods are derived from them. <code>clone</code>, <code>equal</code>,
+<code>update</code>, <code>from_dict</code> and <code>load_dict</code> are <code>@final</code>, so a
+type checker rejects an override. A comparable record overrides that overrides <code>is_comparable</code>,
 <code>get_best_value</code>, <code>get_best_step</code> and <code>has_improved</code>.</p>
 <p>The contract of a record is:</p>
 <div class="highlight"><pre><span></span><code>1. ``to_dict`` returns exactly the arguments of the constructor
