@@ -25,7 +25,7 @@
         <img  alt="Doc style: google" src="https://img.shields.io/badge/%20style-google-3666d6.svg">
     </a>
     <a href="https://github.com/astral-sh/ruff">
-        <img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json" alt="Ruff" style="max-width:100%;">
+        <img alt="Ruff" src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json">
     </a>
     <a href="https://github.com/guilatrova/tryceratops">
         <img  alt="Doc style: google" src="https://img.shields.io/badge/try%2Fexcept%20style-tryceratops%20%F0%9F%A6%96%E2%9C%A8-black">
@@ -119,7 +119,7 @@ install only some specific dependencies or other alternatives to install the lib
 The following is the corresponding `minrecord` versions and tested dependencies.
 
 | `minrecord` | `coola`        | `objectory`              | `python`      |
-|-------------|----------------|--------------------------|---------------|
+| ----------- | -------------- | ------------------------ | ------------- |
 | `main`      | `>=1.0,<2.0`   | `>=0.3,<1.0`<sup>*</sup> | `>=3.11`      |
 | `0.3.0`     | `>=1.0,<2.0`   | `>=0.3,<1.0`<sup>*</sup> | `>=3.10`      |
 | `0.2.0`     | `>=0.10,<1.0`  | `>=0.3,<1.0`<sup>*</sup> | `>=3.10`      |

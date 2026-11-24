@@ -29,6 +29,7 @@ from minrecord.comparator import (
     MaxScalarComparator,
     MinScalarComparator,
 )
+from minrecord.config import get_max_size, set_max_size
 from minrecord.functional import get_best_values, get_last_values
 from minrecord.generic import Record
 from minrecord.manager import RecordManager

@@ -22,7 +22,8 @@ This guide provides practical information for using `minrecord` effectively in y
 - Provide access to the most recent value
 - Don't track "best" values
 
-**Comparable Records** (`ComparableRecord`, `MinScalarRecord`, `MaxScalarRecord`) extend records with comparison logic:
+**Comparable Records** (`ComparableRecord`, `MinScalarRecord`, `MaxScalarRecord`) extend records
+with comparison logic:
 
 - Track the best value seen so far
 - Indicate whether the latest value is an improvement

@@ -64,7 +64,7 @@ class ComparableRecord(Record[T]):
     ) -> None:
         super().__init__(name=name, elements=elements, max_size=max_size)
         self._comparator = comparator
-        self._best_value = best_value or self._comparator.get_initial_best_value()
+        self._best_value: T = best_value or self._comparator.get_initial_best_value()
         self._improved = bool(improved)
 
     def __str__(self) -> str:
@@ -220,7 +220,7 @@ class MaxScalarRecord(ComparableRecord[float]):
     @classmethod
     # The scalar records have no ``comparator`` argument. Changing the signature of the
     # inherited method is a breaking change, so the override is kept as it is.
-    def from_elements(  # ty: ignore[incompatible-method-override]
+    def from_elements(  # ty: ignore[incompatible-method-override]  # pyright: ignore[reportIncompatibleMethodOverride]
         cls, name: str, elements: Iterable[tuple[float | None, float]]
     ) -> Self:
         r"""Instantiate a ``MaxScalarRecord`` object from the elements.
@@ -308,7 +308,7 @@ class MinScalarRecord(ComparableRecord[float]):
     @classmethod
     # The scalar records have no ``comparator`` argument. Changing the signature of the
     # inherited method is a breaking change, so the override is kept as it is.
-    def from_elements(  # ty: ignore[incompatible-method-override]
+    def from_elements(  # ty: ignore[incompatible-method-override]  # pyright: ignore[reportIncompatibleMethodOverride]
         cls, name: str, elements: Iterable[tuple[float | None, float]]
     ) -> Self:
         r"""Instantiate a ``MaxScalarRecord`` object from the elements.

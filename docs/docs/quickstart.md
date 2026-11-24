@@ -297,7 +297,8 @@ class method.
 
 ## Record Manager
 
-When working with multiple records, `RecordManager` provides a convenient way to organize and manage them.
+When working with multiple records, `RecordManager` provides a convenient way to organize and
+manage them.
 It allows you to add, update, and query multiple records efficiently.
 
 ```pycon
@@ -355,6 +356,7 @@ The manager provides convenient methods to get all best or last values:
 Now that you understand the basics, you can:
 
 - Read the [Usage Guide](usage_guide.md) for detailed patterns and best practices
-- Explore [Examples](https://github.com/durandtibo/minrecord/tree/main/examples) for complete working code
+- Explore [Examples](https://github.com/durandtibo/minrecord/tree/main/examples) for complete
+  working code
 - Check the [FAQ](faq.md) for common questions and troubleshooting
 - Browse the [API Reference](refs/root.md) for detailed documentation

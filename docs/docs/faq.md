@@ -56,9 +56,9 @@ testing.
 
 - **Use `Record`** when you only need to track recent values
 - **Use `ComparableRecord`/`MinScalarRecord`/`MaxScalarRecord`** when you need to:
-    - Track the best value
-    - Check if values are improving
-    - Implement early stopping
+  - Track the best value
+  - Check if values are improving
+  - Implement early stopping
 
 ### How do I choose max_size?
 
