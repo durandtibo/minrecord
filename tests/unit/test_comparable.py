@@ -18,7 +18,7 @@ from minrecord import (
     MinScalarRecord,
     set_max_size,
 )
-from minrecord.comparable import _check_pair, _ScalarRecord
+from minrecord.comparable import _ScalarRecord
 from minrecord.config import reset_max_size
 from tests.unit.helpers import ToleranceComparator
 
@@ -288,6 +288,18 @@ def test_comparable_record_init_best_outside_window() -> None:
 def test_comparable_record_init_best_list_is_converted_to_tuple() -> None:
     best: Any = [1, 2.0]
     assert create_max_record(best=best, elements=[(2, 1.0)]).to_dict()["best"] == (1, 2.0)
+
+
+def test_comparable_record_init_best_not_a_pair_raises() -> None:
+    best: Any = (0, 1, 2)
+    with pytest.raises(ValueError, match=r"best must be a pair \(step, value\), got \(0, 1, 2\)"):
+        create_max_record(best=best, elements=[(0, 1.0)])
+
+
+def test_comparable_record_init_element_not_a_pair_raises() -> None:
+    elements: Any = [(0, 1.0, 2)]
+    with pytest.raises(ValueError, match=r"element must be a pair \(step, value\), got"):
+        create_max_record(elements=elements)
 
 
 def test_comparable_record_init_best_without_elements_raises() -> None:
@@ -978,31 +990,6 @@ def test_min_scalar_record_clone_is_independent() -> None:
 
 def test_min_scalar_record_clone_empty() -> None:
     assert MinScalarRecord("loss").clone().is_empty()
-
-
-##################################
-#     Tests for _check_pair      #
-##################################
-
-
-def test_check_pair_tuple() -> None:
-    assert _check_pair((1, 2.0)) == (1, 2.0)
-
-
-def test_check_pair_list_is_converted_to_tuple() -> None:
-    assert _check_pair([1, 2.0]) == (1, 2.0)
-
-
-def test_check_pair_step_none() -> None:
-    assert _check_pair((None, 0.0)) == (None, 0.0)
-
-
-@pytest.mark.parametrize(
-    "best", [(), (1,), (1, 2, 3), [1], [1, 2, 3], {1, 2}, "ab", {"a": 1, "b": 2}, 5, None, 1.5]
-)
-def test_check_pair_invalid_raises(best: Any) -> None:
-    with pytest.raises(ValueError, match=r"best must be a pair \(step, value\), got"):
-        _check_pair(best)
 
 
 ##############################################

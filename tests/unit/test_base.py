@@ -152,6 +152,29 @@ def test_base_record_update_max_size() -> None:
     assert record.get_most_recent() == ((1, 2), (2, 3))
 
 
+def test_base_record_update_lists_of_length_two() -> None:
+    record = Record("loss")
+    elements: Any = [[0, 1], [1, 2]]
+    record.update(elements)
+    assert record.get_most_recent() == ((0, 1), (1, 2))
+
+
+@pytest.mark.parametrize("element", [(0, 1, 2), (0,), 5, "ab", None])
+def test_base_record_update_element_not_a_pair_raises(element: Any) -> None:
+    record = Record("loss")
+    with pytest.raises(ValueError, match=r"element must be a pair \(step, value\), got"):
+        record.update([element])
+    assert record.is_empty()
+
+
+def test_base_record_update_element_not_a_pair_keeps_previous_elements() -> None:
+    record = Record("loss")
+    elements: Any = [(0, 1), (1, 2), (2,)]
+    with pytest.raises(ValueError, match=r"element must be a pair \(step, value\), got \(2,\)"):
+        record.update(elements)
+    assert record.get_most_recent() == ((0, 1), (1, 2))
+
+
 # --- from_dict ---
 
 

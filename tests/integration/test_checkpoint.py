@@ -43,6 +43,13 @@ def test_state_dict_json_round_trip_objects_are_equal() -> None:
     assert objects_are_equal(new_manager, manager)
 
 
+def test_state_dict_json_round_trip_keeps_the_keys() -> None:
+    manager = create_manager()
+    new_manager = RecordManager()
+    new_manager.load_state_dict(json.loads(json.dumps(manager.state_dict())))
+    assert list(new_manager.get_records()) == list(manager.get_records())
+
+
 def test_state_dict_json_round_trip_best_values() -> None:
     manager = create_manager()
     new_manager = RecordManager()
