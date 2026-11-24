@@ -1686,6 +1686,10 @@ with comparison logic:</p>
 <td><code>BaseRecord.from_dict(r.to_dict()).equal(r)</code>, <code>r.clone().equal(r)</code>, and <code>r.load_dict(r2.to_dict())</code> makes <code>r</code> equal to <code>r2</code>, also after a JSON round trip and when <code>r</code> holds a NaN (<code>equal</code> treats NaN as equal to NaN). The clone has the same <code>has_improved()</code> and the same best pair. A clone is independent: adding values to it does not change <code>r</code>.</td>
 </tr>
 <tr>
+<td>Consistent state</td>
+<td>A comparable record has a best pair if and only if it has a value. <code>best</code> must be a pair <code>(step, value)</code>, and it requires <code>elements</code>: <code>MinScalarRecord("loss", best=(0, 1.0))</code> raises <code>ValueError</code>.</td>
+</tr>
+<tr>
 <td>Safe to load</td>
 <td><code>from_dict</code> and the comparator dict only build objects of the expected type (a record, a comparator): a dict that names any other importable callable raises <code>TypeError</code> before it is called. <code>MinScalarRecord.from_dict(d)</code> only accepts the dict of a <code>MinScalarRecord</code>.</td>
 </tr>

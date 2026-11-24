@@ -1290,7 +1290,9 @@ at the time of the creation of the record is used.</p>
                 <p>The best pair <code>(step, value)</code> before the <code>elements</code>
 are added. It is useful when the best value is not in the
 <code>elements</code> anymore, because it has been removed from the
-recent values. <code>None</code> means there is no value yet.</p>
+recent values. It requires at least one element, because a
+record has a best value if and only if it has a value.
+<code>None</code> means there is no value yet.</p>
               </div>
             </td>
             <td>
@@ -1328,7 +1330,9 @@ is not a <code>BaseComparator</code>).</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>if <code>max_size</code> is not a positive integer.</p>
+                <p>if <code>max_size</code> is not a positive integer, if
+<code>best</code> is not a pair <code>(step, value)</code>, or if <code>best</code>
+is given without <code>elements</code>.</p>
               </div>
             </td>
           </tr>
@@ -1478,7 +1482,8 @@ at the time of the creation of the record is used.</p>
             <td>
               <div class="doc-md-description">
                 <p>The best pair <code>(step, value)</code> before the <code>elements</code>
-are added. <code>None</code> means there is no value yet.</p>
+are added. It requires at least one element. <code>None</code>
+means there is no value yet.</p>
               </div>
             </td>
             <td>
@@ -1504,7 +1509,9 @@ are added. <code>None</code> means there is no value yet.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>if <code>max_size</code> is not a positive integer.</p>
+                <p>if <code>max_size</code> is not a positive integer, if
+<code>best</code> is not a pair <code>(step, value)</code>, or if <code>best</code>
+is given without <code>elements</code>.</p>
               </div>
             </td>
           </tr>
@@ -1655,7 +1662,8 @@ at the time of the creation of the record is used.</p>
             <td>
               <div class="doc-md-description">
                 <p>The best pair <code>(step, value)</code> before the <code>elements</code>
-are added. <code>None</code> means there is no value yet.</p>
+are added. It requires at least one element. <code>None</code>
+means there is no value yet.</p>
               </div>
             </td>
             <td>
@@ -1681,7 +1689,9 @@ are added. <code>None</code> means there is no value yet.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>if <code>max_size</code> is not a positive integer.</p>
+                <p>if <code>max_size</code> is not a positive integer, if
+<code>best</code> is not a pair <code>(step, value)</code>, or if <code>best</code>
+is given without <code>elements</code>.</p>
               </div>
             </td>
           </tr>

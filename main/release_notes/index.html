@@ -1178,6 +1178,10 @@ compatibility layer.</p>
   <code>add_value</code>.</li>
 <li>The <code>best_value</code> and <code>improved</code> arguments are removed. A new <code>best=(step, value)</code> argument is the
   best pair that left the recent values. <code>has_improved()</code> is derived from the values.</li>
+<li>The <code>best</code> argument must be a pair <code>(step, value)</code> and requires <code>elements</code>: <code>best</code> of the wrong
+  length, or <code>best</code> without any element, raises <code>ValueError</code>. A record had an empty window and a best
+  value, and <code>best=(a, b, c)</code> was truncated. A record that is saved with <code>to_dict</code> always has
+  elements with its best pair.</li>
 <li>The options <code>elements</code>, <code>max_size</code> and <code>best</code> of <code>Record</code>, <code>ComparableRecord</code>, <code>MaxScalarRecord</code>
   and <code>MinScalarRecord</code> are keyword-only.</li>
 <li><code>ComparableRecord.is_better</code> is removed. Use the comparator.</li>
