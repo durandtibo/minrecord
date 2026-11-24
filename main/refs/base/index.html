@@ -2538,6 +2538,11 @@ the record, otherwise <code>False</code>.</p>
 <p>The new record is built first from the dictionary (with
 <code>BaseRecord.from_dict</code>), so the record is not modified if the
 dictionary is invalid.</p>
+<p>The dictionary is the whole state of the record: the record
+takes its name, its <code>max_size</code> and its elements, and every
+attribute of <code>vars(self)</code> is replaced. Thus the state of a
+custom record must live in <code>vars(self)</code> (no <code>__slots__</code>).
+A caller that needs the name to stay the same checks it before.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2688,6 +2693,12 @@ input of <code>from_dict</code> or <code>load_dict</code>, or as the arguments o
     <div class="doc doc-contents ">
 
         <p>Update the record by adding the elements.</p>
+<p>The elements are added one by one with <code>add_value</code>. If an
+element is rejected (for example a value that the comparator
+cannot compare), the elements before it have been added and the
+record is otherwise unchanged, because <code>add_value</code> is atomic.
+Use <code>record.clone().update(elements)</code> to keep the original
+record if it fails.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>

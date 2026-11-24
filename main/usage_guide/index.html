@@ -1695,11 +1695,11 @@ with comparison logic:</p>
 </tr>
 <tr>
 <td>Atomic</td>
-<td>An operation that raises (a comparator that fails, an invalid dict given to <code>load_dict</code> or to the manager <code>load_state_dict</code>) leaves the record, or the manager, as it was.</td>
+<td><code>add_value</code>, <code>load_dict</code> and the manager <code>load_state_dict</code> leave the record, or the manager, as it was if they raise. <code>update</code> is a loop of <code>add_value</code>: the elements before the failing one are kept (use <code>clone().update(...)</code> to keep the original).</td>
 </tr>
 <tr>
 <td>Typed errors</td>
-<td><code>EmptyRecordError</code> for a value asked from an empty record, <code>NotAComparableRecordError</code> for a best value asked from a record that cannot compare, <code>ValueError</code> for an invalid <code>max_size</code>, <code>TypeError</code> for a dict of the wrong type.</td>
+<td><code>EmptyRecordError</code> for a value asked from an empty record (<code>get_last_value</code>, <code>get_best_value</code>, <code>get_best_step</code>, <code>has_improved</code>), <code>NotAComparableRecordError</code> for a best value asked from a record that cannot compare, <code>ValueError</code> for an invalid <code>max_size</code>, <code>TypeError</code> for a dict of the wrong type.</td>
 </tr>
 <tr>
 <td>No hidden global</td>
@@ -1718,8 +1718,11 @@ with comparison logic:</p>
 <li><strong>Values are stored by reference.</strong> <code>add_value</code> does not copy the value, and <code>to_dict</code> and <code>clone</code>
   share the value objects between the copies. Store scalars or immutable objects.</li>
 <li><strong>Order of the <code>step</code> values.</strong> <code>step</code> is a label, it is not checked to increase.</li>
-<li><strong>Truthiness.</strong> <code>Record</code> defines <code>__len__</code>, so an empty record is falsy: write
+<li><strong>Truthiness.</strong> <code>Record</code> and <code>RecordManager</code> define <code>__len__</code>, so an empty one is falsy: write
   <code>record.is_empty()</code>, not <code>if record:</code>.</li>
+<li><strong><code>load_dict</code> replaces the whole state.</strong> The name and the <code>max_size</code> of the record are replaced
+  too: a record named <code>a</code> that loads the dict of a record named <code>b</code> is named <code>b</code>. Check the name
+  before if it must stay.</li>
 </ul>
 <h2 id="common-patterns">Common Patterns<a class="headerlink" href="#common-patterns" title="Permanent link">&para;</a></h2>
 <h3 id="pattern-1-basic-training-loop">Pattern 1: Basic Training Loop<a class="headerlink" href="#pattern-1-basic-training-loop" title="Permanent link">&para;</a></h3>
@@ -1759,19 +1762,17 @@ with comparison logic:</p>
 
 <span class="n">val_loss</span> <span class="o">=</span> <span class="n">MinScalarRecord</span><span class="p">(</span><span class="s2">"val_loss"</span><span class="p">)</span>
 <span class="n">patience</span> <span class="o">=</span> <span class="mi">5</span>
-<span class="n">no_improvement_count</span> <span class="o">=</span> <span class="mi">0</span>
 
 <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_epochs</span><span class="p">):</span>
     <span class="c1"># Training...</span>
     <span class="n">val_loss</span><span class="o">.</span><span class="n">add_value</span><span class="p">(</span><span class="n">epoch_val_loss</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="n">epoch</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">val_loss</span><span class="o">.</span><span class="n">has_improved</span><span class="p">():</span>
-        <span class="n">no_improvement_count</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">save_checkpoint</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s2">"best_model.pt"</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">no_improvement_count</span> <span class="o">+=</span> <span class="mi">1</span>
 
-    <span class="k">if</span> <span class="n">no_improvement_count</span> <span class="o">&gt;=</span> <span class="n">patience</span><span class="p">:</span>
+    <span class="c1"># The count is derived from the best pair, so it survives to_dict/from_dict.</span>
+    <span class="c1"># It needs a numeric step.</span>
+    <span class="k">if</span> <span class="n">epoch</span> <span class="o">-</span> <span class="n">val_loss</span><span class="o">.</span><span class="n">get_best_step</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="n">patience</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Early stopping at epoch </span><span class="si">{</span><span class="n">epoch</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="k">break</span>
 </code></pre></div>

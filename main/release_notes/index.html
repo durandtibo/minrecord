@@ -1276,6 +1276,11 @@ compatibility layer.</p>
   instead of <code>get_best_value</code> for a <code>Record</code>, <code>add_value</code>, <code>NotAComparableRecordError</code>, typos).</li>
 <li>Replaced the PyTorch Lightning example of the <a href="../faq/">FAQ</a> by one that works with Lightning 2.x.</li>
 <li>The badges of the home page are the ones of the <code>README.md</code>.</li>
+<li>Narrowed the Atomic property: <code>update</code> keeps the elements before a rejected one, and documented
+  it. Documented that <code>load_dict</code> replaces the whole state (name and <code>max_size</code> included), that the
+  state of a custom record must live in <code>vars(self)</code>, and that <code>RecordManager</code> is falsy when empty.</li>
+<li>The early stopping pattern of the usage guide uses <code>get_best_step</code>, so the patience survives
+  <code>to_dict</code>/<code>from_dict</code>. The properties are linked from the reference of the root package.</li>
 </ul>
 
 
