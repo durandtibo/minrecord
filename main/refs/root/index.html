@@ -1230,6 +1230,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#minrecord.reset_max_size" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        reset_max_size
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#minrecord.set_max_size" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2068,6 +2079,17 @@
     <span class="md-ellipsis">
       
         get_max_size
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.reset_max_size" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        reset_max_size
       
     </span>
   </a>
@@ -5816,6 +5838,38 @@ record.</p>
 <div class="doc doc-object doc-function">
 
 
+<h3 id="minrecord.reset_max_size" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">minrecord.reset_max_size</span>
+
+
+<a href="#minrecord.reset_max_size" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">reset_max_size</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Reset the default maximum size to its initial value.</p>
+
+
+<details class="example" open>
+  <summary>Example</summary>
+  <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">minrecord.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_max_size</span><span class="p">,</span> <span class="n">reset_max_size</span><span class="p">,</span> <span class="n">set_max_size</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">set_max_size</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">get_max_size</span><span class="p">()</span>
+<span class="go">5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">reset_max_size</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">get_max_size</span><span class="p">()</span>
+<span class="go">10</span>
+</code></pre></div>
+</details>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
 <h3 id="minrecord.set_max_size" class="doc doc-heading">
             <span class="doc doc-object-name doc-function-name">minrecord.set_max_size</span>
 
@@ -5853,7 +5907,7 @@ will be created after the call of this function.</p>
             <td>
               <div class="doc-md-description">
                 <p>The new default maximum size of values to track in
-each record.</p>
+each record. Must be a positive integer.</p>
               </div>
             </td>
             <td>
@@ -5864,14 +5918,38 @@ each record.</p>
     </table>
 
 
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="ValueError">ValueError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If <code>max_size</code> is not a positive integer.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
 <details class="example" open>
   <summary>Example</summary>
-  <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">minrecord.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_max_size</span><span class="p">,</span> <span class="n">set_max_size</span>
+  <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">minrecord.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_max_size</span><span class="p">,</span> <span class="n">reset_max_size</span><span class="p">,</span> <span class="n">set_max_size</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">get_max_size</span><span class="p">()</span>
 <span class="go">10</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">set_max_size</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">get_max_size</span><span class="p">()</span>
 <span class="go">5</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">reset_max_size</span><span class="p">()</span>
 </code></pre></div>
 </details>
 

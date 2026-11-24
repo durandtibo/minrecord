@@ -925,53 +925,25 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#minrecord.utils.value" class="md-nav__link">
+  <a href="#minrecord.utils.validation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        value
+        validation
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="value">
+    <nav class="md-nav" aria-label="validation">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#minrecord.utils.value.MutableValue" class="md-nav__link">
+  <a href="#minrecord.utils.validation.check_max_size" class="md-nav__link">
     <span class="md-ellipsis">
       
-        MutableValue
+        check_max_size
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="MutableValue">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#minrecord.utils.value.MutableValue.get_value" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_value
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#minrecord.utils.value.MutableValue.set_value" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        set_value
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -1059,53 +1031,25 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#minrecord.utils.value" class="md-nav__link">
+  <a href="#minrecord.utils.validation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        value
+        validation
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="value">
+    <nav class="md-nav" aria-label="validation">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#minrecord.utils.value.MutableValue" class="md-nav__link">
+  <a href="#minrecord.utils.validation.check_max_size" class="md-nav__link">
     <span class="md-ellipsis">
       
-        MutableValue
+        check_max_size
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="MutableValue">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#minrecord.utils.value.MutableValue.get_value" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        get_value
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#minrecord.utils.value.MutableValue.set_value" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        set_value
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
         
@@ -1182,97 +1126,15 @@
 
 
 
-<h2 id="minrecord.utils.value" class="doc doc-heading">
-            <span class="doc doc-object-name doc-module-name">minrecord.utils.value</span>
+<h2 id="minrecord.utils.validation" class="doc doc-heading">
+            <span class="doc doc-object-name doc-module-name">minrecord.utils.validation</span>
 
 
-<a href="#minrecord.utils.value" class="headerlink" title="Permanent link">&para;</a></h2>
+<a href="#minrecord.utils.validation" class="headerlink" title="Permanent link">&para;</a></h2>
 
     <div class="doc doc-contents first">
 
-        <p>Contain utility functions to manage objects.</p>
-
-
-
-
-
-
-
-
-
-
-<div class="doc doc-children">
-
-
-
-
-
-
-
-
-
-<div class="doc doc-object doc-class">
-
-
-
-<h3 id="minrecord.utils.value.MutableValue" class="doc doc-heading">
-            <span class="doc doc-object-name doc-class-name">minrecord.utils.value.MutableValue</span>
-
-
-<a href="#minrecord.utils.value.MutableValue" class="headerlink" title="Permanent link">&para;</a></h3>
-
-
-    <div class="doc doc-contents ">
-            <p class="doc doc-class-bases">
-              Bases: <code><span title="typing.Generic">Generic</span>[<span title="minrecord.utils.value.T">T</span>]</code></p>
-
-
-
-        <p>Implement a simple class to build a mutable object.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>value</code>
-            </td>
-            <td>
-                  <code><span title="minrecord.utils.value.T">T</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>The initial value.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-<details class="example" open>
-  <summary>Example</summary>
-  <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">minrecord.utils.value</span><span class="w"> </span><span class="kn">import</span> <span class="n">MutableValue</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">value</span> <span class="o">=</span> <span class="n">MutableValue</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">value</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
-<span class="go">10</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">value</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">value</span><span class="o">.</span><span class="n">get_value</span><span class="p">()</span>
-<span class="go">42</span>
-</code></pre></div>
-</details>
+        <p>Contain utility functions to validate arguments.</p>
 
 
 
@@ -1297,17 +1159,49 @@
 <div class="doc doc-object doc-function">
 
 
-<h4 id="minrecord.utils.value.MutableValue.get_value" class="doc doc-heading">
-            <span class="doc doc-object-name doc-function-name">minrecord.utils.value.MutableValue.get_value</span>
+<h3 id="minrecord.utils.validation.check_max_size" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">minrecord.utils.validation.check_max_size</span>
 
 
-<a href="#minrecord.utils.value.MutableValue.get_value" class="headerlink" title="Permanent link">&para;</a></h4>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">get_value</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n"><span title="minrecord.utils.value.T">T</span></span>
+<a href="#minrecord.utils.validation.check_max_size" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">check_max_size</span><span class="p">(</span><span class="n">max_size</span><span class="p">:</span> <span class="n"><span title="typing.Any">Any</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="int">int</span></span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Get the current value.</p>
+        <p>Check that the maximum size of a record is valid.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>max_size</code>
+            </td>
+            <td>
+                  <code><span title="typing.Any">Any</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The maximum size to check. It must be a positive
+integer (a <code>bool</code> is not accepted).</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -1321,11 +1215,11 @@
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="minrecord.utils.value.T">T</span></code>
+                  <code><span title="int">int</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The current value.</p>
+                <p>The maximum size.</p>
               </div>
             </td>
           </tr>
@@ -1333,69 +1227,40 @@
     </table>
 
 
-    </div>
-
-</div>
-
-<div class="doc doc-object doc-function">
-
-
-<h4 id="minrecord.utils.value.MutableValue.set_value" class="doc doc-heading">
-            <span class="doc doc-object-name doc-function-name">minrecord.utils.value.MutableValue.set_value</span>
-
-
-<a href="#minrecord.utils.value.MutableValue.set_value" class="headerlink" title="Permanent link">&para;</a></h4>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">set_value</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n"><span title="minrecord.utils.value.T">T</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
-</code></pre></div>
-
-    <div class="doc doc-contents ">
-
-        <p>Set a new value.</p>
-
-
-<p><span class="doc-section-title">Parameters:</span></p>
+<p><span class="doc-section-title">Raises:</span></p>
     <table>
       <thead>
         <tr>
-          <th>Name</th>
           <th>Type</th>
           <th>Description</th>
-          <th>Default</th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                <code>value</code>
-            </td>
-            <td>
-                  <code><span title="minrecord.utils.value.T">T</span></code>
+                  <code><span title="ValueError">ValueError</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The new value.</p>
+                <p>If <code>max_size</code> is not a positive integer.</p>
               </div>
-            </td>
-            <td>
-                <em>required</em>
             </td>
           </tr>
       </tbody>
     </table>
 
 
+<details class="example" open>
+  <summary>Example</summary>
+  <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">minrecord.utils.validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">check_max_size</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">check_max_size</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="go">5</span>
+</code></pre></div>
+</details>
+
     </div>
 
 </div>
-
-
-
-  </div>
-
-    </div>
-
-</div>
-
 
 
 
