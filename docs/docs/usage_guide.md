@@ -67,9 +67,9 @@ These properties are guaranteed by the base classes, so every record has them.
 | Round trip         | `BaseRecord.from_dict(r.to_dict()).equal(r)`, `r.clone().equal(r)`, and `r.load_dict(r2.to_dict())` makes `r` equal to `r2`, also after a JSON round trip and when `r` holds a NaN (`equal` treats NaN as equal to NaN). The clone has the same `has_improved()` and the same best pair. A clone is independent: adding values to it does not change `r`. |
 | Consistent state   | A comparable record has a best pair if and only if it has a value. `best` must be a pair `(step, value)` (a `tuple` or a `list` of length 2), and it requires `elements`: `MinScalarRecord("loss", best=(0, 1.0))` raises `ValueError`. |
 | Safe to load       | `from_dict` and the comparator dict only build objects of the expected type (a record, a comparator): a dict that names any other importable callable raises `TypeError` before it is called, and so does anything that is not a dict. `MinScalarRecord.from_dict(d)` only accepts the dict of a `MinScalarRecord`. |
-| Fails early        | A value that the comparator cannot compare (`None`, a string, ...) is rejected by the `add_value` that receives it, and never stored: the first value is compared with itself. A record is never left in a state where every later `add_value` raises. A `max_size` that a deque cannot hold and a `name` that is not a `str` are rejected by the call that receives them. |
+| Fails early        | A value that the comparator cannot compare (`None`, a string, ...) is rejected by the `add_value` that receives it, and never stored: the first value is compared with itself. A record is never left in a state where every later `add_value` raises. A `max_size` that a deque cannot hold and a `name` that is not a `str` are rejected by the call that receives them, and so is a manager key that nobody registered (`RecordManager.get_record` raises `KeyError` unless a `default_factory` is given). |
 | Atomic             | `add_value`, `load_dict` and the manager `load_state_dict` leave the record, or the manager, as it was if they raise. `update` is a loop of `add_value`: the elements before the failing one are kept (use `clone().update(...)` to keep the original). |
-| Typed errors       | `EmptyRecordError` for a value asked from an empty record (`get_last_value`, `get_best_value`, `get_best_step`, `has_improved`), `NotAComparableRecordError` for a best value asked from a record that cannot compare, `ValueError` for an invalid `max_size`, `TypeError` for a `name` that is not a `str` and for a dict or a comparator of the wrong type. |
+| Typed errors       | `EmptyRecordError` for a value asked from an empty record (`get_last_value`, `get_best_value`, `get_best_step`, `has_improved`), `NotAComparableRecordError` for a best value asked from a record that cannot compare, `ValueError` for an invalid `max_size`, `TypeError` for a `name` that is not a `str` and for a dict or a comparator of the wrong type, `KeyError` for an unknown manager key. |
 | No hidden global   | The default `max_size` is read when a record is **created**. It is the only global setting (`get_max_size`, `set_max_size`, `reset_max_size`), and it only accepts values that a record can use.                                         |
 | Contract is enforced | `clone`, `equal`, `update`, `from_dict` and `load_dict` are `@final`: a type checker rejects an override. |
 | Readable text      | `repr` and `str` of a record and of a comparator are deterministic and show the arguments, without a memory address: `MinScalarComparator()`, `ToleranceComparator(tolerance=0.1)`. |
@@ -234,10 +234,10 @@ for epoch in range(epochs):
 
 ```python
 import wandb
-from minrecord import RecordManager
+from minrecord import Record, RecordManager
 
-manager = RecordManager()
-# ... add records ...
+# A record is created for every new metric name.
+manager = RecordManager(default_factory=Record)
 
 for epoch in range(epochs):
     # Training...

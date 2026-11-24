@@ -13,10 +13,9 @@ from coola.formatting.structure import repr_indent, repr_mapping, str_indent, st
 
 from minrecord.base import BaseRecord
 from minrecord.functional import get_best_values, get_last_values
-from minrecord.generic import Record
 
 if TYPE_CHECKING:
-    from collections.abc import Mapping
+    from collections.abc import Callable, Mapping
 
 
 class RecordManager:
@@ -30,6 +29,11 @@ class RecordManager:
         records: The initial records to add to the manager. The
             mapping is copied, so adding a record to the manager does
             not change it.
+        default_factory: The function that creates the record of a
+            key that is not registered. It is called with the key and
+            must return a record. If ``None``, ``get_record`` raises
+            ``KeyError`` for an unknown key. The factory is not part
+            of the state of the manager (``state_dict``, ``equal``).
 
     Example:
         ```pycon
@@ -38,14 +42,21 @@ class RecordManager:
         >>> manager.add_record(MinScalarRecord("loss"))
         >>> manager.get_record("loss")
         MinScalarRecord(name=loss, max_size=10, size=0)
+        >>> manager = RecordManager(default_factory=MinScalarRecord)
         >>> manager.get_record("new_record")
-        Record(name=new_record, max_size=10, size=0)
+        MinScalarRecord(name=new_record, max_size=10, size=0)
 
         ```
     """
 
-    def __init__(self, records: Mapping[str, BaseRecord[Any]] | None = None) -> None:
+    def __init__(
+        self,
+        records: Mapping[str, BaseRecord[Any]] | None = None,
+        *,
+        default_factory: Callable[[str], BaseRecord[Any]] | None = None,
+    ) -> None:
         self._records = dict(records or {})
+        self._default_factory = default_factory
 
     def __len__(self) -> int:
         return len(self._records)
@@ -207,9 +218,15 @@ class RecordManager:
             key: The key of the record to retrieve.
 
         Returns:
-            The record if it exists, otherwise it returns an empty
-                record. The created empty record is a ``Record``
-                object.
+            The record registered for the key. If there is none and
+                the manager has a ``default_factory``, the record is
+                created with ``default_factory(key)``, registered and
+                returned. The next call returns the same object.
+
+        Raises:
+            KeyError: if no record is registered for the key and the
+                manager has no ``default_factory``. The manager is not
+                modified (also if the factory raises).
 
         Example:
             ```pycon
@@ -219,12 +236,23 @@ class RecordManager:
             >>> manager.get_record("loss")
             MinScalarRecord(name=loss, max_size=10, size=0)
             >>> manager.get_record("new_record")
-            Record(name=new_record, max_size=10, size=0)
+            Traceback (most recent call last):
+                ...
+            KeyError: "No record is registered for the key 'new_record'. Known keys: ['loss']"
+            >>> manager = RecordManager(default_factory=MinScalarRecord)
+            >>> manager.get_record("new_record")
+            MinScalarRecord(name=new_record, max_size=10, size=0)
 
             ```
         """
         if not self.has_record(key):
-            self._records[key] = Record(name=key)
+            if self._default_factory is None:
+                msg = (
+                    f"No record is registered for the key {key!r}. "
+                    f"Known keys: {list(self._records)}"
+                )
+                raise KeyError(msg)
+            self._records[key] = self._default_factory(key)
         return self._records[key]
 
     def get_records(self) -> dict[str, BaseRecord[Any]]:

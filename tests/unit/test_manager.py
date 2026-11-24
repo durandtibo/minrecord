@@ -33,8 +33,7 @@ def test_record_manager_str() -> None:
 
 
 def test_record_manager_str_with_record() -> None:
-    manager = RecordManager()
-    manager.get_record("something")
+    manager = RecordManager({"something": Record("something")})
     assert str(manager).startswith("RecordManager(")
 
 
@@ -43,15 +42,14 @@ def test_record_manager_len_empty() -> None:
 
 
 def test_record_manager_len_1_record() -> None:
-    manager = RecordManager()
-    manager.get_record("my_record1")
+    manager = RecordManager({"my_record1": Record("my_record1")})
     assert len(manager) == 1
 
 
 def test_record_manager_len_2_records() -> None:
-    manager = RecordManager()
-    manager.get_record("my_record1")
-    manager.get_record("my_record2")
+    manager = RecordManager(
+        {"my_record1": Record("my_record1"), "my_record2": Record("my_record2")}
+    )
     assert len(manager) == 2
 
 
@@ -125,11 +123,97 @@ def test_record_manager_get_record_exists() -> None:
     assert manager.get_record("loss") is record
 
 
-def test_record_manager_get_record_does_not_exist() -> None:
-    manager = RecordManager()
-    record = manager.get_record("loss")
-    assert isinstance(record, Record)
-    assert len(record.get_most_recent()) == 0
+def test_record_manager_get_record_does_not_exist_raises() -> None:
+    manager = RecordManager({"loss": MinScalarRecord("loss")})
+    with pytest.raises(
+        KeyError, match=r"No record is registered for the key 'train_loss'. Known keys: \['loss'\]"
+    ):
+        manager.get_record("train_loss")
+
+
+def test_record_manager_get_record_does_not_exist_leaves_manager_unchanged() -> None:
+    manager = RecordManager({"loss": MinScalarRecord("loss")})
+    with pytest.raises(KeyError, match=r"No record is registered"):
+        manager.get_record("train_loss")
+    assert manager.equal(RecordManager({"loss": MinScalarRecord("loss")}))
+
+
+def test_record_manager_get_record_does_not_exist_empty_manager() -> None:
+    with pytest.raises(KeyError, match=r"Known keys: \[\]"):
+        RecordManager().get_record("loss")
+
+
+def test_record_manager_get_record_default_factory_min_scalar_record() -> None:
+    record = RecordManager(default_factory=MinScalarRecord).get_record("loss")
+    assert record.equal(MinScalarRecord("loss"))
+
+
+def test_record_manager_get_record_default_factory_record() -> None:
+    record = RecordManager(default_factory=Record).get_record("loss")
+    assert record.equal(Record("loss"))
+
+
+def test_record_manager_get_record_default_factory_is_called_with_the_key() -> None:
+    manager = RecordManager(default_factory=lambda key: Record(f"name of {key}"))
+    assert manager.get_record("loss").name == "name of loss"
+
+
+def test_record_manager_get_record_default_factory_registers_the_record() -> None:
+    manager = RecordManager(default_factory=MinScalarRecord)
+    manager.get_record("loss")
+    assert manager.get_records().keys() == {"loss"}
+
+
+def test_record_manager_get_record_default_factory_returns_the_same_object() -> None:
+    manager = RecordManager(default_factory=MinScalarRecord)
+    assert manager.get_record("loss") is manager.get_record("loss")
+
+
+def test_record_manager_get_record_default_factory_not_used_for_existing_key() -> None:
+    record = MaxScalarRecord("loss")
+    manager = RecordManager({"loss": record}, default_factory=MinScalarRecord)
+    assert manager.get_record("loss") is record
+
+
+def test_record_manager_get_record_default_factory_raises_leaves_manager_unchanged() -> None:
+    def factory(key: str) -> Record:
+        msg = f"cannot create {key}"
+        raise RuntimeError(msg)
+
+    manager = RecordManager(default_factory=factory)
+    with pytest.raises(RuntimeError, match=r"cannot create loss"):
+        manager.get_record("loss")
+    assert len(manager) == 0
+
+
+def test_record_manager_default_factory_keyword_only() -> None:
+    manager_class: Any = RecordManager
+    with pytest.raises(TypeError, match=r"takes from 1 to 2 positional arguments"):
+        manager_class({}, Record)
+
+
+def test_record_manager_default_factory_not_in_state_dict() -> None:
+    manager = RecordManager(default_factory=MinScalarRecord)
+    manager.get_record("loss")
+    assert manager.state_dict() == {
+        "loss": {
+            OBJECT_TARGET: "minrecord.comparable.MinScalarRecord",
+            "name": "loss",
+            "max_size": 10,
+            "elements": (),
+            "best": None,
+        }
+    }
+
+
+def test_record_manager_equal_ignores_default_factory() -> None:
+    assert RecordManager(default_factory=Record).equal(RecordManager())
+
+
+def test_record_manager_load_state_dict_new_key_ignores_default_factory() -> None:
+    manager = RecordManager(default_factory=MinScalarRecord)
+    manager.load_state_dict({"loss": Record("loss").to_dict()})
+    assert manager.get_record("loss").equal(Record("loss"))
 
 
 def test_record_manager_get_records() -> None:
@@ -382,7 +466,7 @@ def test_record_manager_equal_false_nan_and_number() -> None:
 
 def test_record_manager_equal_false_different_keys() -> None:
     manager = create_manager_with_values()
-    manager.get_record("new_record")
+    manager.add_record(Record("new_record"))
     assert not manager.equal(create_manager_with_values())
 
 

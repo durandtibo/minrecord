@@ -68,6 +68,13 @@ Manager and functions:
 - `exist_ok` (`RecordManager.add_record`), and `prefix` and `suffix` (`RecordManager.get_best_values`,
   `get_best_values`, `get_last_values`) are keyword-only.
 - `RecordManager(records)` copies the dict.
+- `RecordManager.get_record(key)` raises `KeyError` for a key that nobody registered. It created an
+  empty `Record` (never a comparable one), so a typo in a metric name silently lost the best value.
+  The new keyword-only argument `default_factory` (a function of the key that returns a record, as
+  for `collections.defaultdict`) restores the creation, for example
+  `RecordManager(default_factory=Record)` or `RecordManager(default_factory=MinScalarRecord)`. The
+  factory is not part of the state: `state_dict`, `equal` and `load_state_dict` do not use it.
+  `minrecord.manager` no longer imports `Record`.
 
 Configuration and utilities:
 
