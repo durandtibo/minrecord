@@ -1686,12 +1686,16 @@ with comparison logic:</p>
 <td><code>BaseRecord.from_dict(r.to_dict()).equal(r)</code>, <code>r.clone().equal(r)</code>, and <code>r.load_dict(r2.to_dict())</code> makes <code>r</code> equal to <code>r2</code>, also after a JSON round trip and when <code>r</code> holds a NaN (<code>equal</code> treats NaN as equal to NaN). The clone has the same <code>has_improved()</code> and the same best pair. A clone is independent: adding values to it does not change <code>r</code>.</td>
 </tr>
 <tr>
+<td>Safe to load</td>
+<td><code>from_dict</code> and the comparator dict only build objects of the expected type (a record, a comparator): a dict that names any other importable callable raises <code>TypeError</code> before it is called. <code>MinScalarRecord.from_dict(d)</code> only accepts the dict of a <code>MinScalarRecord</code>.</td>
+</tr>
+<tr>
 <td>Atomic</td>
 <td>An operation that raises (a comparator that fails, an invalid dict given to <code>load_dict</code> or to the manager <code>load_state_dict</code>) leaves the record, or the manager, as it was.</td>
 </tr>
 <tr>
 <td>Typed errors</td>
-<td><code>EmptyRecordError</code> for a value asked from an empty record, <code>NotAComparableRecordError</code> for a best value asked from a record that cannot compare, <code>ValueError</code> for an invalid <code>max_size</code>.</td>
+<td><code>EmptyRecordError</code> for a value asked from an empty record, <code>NotAComparableRecordError</code> for a best value asked from a record that cannot compare, <code>ValueError</code> for an invalid <code>max_size</code>, <code>TypeError</code> for a dict of the wrong type.</td>
 </tr>
 <tr>
 <td>No hidden global</td>
@@ -1882,6 +1886,11 @@ the new record first, so the record is not changed if the dict is invalid or if 
 record of another type:</p>
 <div class="highlight"><pre><span></span><code><span class="n">record</span><span class="o">.</span><span class="n">load_dict</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
 </code></pre></div>
+<p>Loading only builds records and comparators: a dict whose <code>_target_</code> names another importable
+callable (for example <code>collections.OrderedDict</code>) raises <code>TypeError</code> before the callable is called.
+<code>BaseRecord.from_dict</code> accepts every record, and <code>MinScalarRecord.from_dict</code> only a <code>MinScalarRecord</code>
+(or a subclass). The module that <code>_target_</code> names is still imported, so do not load a dict from an
+untrusted source without checking <code>_target_</code> first.</p>
 <p>For <code>RecordManager</code>:</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Save entire manager</span>
 <span class="n">manager_state</span> <span class="o">=</span> <span class="n">manager</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()</span>

@@ -1213,6 +1213,17 @@ compatibility layer.</p>
 <li><code>minrecord.utils.value.MutableValue</code> is removed.</li>
 <li>An invalid <code>max_size</code> (not a positive <code>int</code>, or a <code>bool</code>) raises <code>ValueError</code>.</li>
 </ul>
+<p>Loading:</p>
+<ul>
+<li><code>BaseRecord.from_dict</code> returns <code>Self</code> and raises <code>TypeError</code> if <code>_target_</code> is missing or is not the
+  class (or a subclass of the class) that it is called on: <code>from_dict</code> does not call an arbitrary
+  importable function any more, and <code>MinScalarRecord.from_dict(Record("x").to_dict())</code> raises
+  instead of returning a <code>Record</code>. <code>load_dict</code> and the manager <code>load_state_dict</code> raise <code>TypeError</code>
+  for a dict that is not the dict of a record.</li>
+<li>The comparator dict of <code>ComparableRecord</code> must be the dict of a <code>BaseComparator</code>, otherwise
+  <code>TypeError</code> (it was <code>TypeError</code> for a missing <code>_target_</code>, with another message, and any callable
+  was accepted otherwise).</li>
+</ul>
 <h3 id="fixes">Fixes<a class="headerlink" href="#fixes" title="Permanent link">&para;</a></h3>
 <ul>
 <li><code>set_max_size</code> changes the maximum size of the records created after the call. The default was
@@ -1236,6 +1247,8 @@ compatibility layer.</p>
   <code>coola.equality.objects_are_equal</code>).</li>
 <li><code>reset_max_size</code> is exported at the root of the package.</li>
 <li><code>minrecord.utils.validation.check_max_size</code>.</li>
+<li><code>minrecord.utils.factory.instantiate(config, cls)</code>: builds an object from its dict if the
+  object named by <code>_target_</code> is <code>cls</code> or a subclass of <code>cls</code>.</li>
 <li><code>ComparableRecord</code> accepts the comparator as an object or as its dict.</li>
 </ul>
 <h3 id="documentation">Documentation<a class="headerlink" href="#documentation" title="Permanent link">&para;</a></h3>

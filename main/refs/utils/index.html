@@ -953,6 +953,34 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#minrecord.utils.factory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        factory
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="factory">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.utils.factory.instantiate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        instantiate
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#minrecord.utils.validation" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1059,6 +1087,34 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#minrecord.utils.factory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        factory
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="factory">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.utils.factory.instantiate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        instantiate
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#minrecord.utils.validation" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1141,6 +1197,196 @@
 
 
 
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-module">
+
+
+
+<h2 id="minrecord.utils.factory" class="doc doc-heading">
+            <span class="doc doc-object-name doc-module-name">minrecord.utils.factory</span>
+
+
+<a href="#minrecord.utils.factory" class="headerlink" title="Permanent link">&para;</a></h2>
+
+    <div class="doc doc-contents first">
+
+        <p>Contain a function to instantiate an object from a configuration of
+an expected type.</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="minrecord.utils.factory.instantiate" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">minrecord.utils.factory.instantiate</span>
+
+
+<a href="#minrecord.utils.factory.instantiate" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">instantiate</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><span title="typing.Any">Any</span></span><span class="p">],</span> <span class="bp">cls</span><span class="p">:</span> <span class="n"><span title="type">type</span></span><span class="p">[</span><span class="n"><span title="minrecord.utils.factory.T">T</span></span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n"><span title="minrecord.utils.factory.T">T</span></span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Instantiate an object from its configuration, if the object is
+of the expected type.</p>
+<p>The object named by <code>_target_</code> is imported and checked to be a
+subclass of <code>cls</code> <strong>before</strong> it is called, so a configuration
+cannot call any other importable function. The module of
+<code>_target_</code> is imported, so a configuration from an untrusted
+source can still run the top-level code of a module.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>config</code>
+            </td>
+            <td>
+                  <code><span title="dict">dict</span>[<span title="str">str</span>, <span title="typing.Any">Any</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The configuration of the object. It must have the key
+<code>_target_</code> and the arguments of the constructor, as the
+output of <code>to_dict</code>. It is not modified.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>cls</code>
+            </td>
+            <td>
+                  <code><span title="type">type</span>[<span title="minrecord.utils.factory.T">T</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The expected class of the object. The class named by
+<code>_target_</code> must be <code>cls</code> or a subclass of <code>cls</code>.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="minrecord.utils.factory.T">T</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The instantiated object.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="TypeError">TypeError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>if <code>config</code> is not a configuration of <code>cls</code>
+(the key <code>_target_</code> is missing, or it names an object
+that is not <code>cls</code> or a subclass of <code>cls</code>).</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="ImportError">ImportError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>if the object named by <code>_target_</code> cannot be
+imported.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<details class="example" open>
+  <summary>Example</summary>
+  <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">minrecord</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseRecord</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">minrecord.utils.factory</span><span class="w"> </span><span class="kn">import</span> <span class="n">instantiate</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span> <span class="o">=</span> <span class="n">instantiate</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="p">{</span><span class="s2">"_target_"</span><span class="p">:</span> <span class="s2">"minrecord.Record"</span><span class="p">,</span> <span class="s2">"name"</span><span class="p">:</span> <span class="s2">"loss"</span><span class="p">,</span> <span class="s2">"max_size"</span><span class="p">:</span> <span class="mi">5</span><span class="p">},</span> <span class="n">BaseRecord</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span>
+<span class="go">Record(name=loss, max_size=5, size=0)</span>
+</code></pre></div>
+</details>
+
+    </div>
+
+</div>
 
 
 

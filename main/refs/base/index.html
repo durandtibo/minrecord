@@ -1844,15 +1844,18 @@ trip.</p>
   </span>
 
 <a href="#minrecord.base.BaseRecord.from_dict" class="headerlink" title="Permanent link">&para;</a></h4>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">from_dict</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><span title="typing.Any">Any</span></span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n"><a class="autorefs autorefs-internal" title="minrecord.base.BaseRecord" href="#minrecord.base.BaseRecord">BaseRecord</a></span><span class="p">[</span><span class="n"><span title="minrecord.base.T">T</span></span><span class="p">]</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">from_dict</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><span title="typing.Any">Any</span></span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n"><span title="typing.Self">Self</span></span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
 
         <p>Instantiate a record from a dictionary.</p>
 <p>This method is equivalent to <code>coola.factory.factory(**data)</code>,
-so the constructor validates the arguments. The dictionary is
-not modified.</p>
+so the constructor validates the arguments, but the object
+named by <code>_target_</code> must be <code>cls</code> or a subclass of <code>cls</code>,
+and it is checked before it is called. <code>BaseRecord.from_dict</code>
+accepts every record, <code>MinScalarRecord.from_dict</code> only a
+<code>MinScalarRecord</code>. The dictionary is not modified.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1899,11 +1902,36 @@ output of <code>to_dict</code>.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><a class="autorefs autorefs-internal" title="minrecord.base.BaseRecord" href="#minrecord.base.BaseRecord">BaseRecord</a>[<span title="minrecord.base.T">T</span>]</code>
+                  <code><span title="typing.Self">Self</span></code>
             </td>
             <td>
               <div class="doc-md-description">
                 <p>The instantiated record.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="TypeError">TypeError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>if the dictionary is not the dictionary of a
+<code>cls</code> record (<code>_target_</code> is missing, or it is not
+<code>cls</code> or a subclass of <code>cls</code>).</p>
               </div>
             </td>
           </tr>
@@ -2388,7 +2416,7 @@ the record, otherwise <code>False</code>.</p>
 
         <p>Load a dictionary in the current record, in place.</p>
 <p>The new record is built first from the dictionary (with
-<code>from_dict</code>), so the record is not modified if the
+<code>BaseRecord.from_dict</code>), so the record is not modified if the
 dictionary is invalid.</p>
 
 
@@ -2441,7 +2469,8 @@ the same type.</p>
             <td>
               <div class="doc-md-description">
                 <p>if the dictionary is the dictionary of a
-record of another type.</p>
+record of another type, or if it is not the dictionary
+of a record.</p>
               </div>
             </td>
           </tr>

@@ -575,6 +575,28 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#serialization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Serialization
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#custom-comparator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Custom Comparator
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#record-manager" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1083,6 +1105,28 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#serialization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Serialization
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#custom-comparator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Custom Comparator
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#record-manager" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1310,6 +1354,37 @@ a <code>NotAComparableRecordError</code> exception.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">add_value</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">get_best_value</span><span class="p">()</span>
 <span class="go">42</span>
+</code></pre></div>
+<h2 id="serialization">Serialization<a class="headerlink" href="#serialization" title="Permanent link">&para;</a></h2>
+<p><code>to_dict</code> returns the arguments of the constructor, so a record can be saved (for example in a JSON
+file) and rebuilt with <code>BaseRecord.from_dict</code>. The best value is kept even if it is not in the
+recent values.</p>
+<div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">minrecord</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseRecord</span><span class="p">,</span> <span class="n">MinScalarRecord</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span> <span class="o">=</span> <span class="n">MinScalarRecord</span><span class="p">(</span><span class="s2">"loss"</span><span class="p">,</span> <span class="n">max_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">elements</span><span class="o">=</span><span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mf">6.0</span><span class="p">)])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new_record</span> <span class="o">=</span> <span class="n">BaseRecord</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new_record</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new_record</span><span class="o">.</span><span class="n">get_best_value</span><span class="p">()</span>
+<span class="go">1.0</span>
+</code></pre></div>
+<p><code>from_dict</code> only builds a record of the expected type: <code>MinScalarRecord.from_dict</code> raises
+a <code>TypeError</code> for the dict of another type of record. The <code>load_dict</code> method loads a dictionary in
+an existing record, in place.</p>
+<h2 id="custom-comparator">Custom Comparator<a class="headerlink" href="#custom-comparator" title="Permanent link">&para;</a></h2>
+<p>A <code>ComparableRecord</code> uses a comparator to find the best value. A comparator implements one method,
+<code>is_better</code>. A value that is equal to the best value must be better, so use <code>&gt;=</code> or <code>&lt;=</code> and not
+<code>&gt;</code> or <code>&lt;</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">minrecord</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseComparator</span><span class="p">,</span> <span class="n">ComparableRecord</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span><span class="w"> </span><span class="nc">AbsMinComparator</span><span class="p">(</span><span class="n">BaseComparator</span><span class="p">[</span><span class="nb">float</span><span class="p">]):</span>
+<span class="gp">... </span>    <span class="k">def</span><span class="w"> </span><span class="nf">is_better</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">new_value</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">old_value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="gp">... </span>        <span class="k">return</span> <span class="nb">abs</span><span class="p">(</span><span class="n">new_value</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">old_value</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span> <span class="o">=</span> <span class="n">ComparableRecord</span><span class="p">(</span><span class="s2">"error"</span><span class="p">,</span> <span class="n">AbsMinComparator</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">update</span><span class="p">([(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.0</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.5</span><span class="p">)])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">get_best_value</span><span class="p">()</span>
+<span class="go">2.0</span>
 </code></pre></div>
 <h2 id="record-manager">Record Manager<a class="headerlink" href="#record-manager" title="Permanent link">&para;</a></h2>
 <p>When working with multiple records, <code>RecordManager</code> provides a convenient way to organize and
