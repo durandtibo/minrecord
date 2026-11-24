@@ -113,7 +113,7 @@ Not guaranteed, and documented as such in `design.md` (the last two items are ne
    environment). The records store the values as given and the comparators compare what `<=` and
    `isnan` accept. Nothing in this review adds, tests or promises support for an array, a tensor
    or a NumPy scalar (JSON-serializable snapshots, detaching a tensor, `numpy.int64` as
-   `max_size`). The caller converts (`float(x)`, `x.item()`, `int(n)`): see D3 and D5.
+   `max_size`). The caller converts (`float(x)`, `x.item()`, `int(n)`): see D3.
 6. **Fast enough by construction.** `add_value` is not touched. The equality tester has the cost of
    today's `equal`: 1.36 ms against 1.35 ms for a window of 1,000 pairs, and 21.9 µs against 21.2 µs
    for the default window of 10 **[verified]**.
@@ -543,9 +543,6 @@ record would no longer be a record of "values as given". The user converts (`flo
 manager is a small group of records and `has_record`, `get_record`, `get_records` cover the use. A
 caller who needs to drop a record builds a new manager from `get_records()`. The mapping protocol
 would be a second way to spell `get_record`, and `__getitem__` would raise the same `KeyError`.
-
-**D5. Validate `max_size` for NumPy integers?** _Recommended: no._ `check_max_size` accepts `int`
-only (not `bool`, not `numpy.int64`); a user casts with `int(...)`, as before.
 
 Settled by the previous reviews and **not reopened**: the reflexivity contract also decides the
 first value; `update` is not all-or-nothing and says so; loading is type-checked and not
