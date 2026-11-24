@@ -86,9 +86,9 @@ Not guaranteed, and documented as such in `design.md` (the last two items are ne
 - **`==` and `hash` are the identity** (**new**). A record, a comparator and a manager have no
   `__eq__`: `MinScalarRecord("a") == MinScalarRecord("a")` is `False` **[verified]**. Use
   `coola.equality.objects_are_equal` (section 4.1).
-- **Values that are not numbers are the caller's responsibility.** A scalar record accepts any
-  value that its comparator can compare (`int`, `bool`, `Decimal`); it does not convert it to
-  `float`, so the snapshot of a NumPy scalar is not JSON-serializable (**D3**).
+- **The type of a value is the caller's responsibility.** A scalar record accepts any value that
+  its comparator can compare (`int`, `bool`, `Decimal`) and stores it as given: it does not convert
+  it to `float` (**D3**). Support for NumPy and PyTorch values is out of scope (section 2).
 
 ## 2. Constraints
 
@@ -109,11 +109,8 @@ Not guaranteed, and documented as such in `design.md` (the last two items are ne
    uses (`BaseEqualityTester`, the child-pair iterator, `AttributeName`) is in `2.0.0a5`
    **[verified]**.
 5. **NumPy and PyTorch compatibility is out of scope.** `minrecord` has no optional dependency and
-   never imports `numpy` or `torch` (not even in the tests: neither is installed in the project
-   environment). The records store the values as given and the comparators compare what `<=` and
-   `isnan` accept. Nothing in this review adds, tests or promises support for an array, a tensor
-   or a NumPy scalar (JSON-serializable snapshots, detaching a tensor, `numpy.int64` as
-   `max_size`). The caller converts (`float(x)`, `x.item()`, `int(n)`): see D3.
+   never imports `numpy` or `torch`. Nothing in this review adds, tests or promises support for
+   them: the records store the values as given, and the caller converts what it adds.
 6. **Fast enough by construction.** `add_value` is not touched. The equality tester has the cost of
    today's `equal`: 1.36 ms against 1.35 ms for a window of 1,000 pairs, and 21.9 µs against 21.2 µs
    for the default window of 10 **[verified]**.
@@ -532,12 +529,11 @@ per call (an estimated 40 ns on 58 ns), and the label use (`"epoch1"`) that the 
 would break for no bug that anyone reported. The type is `float | None`, so a type checker already
 rejects what the documentation calls a non-number. F4 is a documentation fix.
 
-**D3. Convert the values of a scalar record with `float(value)`?** _Recommended: no._ It would
-reject `None` and `"x"` (they are already rejected by the comparator), make a NumPy scalar or a
-0-d tensor JSON-serializable, and detach a tensor from its graph. But `get_best_value()` of the
-`index.md` example would return `46.0` and not `46`, a `Decimal` would lose its precision, and the
-record would no longer be a record of "values as given". The user converts (`float(loss)`,
-`loss.item()`), as the PyTorch example of the usage guide does.
+**D3. Convert the values of a scalar record with `float(value)`?** _Recommended: no._ The
+comparator already rejects `None` and `"x"`, so a conversion would add nothing to the validation.
+It would also change what the record returns: `get_best_value()` of the `index.md` example would
+return `46.0` and not `46`, a `Decimal` would lose its precision, and the record would no longer
+be a record of "values as given". The caller converts what it adds.
 
 **D4. Add `remove_record`, `__contains__` or `__getitem__` to the manager?** _Recommended: no._ The
 manager is a small group of records and `has_record`, `get_record`, `get_records` cover the use. A
