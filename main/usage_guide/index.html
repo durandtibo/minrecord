@@ -1671,11 +1671,11 @@ with comparison logic:</p>
 </tr>
 <tr>
 <td>Ties improve</td>
-<td>A value equal to the best value counts as an improvement. It is useful when a metric plateaus at its optimum.</td>
+<td>A value equal to the best value counts as an improvement. It is useful when a metric plateaus at its optimum. The comparison is reflexive: <code>is_better(new_value=x, old_value=x)</code> is <code>True</code> for all <code>x</code>, NaN included.</td>
 </tr>
 <tr>
 <td>NaN never wins</td>
-<td>A NaN value is never better than another value. A NaN best value is replaced by the first number.</td>
+<td>A NaN value is never better than a number. A NaN best value is replaced by any value (a number, or another NaN as a tie).</td>
 </tr>
 <tr>
 <td>One snapshot</td>
@@ -1683,7 +1683,7 @@ with comparison logic:</p>
 </tr>
 <tr>
 <td>Round trip</td>
-<td><code>BaseRecord.from_dict(r.to_dict()).equal(r)</code>, <code>r.clone().equal(r)</code>, and <code>r.load_dict(r2.to_dict())</code> makes <code>r</code> equal to <code>r2</code>. A clone is independent: adding values to it does not change <code>r</code>.</td>
+<td><code>BaseRecord.from_dict(r.to_dict()).equal(r)</code>, <code>r.clone().equal(r)</code>, and <code>r.load_dict(r2.to_dict())</code> makes <code>r</code> equal to <code>r2</code>, also after a JSON round trip and when <code>r</code> holds a NaN (<code>equal</code> treats NaN as equal to NaN). The clone has the same <code>has_improved()</code> and the same best pair. A clone is independent: adding values to it does not change <code>r</code>.</td>
 </tr>
 <tr>
 <td>Atomic</td>
@@ -1787,7 +1787,10 @@ with comparison logic:</p>
 <span class="n">record</span><span class="o">.</span><span class="n">add_value</span><span class="p">((</span><span class="n">precision</span><span class="p">,</span> <span class="n">recall</span><span class="p">))</span>
 </code></pre></div>
 <p>A comparator only implements <code>is_better</code>. The first value of a record is the best value, so the
-comparator does not need an initial value. If the comparator has some arguments, override <code>to_dict</code>
+comparator does not need an initial value. The comparison must be reflexive:
+<code>is_better(new_value=x, old_value=x)</code> returns <code>True</code> for every <code>x</code> (a plateau is an improvement), as
+a record that is rebuilt from <code>to_dict</code> replays its last value against a best value that is that
+value. Use <code>&gt;=</code> or <code>&lt;=</code>, not <code>&gt;</code> or <code>&lt;</code>. If the comparator has some arguments, override <code>to_dict</code>
 so the record can be saved and loaded: <code>{**super().to_dict(), "tolerance": self._tolerance}</code>.</p>
 <h2 id="performance-considerations">Performance Considerations<a class="headerlink" href="#performance-considerations" title="Permanent link">&para;</a></h2>
 <h3 id="memory-usage">Memory Usage<a class="headerlink" href="#memory-usage" title="Permanent link">&para;</a></h3>

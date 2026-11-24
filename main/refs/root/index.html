@@ -2115,6 +2115,9 @@
 <code>is_better</code> method. A comparator that has some arguments needs to
 override <code>to_dict</code> too, so the comparator can be re-created and
 compared.</p>
+<p>The comparison must be reflexive: <code>is_better(new_value=x,
+old_value=x)</code> returns <code>True</code> for every value <code>x</code>. A record
+relies on it to rebuild itself from <code>to_dict</code>.</p>
 
 
 <details class="example" open>
@@ -2252,7 +2255,10 @@ same <code>to_dict</code> output.</p>
 
         <p>Indicate if the new value is better than the old value.</p>
 <p>A new value that is equal to the old value is better, so a
-record counts a plateau as an improvement.</p>
+record counts a plateau as an improvement. This rule is a
+contract: <code>is_better(new_value=x, old_value=x)</code> returns
+<code>True</code> for every value <code>x</code>, because <code>BaseRecord.from_dict</code>
+replays the last value against a best value that is that value.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2669,7 +2675,9 @@ the original record. The values are shared, not copied.</p>
 
         <p>Indicate if two records are equal or not.</p>
 <p>Two records are equal if they have the same type and the same
-<code>to_dict</code> output.</p>
+<code>to_dict</code> output. A NaN value is equal to a NaN value, so a
+record that holds a NaN is equal to its copy after a JSON round
+trip.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -3753,8 +3761,8 @@ recent values. <code>None</code> means there is no value yet.</p>
 
         <p>Implement a max comparator for scalar value.</p>
 <p>This comparator can be used to find the maximum value between two
-scalar values. A NaN value is never better than another value, and
-a NaN old value is replaced by any number.</p>
+scalar values. A NaN value is never better than a number, and a NaN
+old value is replaced by any value (a number, or a NaN as a tie).</p>
 
 
 <details class="example" open>
@@ -3766,6 +3774,8 @@ a NaN old value is replaced by any number.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">comparator</span><span class="o">.</span><span class="n">is_better</span><span class="p">(</span><span class="n">old_value</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">new_value</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="s2">"nan"</span><span class="p">))</span>
 <span class="go">False</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">comparator</span><span class="o">.</span><span class="n">is_better</span><span class="p">(</span><span class="n">old_value</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="s2">"nan"</span><span class="p">),</span> <span class="n">new_value</span><span class="o">=</span><span class="mf">0.4</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">comparator</span><span class="o">.</span><span class="n">is_better</span><span class="p">(</span><span class="n">old_value</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="s2">"nan"</span><span class="p">),</span> <span class="n">new_value</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="s2">"nan"</span><span class="p">))</span>
 <span class="go">True</span>
 </code></pre></div>
 </details>
@@ -3994,8 +4004,8 @@ are added. <code>None</code> means there is no value yet.</p>
 
         <p>Implementation of a min comparator for scalar value.</p>
 <p>This comparator can be used to find the minimum value between two
-scalar values. A NaN value is never better than another value, and
-a NaN old value is replaced by any number.</p>
+scalar values. A NaN value is never better than a number, and a NaN
+old value is replaced by any value (a number, or a NaN as a tie).</p>
 
 
 <details class="example" open>
@@ -4007,6 +4017,8 @@ a NaN old value is replaced by any number.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">comparator</span><span class="o">.</span><span class="n">is_better</span><span class="p">(</span><span class="n">old_value</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">new_value</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="s2">"nan"</span><span class="p">))</span>
 <span class="go">False</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">comparator</span><span class="o">.</span><span class="n">is_better</span><span class="p">(</span><span class="n">old_value</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="s2">"nan"</span><span class="p">),</span> <span class="n">new_value</span><span class="o">=</span><span class="mf">0.4</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">comparator</span><span class="o">.</span><span class="n">is_better</span><span class="p">(</span><span class="n">old_value</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="s2">"nan"</span><span class="p">),</span> <span class="n">new_value</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="s2">"nan"</span><span class="p">))</span>
 <span class="go">True</span>
 </code></pre></div>
 </details>
@@ -4664,7 +4676,8 @@ key and <code>exist_ok=False</code>.</p>
 
         <p>Indicate if two managers are equal or not.</p>
 <p>Two managers are equal if they have the same type and the same
-records (same keys and equal records).</p>
+records (same keys and equal records). A NaN value is equal to
+a NaN value, as for <code>BaseRecord.equal</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>

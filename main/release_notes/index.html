@@ -1186,14 +1186,19 @@ compatibility layer.</p>
   <code>get_best_value</code> and <code>has_improved</code> are concrete, and the hooks <code>_get_best_value</code> and
   <code>_has_improved</code> are removed. A custom record writes fewer methods.</li>
 <li><code>equal</code> requires the same type.</li>
+<li><code>equal</code> of the records and of the manager treats NaN as equal to NaN, so a record that holds a NaN
+  is equal to its copy after a JSON round trip.</li>
 </ul>
 <p>Comparators:</p>
 <ul>
 <li><code>BaseComparator</code> has one abstract method, <code>is_better(*, new_value, old_value)</code>, which is
   keyword-only. <code>get_initial_best_value</code> is removed: the first value of a record is the best value.
   <code>to_dict</code> and <code>equal</code> are concrete, a comparator with arguments overrides <code>to_dict</code>.</li>
-<li>A NaN value is never better than another value, and a NaN best value is replaced by the first
-  number.</li>
+<li>A NaN value is never better than a number, and a NaN best value is replaced by any value (a
+  number, or another NaN as a tie). The comparison is reflexive: <code>is_better(new_value=x,
+  old_value=x)</code> is <code>True</code> for every <code>x</code>, NaN included. <strong>A custom comparator that is strict (<code>&gt;</code>
+  or <code>&lt;</code>) breaks this contract</strong>: a record rebuilt from <code>to_dict</code> or <code>clone</code> would report a wrong
+  <code>has_improved()</code>. Use <code>&gt;=</code> or <code>&lt;=</code>.</li>
 </ul>
 <p>Manager and functions:</p>
 <ul>
@@ -1221,6 +1226,9 @@ compatibility layer.</p>
   comparator can be written to JSON.</li>
 <li>A comparator that raises in <code>add_value</code> leaves the record unchanged.</li>
 <li><code>RecordManager.load_state_dict</code> does not change the manager if an entry is invalid.</li>
+<li><code>has_improved()</code> of a record that is rebuilt (<code>from_dict</code>, <code>clone</code>) is the one of the original,
+  also when its first value is NaN. A NaN equal to the best NaN is a tie.</li>
+<li>A record that holds a NaN is equal to its JSON round trip.</li>
 </ul>
 <h3 id="new">New<a class="headerlink" href="#new" title="Permanent link">&para;</a></h3>
 <ul>

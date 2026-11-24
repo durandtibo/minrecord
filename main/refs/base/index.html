@@ -1756,7 +1756,9 @@ the original record. The values are shared, not copied.</p>
 
         <p>Indicate if two records are equal or not.</p>
 <p>Two records are equal if they have the same type and the same
-<code>to_dict</code> output.</p>
+<code>to_dict</code> output. A NaN value is equal to a NaN value, so a
+record that holds a NaN is equal to its copy after a JSON round
+trip.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
