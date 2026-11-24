@@ -2214,7 +2214,8 @@ the old value should be better, so a plateau counts as an improvement:</p>
     <span class="p">)</span>
 </code></pre></div>
 <h3 id="does-minrecord-work-with-pytorch-lightning">Does minrecord work with PyTorch Lightning?<a class="headerlink" href="#does-minrecord-work-with-pytorch-lightning" title="Permanent link">&para;</a></h3>
-<p>Yes! Use records in your LightningModule:</p>
+<p>Yes! Use records in your LightningModule (PyTorch Lightning 2.x). Log the validation loss with
+<code>self.log</code> in <code>validation_step</code>, then read it in <code>on_validation_epoch_end</code>:</p>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">pytorch_lightning</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pl</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">minrecord</span><span class="w"> </span><span class="kn">import</span> <span class="n">MinScalarRecord</span>
 
@@ -2224,12 +2225,12 @@ the old value should be better, so a plateau counts as an improvement:</p>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">val_loss</span> <span class="o">=</span> <span class="n">MinScalarRecord</span><span class="p">(</span><span class="s2">"val_loss"</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">validation_epoch_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outputs</span><span class="p">):</span>
-        <span class="n">avg_loss</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">x</span><span class="p">[</span><span class="s2">"loss"</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">outputs</span><span class="p">])</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">val_loss</span><span class="o">.</span><span class="n">add_value</span><span class="p">(</span><span class="n">avg_loss</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span> <span class="n">step</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">current_epoch</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">on_validation_epoch_end</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">callback_metrics</span><span class="p">[</span><span class="s2">"val_loss"</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">val_loss</span><span class="o">.</span><span class="n">add_value</span><span class="p">(</span><span class="n">loss</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">current_epoch</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">val_loss</span><span class="o">.</span><span class="n">has_improved</span><span class="p">():</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">save_checkpoint</span><span class="p">(</span><span class="s2">"best_model.ckpt"</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">save_checkpoint</span><span class="p">(</span><span class="s2">"best_model.ckpt"</span><span class="p">)</span>
 </code></pre></div>
 <h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
 <h3 id="values-seem-incorrect-after-loading-state">Values seem incorrect after loading state<a class="headerlink" href="#values-seem-incorrect-after-loading-state" title="Permanent link">&para;</a></h3>
