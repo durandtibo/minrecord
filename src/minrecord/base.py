@@ -13,16 +13,8 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
 from coola.equality.tester import EqualEqualityTester, get_default_registry
+from coola.factory import OBJECT_TARGET, factory
 from coola.utils.introspection import get_qualified_class_name
-
-from minrecord.utils.imports import check_objectory, is_objectory_available
-
-if TYPE_CHECKING or not is_objectory_available():  # pragma: no cover
-    # The type checkers only see the fallback, so the metaclass of ``BaseRecord`` is not a union.
-    from minrecord.utils.fallback.objectory import OBJECT_TARGET, AbstractFactory
-else:
-    from objectory import OBJECT_TARGET, AbstractFactory
-
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -33,7 +25,7 @@ T = TypeVar("T")
 logger: logging.Logger = logging.getLogger(__name__)
 
 
-class BaseRecord(ABC, Generic[T], metaclass=AbstractFactory):
+class BaseRecord(ABC, Generic[T]):
     r"""Define the base class to implement a record.
 
     The record tracks the value added as well as the step
@@ -351,7 +343,7 @@ class BaseRecord(ABC, Generic[T], metaclass=AbstractFactory):
 
         The config dictionary should contain all the values necessary
         to instantiate a record with the same parameters
-        with the  ``factory`` method. It is expected to contain values
+        with ``coola.factory.factory``. It is expected to contain values
         like the full name of the class and the arguments of the
         constructor. This dictionary should not contain the state
         values. It is possible to get the state values with the
@@ -362,9 +354,10 @@ class BaseRecord(ABC, Generic[T], metaclass=AbstractFactory):
 
         Example:
             ```pycon
-            >>> from minrecord import BaseRecord, Record
+            >>> from coola.factory import factory
+            >>> from minrecord import Record
             >>> config = Record("loss").config_dict()
-            >>> record = BaseRecord.factory(**config)  # Note that the state is not copied.
+            >>> record = factory(**config)  # Note that the state is not copied.
             >>> record
             Record(name=loss, max_size=10, size=0)
 
@@ -426,7 +419,7 @@ class BaseRecord(ABC, Generic[T], metaclass=AbstractFactory):
         Example:
             ```pycon
             >>> from minrecord import BaseRecord
-            >>> from objectory import OBJECT_TARGET
+            >>> from coola.factory import OBJECT_TARGET
             >>> record = BaseRecord.from_dict(
             ...     {
             ...         "config": {
@@ -442,8 +435,7 @@ class BaseRecord(ABC, Generic[T], metaclass=AbstractFactory):
 
             ```
         """
-        check_objectory()
-        obj = cls.factory(**data["config"])
+        obj = factory(**data["config"])
         obj.load_state_dict(data["state"])
         return obj
 

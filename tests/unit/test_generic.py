@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import pytest
 from coola.equality import objects_are_equal
+from coola.factory import OBJECT_TARGET, factory
 
 from minrecord import (
     BaseRecord,
@@ -10,13 +11,6 @@ from minrecord import (
     NotAComparableRecordError,
     Record,
 )
-from minrecord.testing import objectory_available, objectory_not_available
-from minrecord.utils.imports import is_objectory_available
-
-if is_objectory_available():
-    from objectory import OBJECT_TARGET
-else:  # pragma: no cover
-    from minrecord.utils.fallback.objectory import OBJECT_TARGET
 
 ############################
 #     Tests for Record     #
@@ -200,9 +194,8 @@ def test_record_config_dict() -> None:
     }
 
 
-@objectory_available
 def test_record_config_dict_create_new_record() -> None:
-    assert BaseRecord.factory(**Record("loss", max_size=5, elements=[(0, 1)]).config_dict()).equal(
+    assert factory(**Record("loss", max_size=5, elements=[(0, 1)]).config_dict()).equal(
         Record("loss", max_size=5)
     )
 
@@ -257,7 +250,6 @@ def test_record_to_dict_empty() -> None:
     )
 
 
-@objectory_available
 def test_record_from_dict() -> None:
     assert BaseRecord.from_dict(
         {
@@ -267,7 +259,6 @@ def test_record_from_dict() -> None:
     ).equal(Record("loss", max_size=7, elements=((0, 1), (1, 5))))
 
 
-@objectory_available
 def test_record_from_dict_empty() -> None:
     assert BaseRecord.from_dict(
         {
@@ -275,14 +266,3 @@ def test_record_from_dict_empty() -> None:
             "state": {"record": ()},
         }
     ).equal(Record("loss"))
-
-
-@objectory_not_available
-def test_record_from_dict_objectory_missing() -> None:
-    with pytest.raises(RuntimeError, match=r"'objectory' package is required but not installed."):
-        BaseRecord.from_dict(
-            {
-                "config": {OBJECT_TARGET: "minrecord.Record", "name": "loss", "max_size": 7},
-                "state": {"record": ((0, 1), (1, 5))},
-            }
-        )
