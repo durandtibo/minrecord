@@ -33,7 +33,8 @@ def _check_pair(best: Any) -> tuple[Any, Any]:
         The pair as a tuple.
 
     Raises:
-        ValueError: if ``best`` is not a pair ``(step, value)``.
+        ValueError: if ``best`` is not a ``tuple`` or a ``list`` of
+            length 2.
 
     Example:
         ```pycon
@@ -43,12 +44,10 @@ def _check_pair(best: Any) -> tuple[Any, Any]:
 
         ```
     """
-    try:
-        step, value = best
-    except (TypeError, ValueError):
+    if not isinstance(best, (tuple, list)) or len(best) != 2:
         msg = f"best must be a pair (step, value), got {best!r}"
-        raise ValueError(msg) from None
-    return (step, value)
+        raise ValueError(msg)
+    return (best[0], best[1])
 
 
 class ComparableRecord(Record[T]):

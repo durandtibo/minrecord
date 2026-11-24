@@ -358,3 +358,17 @@ def test_contract_comparable_record_rejects_value_that_cannot_be_compared(
     with pytest.raises(TypeError, match=r"NoneType"):
         record.add_value(value, step=0)
     assert record.is_empty()
+
+
+@pytest.mark.parametrize(
+    ("comparator", "expected"),
+    [
+        (MaxScalarComparator(), "MaxScalarComparator()"),
+        (MinScalarComparator(), "MinScalarComparator()"),
+        (ToleranceComparator(0.1), "ToleranceComparator(tolerance=0.1)"),
+    ],
+)
+def test_contract_comparator_repr_is_stable(
+    comparator: BaseComparator[float], expected: str
+) -> None:
+    assert repr(comparator) == expected

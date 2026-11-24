@@ -38,6 +38,13 @@ Records:
   (`TypeError` or `OverflowError`, from the comparator) and the record stays empty. It was stored
   and became the best value, and every later `add_value` raised. A comparator that is not reflexive
   (`>` instead of `>=`) now gives `has_improved() is False` for the first value.
+- `clone`, `equal`, `update`, `from_dict` and `load_dict` of `BaseRecord` are `@final`: a type
+  checker rejects a subclass that overrides one.
+- `best` must be a `tuple` or a `list` of length 2. A `set` or a `str` of two items was accepted as a
+  pair and now raises `ValueError`.
+- `BaseComparator.equal` treats NaN as equal to NaN, as the records do.
+- `BaseComparator` has a `repr` built from `to_dict` (`ToleranceComparator(tolerance=0.1)`), so
+  `str(record)` no longer contains a memory address.
 - `equal` requires the same type.
 - `equal` of the records and of the manager treats NaN as equal to NaN, so a record that holds a NaN
   is equal to its copy after a JSON round trip.

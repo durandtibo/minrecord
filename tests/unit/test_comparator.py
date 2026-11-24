@@ -60,6 +60,26 @@ def test_base_comparator_equal_false_different_argument() -> None:
     assert not ToleranceComparator(0.5).equal(ToleranceComparator(0.1))
 
 
+def test_base_comparator_equal_true_with_nan_argument() -> None:
+    assert ToleranceComparator(NAN).equal(ToleranceComparator(NAN))
+
+
+def test_base_comparator_equal_false_nan_and_number_argument() -> None:
+    assert not ToleranceComparator(NAN).equal(ToleranceComparator(0.5))
+
+
+def test_base_comparator_repr_without_argument() -> None:
+    assert repr(MinScalarComparator()) == "MinScalarComparator()"
+
+
+def test_base_comparator_repr_with_argument() -> None:
+    assert repr(ToleranceComparator(0.1)) == "ToleranceComparator(tolerance=0.1)"
+
+
+def test_base_comparator_repr_is_stable() -> None:
+    assert repr(MaxScalarComparator()) == repr(MaxScalarComparator())
+
+
 def test_base_comparator_is_better_positional_arguments() -> None:
     comparator: Any = MaxScalarComparator()
     with pytest.raises(TypeError, match=r"takes 1 positional argument but 3 were given"):

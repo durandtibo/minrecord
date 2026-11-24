@@ -76,7 +76,16 @@ def test_comparable_record_repr() -> None:
 
 
 def test_comparable_record_str() -> None:
-    assert str(create_max_record()).startswith("ComparableRecord(")
+    assert str(create_max_record()) == (
+        "ComparableRecord(\n"
+        "  (name): accuracy\n"
+        "  (max_size): 10\n"
+        "  (comparator): MaxScalarComparator()\n"
+        "  (best): None\n"
+        "  (improved): False\n"
+        "  (record): ()\n"
+        ")"
+    )
 
 
 @pytest.mark.parametrize("name", ["name", "accuracy", ""])
@@ -965,7 +974,9 @@ def test_check_pair_step_none() -> None:
     assert _check_pair((None, 0.0)) == (None, 0.0)
 
 
-@pytest.mark.parametrize("best", [(), (1,), (1, 2, 3), 5, None, 1.5])
+@pytest.mark.parametrize(
+    "best", [(), (1,), (1, 2, 3), [1], [1, 2, 3], {1, 2}, "ab", {"a": 1, "b": 2}, 5, None, 1.5]
+)
 def test_check_pair_invalid_raises(best: Any) -> None:
     with pytest.raises(ValueError, match=r"best must be a pair \(step, value\), got"):
         _check_pair(best)

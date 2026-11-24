@@ -9,7 +9,7 @@ __all__ = [
 ]
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any, Generic, Self, TypeVar
+from typing import TYPE_CHECKING, Any, Generic, Self, TypeVar, final
 
 from coola.equality import objects_are_equal
 from coola.equality.tester import EqualEqualityTester, get_default_registry
@@ -46,9 +46,9 @@ class BaseRecord(ABC, Generic[T]):
         - ``is_empty``
         - ``to_dict``
 
-    The other methods are derived from them and must not be overridden
-    (``clone``, ``equal``, ``update``, ``from_dict`` and ``load_dict``),
-    except by a comparable record that overrides ``is_comparable``,
+    The other methods are derived from them. ``clone``, ``equal``,
+    ``update``, ``from_dict`` and ``load_dict`` are ``@final``, so a
+    type checker rejects an override. A comparable record overrides that overrides ``is_comparable``,
     ``get_best_value``, ``get_best_step`` and ``has_improved``.
 
     The contract of a record is:
@@ -193,6 +193,7 @@ class BaseRecord(ABC, Generic[T]):
             ```
         """
 
+    @final
     def clone(self) -> Self:
         r"""Clone the current record.
 
@@ -216,6 +217,7 @@ class BaseRecord(ABC, Generic[T]):
         del kwargs[OBJECT_TARGET]
         return type(self)(**kwargs)
 
+    @final
     def equal(self, other: Any) -> bool:
         r"""Indicate if two records are equal or not.
 
@@ -373,6 +375,7 @@ class BaseRecord(ABC, Generic[T]):
         """
         return False
 
+    @final
     def update(self, elements: Iterable[tuple[float | None, T]]) -> None:
         r"""Update the record by adding the elements.
 
@@ -401,6 +404,7 @@ class BaseRecord(ABC, Generic[T]):
         for step, value in elements:
             self.add_value(value, step)
 
+    @final
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> Self:
         r"""Instantiate a record from a dictionary.
@@ -444,6 +448,7 @@ class BaseRecord(ABC, Generic[T]):
         """
         return instantiate(data, cls)
 
+    @final
     def load_dict(self, data: dict[str, Any]) -> None:
         r"""Load a dictionary in the current record, in place.
 
