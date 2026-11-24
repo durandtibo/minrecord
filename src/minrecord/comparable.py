@@ -6,7 +6,6 @@ __all__ = ["ComparableRecord", "MaxScalarRecord", "MinScalarRecord"]
 
 from typing import TYPE_CHECKING, Any, TypeVar
 
-from coola.factory import factory
 from coola.formatting.structure import str_indent, str_mapping
 
 from minrecord.base import EmptyRecordError
@@ -16,6 +15,7 @@ from minrecord.comparator import (
     MinScalarComparator,
 )
 from minrecord.generic import Record
+from minrecord.utils.factory import instantiate
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -49,6 +49,9 @@ class ComparableRecord(Record[T]):
             recent values. ``None`` means there is no value yet.
 
     Raises:
+        TypeError: if ``comparator`` is a dictionary that is not the
+            dictionary of a comparator (``_target_`` is missing, or it
+            is not a ``BaseComparator``).
         ValueError: if ``max_size`` is not a positive integer.
 
     Example:
@@ -78,7 +81,9 @@ class ComparableRecord(Record[T]):
         best: tuple[float | None, T] | None = None,
     ) -> None:
         self._comparator: BaseComparator[T] = (
-            comparator if isinstance(comparator, BaseComparator) else factory(**comparator)
+            comparator
+            if isinstance(comparator, BaseComparator)
+            else instantiate(comparator, BaseComparator)
         )
         self._best: tuple[float | None, T] | None = None if best is None else (best[0], best[1])
         self._improved = False

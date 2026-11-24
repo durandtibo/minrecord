@@ -272,6 +272,50 @@ The `elements` argument of the constructor adds the values with `add_value`, so 
 
 ```
 
+## Serialization
+
+`to_dict` returns the arguments of the constructor, so a record can be saved (for example in a JSON
+file) and rebuilt with `BaseRecord.from_dict`. The best value is kept even if it is not in the
+recent values.
+
+```pycon
+
+>>> import json
+>>> from minrecord import BaseRecord, MinScalarRecord
+>>> record = MinScalarRecord("loss", max_size=2, elements=[(0, 1.0), (1, 5.0), (2, 6.0)])
+>>> data = json.loads(json.dumps(record.to_dict()))
+>>> new_record = BaseRecord.from_dict(data)
+>>> new_record.equal(record)
+True
+>>> new_record.get_best_value()
+1.0
+
+```
+
+`from_dict` only builds a record of the expected type: `MinScalarRecord.from_dict` raises
+a `TypeError` for the dict of another type of record. The `load_dict` method loads a dictionary in
+an existing record, in place.
+
+## Custom Comparator
+
+A `ComparableRecord` uses a comparator to find the best value. A comparator implements one method,
+`is_better`. A value that is equal to the best value must be better, so use `>=` or `<=` and not
+`>` or `<`.
+
+```pycon
+
+>>> from minrecord import BaseComparator, ComparableRecord
+>>> class AbsMinComparator(BaseComparator[float]):
+...     def is_better(self, *, new_value: float, old_value: float) -> bool:
+...         return abs(new_value) <= abs(old_value)
+...
+>>> record = ComparableRecord("error", AbsMinComparator())
+>>> record.update([(0, -3.0), (1, 2.0), (2, -2.5)])
+>>> record.get_best_value()
+2.0
+
+```
+
 ## Record Manager
 
 When working with multiple records, `RecordManager` provides a convenient way to organize and

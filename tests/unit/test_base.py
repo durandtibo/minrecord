@@ -173,6 +173,34 @@ def test_base_record_from_dict_invalid() -> None:
         BaseRecord.from_dict({OBJECT_TARGET: "minrecord.Record", "name": "loss", "max_size": 0})
 
 
+def test_base_record_from_dict_other_callable_raises() -> None:
+    with pytest.raises(TypeError, match=r"The configuration 'collections.OrderedDict' is not"):
+        BaseRecord.from_dict({OBJECT_TARGET: "collections.OrderedDict", "a": 1})
+
+
+def test_base_record_from_dict_missing_target_raises() -> None:
+    with pytest.raises(TypeError, match=r"The configuration None is not a configuration of"):
+        BaseRecord.from_dict({"name": "loss"})
+
+
+def test_base_record_from_dict_subclass_accepts_subclass_dict() -> None:
+    assert type(Record.from_dict(MinScalarRecord("loss").to_dict())) is MinScalarRecord
+
+
+def test_base_record_from_dict_subclass_returns_that_class() -> None:
+    assert type(MinScalarRecord.from_dict(MinScalarRecord("loss").to_dict())) is MinScalarRecord
+
+
+def test_base_record_from_dict_subclass_rejects_base_dict() -> None:
+    with pytest.raises(TypeError, match=r"is not a configuration of MinScalarRecord"):
+        MinScalarRecord.from_dict(Record("x").to_dict())
+
+
+@pytest.mark.parametrize("record", [Record("loss"), MinScalarRecord("loss", elements=[(0, 1.0)])])
+def test_base_record_from_dict_returns_the_class_of_the_dict(record: BaseRecord[Any]) -> None:
+    assert type(BaseRecord.from_dict(record.to_dict())) is type(record)
+
+
 # --- load_dict ---
 
 
@@ -204,6 +232,13 @@ def test_base_record_load_dict_invalid_leaves_record_unchanged() -> None:
     record = Record("loss", elements=[(0, 7)])
     with pytest.raises(ValueError, match=r"max_size must be a positive integer, got 0"):
         record.load_dict({OBJECT_TARGET: "minrecord.Record", "name": "loss", "max_size": 0})
+    assert record.equal(Record("loss", elements=[(0, 7)]))
+
+
+def test_base_record_load_dict_not_a_record_leaves_record_unchanged() -> None:
+    record = Record("loss", elements=[(0, 7)])
+    with pytest.raises(TypeError, match=r"The configuration 'collections.OrderedDict' is not"):
+        record.load_dict({OBJECT_TARGET: "collections.OrderedDict"})
     assert record.equal(Record("loss", elements=[(0, 7)]))
 
 
