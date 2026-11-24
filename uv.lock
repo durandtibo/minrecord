@@ -2,7 +2,8 @@ version = 1
 revision = 5
 requires-python = ">=3.11"
 resolution-markers = [
-    "python_full_version >= '3.11.5'",
+    "python_full_version >= '3.14'",
+    "python_full_version >= '3.11.5' and python_full_version < '3.14'",
     "python_full_version < '3.11.5'",
 ]
 
@@ -841,7 +842,7 @@ dev = [
     { name = "coverage" },
     { name = "docformatter" },
     { name = "feu", extra = ["all"] },
-    { name = "import-linter" },
+    { name = "import-linter", marker = "python_full_version >= '3.14'" },
     { name = "invoke" },
     { name = "invoke-tasklib" },
     { name = "pre-commit" },
@@ -870,7 +871,7 @@ dev = [
     { name = "coverage", extras = ["toml"], specifier = ">=7.17.4,<8.0" },
     { name = "docformatter", specifier = ">=1.7.8,<2.0" },
     { name = "feu", extras = ["all"], specifier = ">=0.8.4,<1.0" },
-    { name = "import-linter", specifier = ">=2.0,<3.0" },
+    { name = "import-linter", marker = "python_full_version >= '3.14'", specifier = ">=2.0,<3.0" },
     { name = "invoke", specifier = ">=3.0,<4.0" },
     { name = "invoke-tasklib", specifier = ">=0.1.0a0,<1.0" },
     { name = "pre-commit", specifier = ">=4.7,<5.0" },
@@ -1124,7 +1125,8 @@ name = "pymdown-extensions"
 version = "13.1.2"
 source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
-    "python_full_version >= '3.11.5'",
+    "python_full_version >= '3.14'",
+    "python_full_version >= '3.11.5' and python_full_version < '3.14'",
 ]
 dependencies = [
     { name = "markdown" },
