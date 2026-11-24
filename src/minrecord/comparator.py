@@ -102,7 +102,10 @@ class BaseComparator(ABC, Generic[T]):
         r"""Indicate if two comparators are equal or not.
 
         Two comparators are equal if they have the same type and the
-        same ``to_dict`` output. A NaN value is equal to a NaN value.
+        same ``to_dict`` output: the equality of a comparator is the
+        equality of its snapshot. A NaN value is equal to a NaN value,
+        also when ``objects_are_equal`` is called with
+        ``equal_nan=False``.
 
         Args:
             other: The other object to compare with.

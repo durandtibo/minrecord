@@ -619,3 +619,9 @@ def test_record_manager_load_state_dict_not_a_dict_entry_leaves_manager_unchange
     with pytest.raises(TypeError, match=r"Expected the configuration of a BaseRecord \(a dict\)"):
         manager.load_state_dict({"loss": None})
     assert manager.equal(create_manager_with_values())
+
+
+def test_record_manager_objects_are_equal_nan_ignores_equal_nan() -> None:
+    manager1 = RecordManager({"loss": Record("loss", elements=[(0, NAN)])})
+    manager2 = RecordManager({"loss": Record("loss", elements=[(0, NAN)])})
+    assert objects_are_equal(manager1, manager2, equal_nan=False)

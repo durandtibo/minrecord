@@ -43,6 +43,9 @@ Records:
 - `best` must be a `tuple` or a `list` of length 2. A `set` or a `str` of two items was accepted as a
   pair and now raises `ValueError`.
 - `BaseComparator.equal` treats NaN as equal to NaN, as the records do.
+- The equality of the records, the comparators and the managers is the equality of their snapshot
+  (`to_dict`, `state_dict`). A NaN is equal to a NaN also with `objects_are_equal(...,
+  equal_nan=False)`: this is the one deliberate difference with `coola`, and it is documented.
 - `BaseComparator` has a `repr` built from `to_dict` (`ToleranceComparator(tolerance=0.1)`), so
   `str(record)` no longer contains a memory address.
 - `equal` requires the same type.
@@ -112,9 +115,11 @@ Loading:
   comparator can be written to JSON.
 - A comparator that raises in `add_value` leaves the record unchanged.
 - `RecordManager.load_state_dict` does not change the manager if an entry is invalid.
-- `RecordManager.load_state_dict` builds each record once to validate the state (it cloned the
-  existing records before), and its merge semantics is documented: a record that the state does not
-  mention is kept.
+- `RecordManager.load_state_dict` validates the state by building each record with
+  `BaseRecord.from_dict` (it cloned the existing records before). The data of a key that is already
+  in the manager is then loaded with `load_dict`, so an existing key is built twice, once to validate
+  and once to load. Its merge semantics is documented: a record that the state does not mention is
+  kept.
 - `minrecord.config` has no `global` statement, and `src` has no `noqa`.
 - `MaxScalarRecord` and `MinScalarRecord` share a private base class (`_ScalarRecord`) that builds
   the comparator from a class attribute, so a new scalar record is a docstring and one line. Their

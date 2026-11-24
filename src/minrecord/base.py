@@ -48,8 +48,8 @@ class BaseRecord(ABC, Generic[T]):
 
     The other methods are derived from them. ``clone``, ``equal``,
     ``update``, ``from_dict`` and ``load_dict`` are ``@final``, so a
-    type checker rejects an override. A comparable record overrides that overrides ``is_comparable``,
-    ``get_best_value``, ``get_best_step`` and ``has_improved``.
+    type checker rejects an override. A comparable record overrides ``is_comparable``, ``get_best_value``,
+    ``get_best_step`` and ``has_improved``.
 
     The contract of a record is:
 
@@ -222,9 +222,11 @@ class BaseRecord(ABC, Generic[T]):
         r"""Indicate if two records are equal or not.
 
         Two records are equal if they have the same type and the same
-        ``to_dict`` output. A NaN value is equal to a NaN value, so a
-        record that holds a NaN is equal to its copy after a JSON round
-        trip.
+        ``to_dict`` output: the equality of a record is the equality
+        of its snapshot. A NaN value is equal to a NaN value, also
+        when ``objects_are_equal`` is called with ``equal_nan=False``,
+        so a record that holds a NaN is equal to its copy after a JSON
+        round trip.
 
         Args:
             other: The object to compare.
