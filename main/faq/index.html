@@ -2104,8 +2104,8 @@ are improving.</p>
 <h3 id="what-python-versions-are-supported">What Python versions are supported?<a class="headerlink" href="#what-python-versions-are-supported" title="Permanent link">&para;</a></h3>
 <p>Python 3.11 and higher are officially supported.</p>
 <h3 id="do-i-need-pytorch-or-other-ml-frameworks">Do I need PyTorch or other ML frameworks?<a class="headerlink" href="#do-i-need-pytorch-or-other-ml-frameworks" title="Permanent link">&para;</a></h3>
-<p>No, <code>minrecord</code> has minimal dependencies. It only requires <code>coola</code>, which is used for equality, string
-formatting and the creation of objects from a dictionary.</p>
+<p>No, <code>minrecord</code> has minimal dependencies. It only requires <code>coola</code>, which is used for equality,
+string formatting and the creation of objects from a dictionary.</p>
 <h2 id="usage-questions">Usage Questions<a class="headerlink" href="#usage-questions" title="Permanent link">&para;</a></h2>
 <h3 id="when-should-i-use-record-vs-comparablerecord">When should I use Record vs ComparableRecord?<a class="headerlink" href="#when-should-i-use-record-vs-comparablerecord" title="Permanent link">&para;</a></h3>
 <ul>
@@ -2228,8 +2228,8 @@ not use it.</p>
 </code></pre></div>
 <h2 id="error-handling">Error Handling<a class="headerlink" href="#error-handling" title="Permanent link">&para;</a></h2>
 <h3 id="how-do-i-save-and-resume-a-record-or-a-manager">How do I save and resume a record or a manager?<a class="headerlink" href="#how-do-i-save-and-resume-a-record-or-a-manager" title="Permanent link">&para;</a></h3>
-<p>Use <code>to_dict()</code> / <code>BaseRecord.from_dict()</code> for a record and <code>state_dict()</code> / <code>load_state_dict()</code> for a
-manager. The dictionaries can be written to JSON. See the
+<p>Use <code>to_dict()</code> / <code>BaseRecord.from_dict()</code> for a record and <code>state_dict()</code> / <code>load_state_dict()</code> for
+a manager. The dictionaries can be written to JSON. See the
 <a href="../usage_guide/#state-management">usage guide</a> and the
 <a href="../design/#load_dict-replaces-the-whole-state">design choices</a>.</p>
 <h3 id="how-do-i-implement-early-stopping">How do I implement early stopping?<a class="headerlink" href="#how-do-i-implement-early-stopping" title="Permanent link">&para;</a></h3>
@@ -2259,8 +2259,8 @@ numeric <code>step</code>.</p>
 <p>There's no hard limit. Each record has minimal overhead. With max_size=10:</p>
 <ul>
 <li>Memory per record: about 1 KB when empty, and about 3 KB for a <code>MinScalarRecord</code> that holds 10
-  <code>(step, float)</code> pairs (measured with <code>tracemalloc</code> on Python 3.14; it depends on the Python version
-  and on the values)</li>
+  <code>(step, float)</code> pairs (measured with <code>tracemalloc</code> on Python 3.14; it depends on the Python
+  version and on the values)</li>
 <li>1000 records with 10 scalars each: about 3 MB</li>
 </ul>
 <h3 id="is-minrecord-thread-safe">Is minrecord thread-safe?<a class="headerlink" href="#is-minrecord-thread-safe" title="Permanent link">&para;</a></h3>
@@ -2356,8 +2356,8 @@ create the record from its values:</p>
 <span class="n">best_values</span> <span class="o">=</span> <span class="n">manager</span><span class="o">.</span><span class="n">get_best_values</span><span class="p">()</span>  <span class="c1"># Only comparable records</span>
 </code></pre></div>
 <h3 id="record-not-found-errors">Record not found errors<a class="headerlink" href="#record-not-found-errors" title="Permanent link">&para;</a></h3>
-<p><code>get_record()</code> raises a <code>KeyError</code> that lists the known keys when no record is registered for the key.
-Check that record names match exactly:</p>
+<p><code>get_record()</code> raises a <code>KeyError</code> that lists the known keys when no record is registered for the
+key. Check that record names match exactly:</p>
 <div class="highlight"><pre><span></span><code><span class="n">manager</span><span class="o">.</span><span class="n">add_record</span><span class="p">(</span><span class="n">MinScalarRecord</span><span class="p">(</span><span class="s2">"train/loss"</span><span class="p">))</span>  <span class="c1"># Note the "/"</span>
 <span class="c1"># Wrong name:</span>
 <span class="n">manager</span><span class="o">.</span><span class="n">get_record</span><span class="p">(</span><span class="s2">"train_loss"</span><span class="p">)</span><span class="o">.</span><span class="n">add_value</span><span class="p">(</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># KeyError: No record is registered ...</span>
