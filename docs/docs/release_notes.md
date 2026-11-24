@@ -1,0 +1,82 @@
+# Release notes
+
+## Unreleased (0.4.0)
+
+This release simplifies the design of the records and has **breaking changes**. The API is not
+stable yet (see [API stability](index.md#api-stability)), so there is no deprecation period and no
+compatibility layer.
+
+### Breaking changes
+
+Records:
+
+- A record is rebuilt from one snapshot: `to_dict()` returns the arguments of the constructor
+  (`_target_`, `name`, `max_size`, `elements` and, for a comparable record, `comparator` and
+  `best`). It replaces `{"config": ..., "state": ...}`. The checkpoints of the previous versions
+  are not read.
+- `config_dict`, `state_dict` and `load_state_dict` are removed from the records. Use `to_dict`,
+  `BaseRecord.from_dict` (new record) and `record.load_dict` (in place, atomic). The manager keeps
+  `state_dict` and `load_state_dict`.
+- `ComparableRecord.from_elements`, `MaxScalarRecord.from_elements`, `MinScalarRecord.from_elements`
+  are removed. Use the `elements` argument of the constructor, which adds the values with
+  `add_value`.
+- The `best_value` and `improved` arguments are removed. A new `best=(step, value)` argument is the
+  best pair that left the recent values. `has_improved()` is derived from the values.
+- The options `elements`, `max_size` and `best` of `Record`, `ComparableRecord`, `MaxScalarRecord`
+  and `MinScalarRecord` are keyword-only.
+- `ComparableRecord.is_better` is removed. Use the comparator.
+- `BaseRecord` has 6 abstract members (`name`, `add_value`, `get_last_value`, `get_most_recent`,
+  `is_empty`, `to_dict`). `clone`, `equal`, `update`, `from_dict`, `load_dict`, `is_comparable`,
+  `get_best_value` and `has_improved` are concrete, and the hooks `_get_best_value` and
+  `_has_improved` are removed. A custom record writes fewer methods.
+- `equal` requires the same type.
+
+Comparators:
+
+- `BaseComparator` has one abstract method, `is_better(*, new_value, old_value)`, which is
+  keyword-only. `get_initial_best_value` is removed: the first value of a record is the best value.
+  `to_dict` and `equal` are concrete, a comparator with arguments overrides `to_dict`.
+- A NaN value is never better than another value, and a NaN best value is replaced by the first
+  number.
+
+Manager and functions:
+
+- `exist_ok` (`RecordManager.add_record`), and `prefix` and `suffix` (`RecordManager.get_best_values`,
+  `get_best_values`, `get_last_values`) are keyword-only.
+- `RecordManager(records)` copies the dict.
+
+Configuration and utilities:
+
+- `minrecord.config.Config` and `get_default_config` are removed. Use `get_max_size`, `set_max_size`
+  and `reset_max_size`.
+- `minrecord.utils.value.MutableValue` is removed.
+- An invalid `max_size` (not a positive `int`, or a `bool`) raises `ValueError`.
+
+### Fixes
+
+- `set_max_size` changes the maximum size of the records created after the call. The default was
+  evaluated at import.
+- `clone()` works for `MaxScalarRecord` and `MinScalarRecord`.
+- A falsy best value (`0.0`) is kept. The best value of a record created from some elements is
+  correct.
+- The best value of an empty record is not `inf` or `-inf` any more: `get_best_value` raises
+  `EmptyRecordError`.
+- The comparator of a comparable record is serializable, so the snapshot of a record with a custom
+  comparator can be written to JSON.
+- A comparator that raises in `add_value` leaves the record unchanged.
+- `RecordManager.load_state_dict` does not change the manager if an entry is invalid.
+
+### New
+
+- `RecordManager.get_last_values` and `RecordManager.equal` (the managers work with
+  `coola.equality.objects_are_equal`).
+- `reset_max_size` is exported at the root of the package.
+- `minrecord.utils.validation.check_max_size`.
+- `ComparableRecord` accepts the comparator as an object or as its dict.
+
+### Documentation
+
+- Removed the features that the documentation promised and that do not exist (`minrecord[all]`,
+  the `examples/` directory, "batch updates").
+- Added the properties of the records to the [usage guide](usage_guide.md), and rewrote the
+  sections about custom comparators and serialization.

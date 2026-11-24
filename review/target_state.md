@@ -429,6 +429,19 @@ redesign.
 | 7    | **Manager and functional.** Copy the input, add `get_last_values` and `equal`, atomic `state_dict`/`load_state_dict` built on `to_dict`/`load_dict`, register in `coola`, `exist_ok`/`prefix`/`suffix` keyword-only, `is_empty()` instead of `suppress`, shorter docstrings.                                                                                                                                              | F12, F13, F15   |
 | 8    | **Documentation and tracking.** Rewrite the custom comparator example, the "Why does the constructor behave differently" FAQ entry (deleted), the serialization section; add the properties of section 1 to `usage_guide.md`; `tests/package_checks.py`; release notes with the breaking changes.                                                                                                                         | all             |
 
+**Status** (pull requests, stacked in this order):
+
+| Step | Pull request | Status                    |
+| ---- | ------------ | ------------------------- |
+| 1    | #526         | open                      |
+| 2    | #527         | open                      |
+| 3    | #528         | open                      |
+| 4    | #529         | open                      |
+| 5    | #531         | open                      |
+| 6    | #532         | open                      |
+| 7    | #533         | open                      |
+| 8    | #534         | open                      |
+
 Steps 5 and 6 are the redesign; steps 1 to 4 and 7 are independent small changes. Each step updates
 the docs, the `tests/package_checks.py` and the tracking document it touches (`CLAUDE.md`,
 "Workflow").

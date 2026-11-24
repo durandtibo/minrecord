@@ -52,6 +52,34 @@ record = Record("my_metric", max_size=50)
 - Best values are tracked separately and never lost
 - Recent values are usually sufficient for monitoring
 
+## Properties
+
+These properties are guaranteed by the base classes, so every record has them.
+
+| Property           | Statement                                                                                                                                                                                 |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Bounded memory     | A record keeps at most `max_size` pairs `(step, value)`. The oldest pair is dropped first. Adding a value is O(1).                                                                        |
+| Best is never lost | The best pair `(step, value)` of a comparable record is stored apart from the recent values: it survives the eviction of the pair that produced it, `clone` and `to_dict`/`from_dict`.     |
+| No sentinel        | The best pair is `None` until a value is added. The first value is then the best value and an improvement. No `inf` or `-inf` is stored or returned.                                      |
+| Ties improve       | A value equal to the best value counts as an improvement. It is useful when a metric plateaus at its optimum.                                                                             |
+| NaN never wins     | A NaN value is never better than another value. A NaN best value is replaced by the first number.                                                                                         |
+| One snapshot       | `to_dict()` returns the arguments of the constructor, content included (the recent values as `elements`, the best pair as `best`). `improved` is derived from the values, it is not stored. |
+| Round trip         | `BaseRecord.from_dict(r.to_dict()).equal(r)`, `r.clone().equal(r)`, and `r.load_dict(r2.to_dict())` makes `r` equal to `r2`. A clone is independent: adding values to it does not change `r`. |
+| Atomic             | An operation that raises (a comparator that fails, an invalid dict given to `load_dict` or to the manager `load_state_dict`) leaves the record, or the manager, as it was.                 |
+| Typed errors       | `EmptyRecordError` for a value asked from an empty record, `NotAComparableRecordError` for a best value asked from a record that cannot compare, `ValueError` for an invalid `max_size`.  |
+| No hidden global   | The default `max_size` is read when a record is **created**. It is the only global setting (`get_max_size`, `set_max_size`, `reset_max_size`).                                             |
+| Extensible         | A new record type implements the 6 abstract members of `BaseRecord`. A new notion of "better" implements the one method `BaseComparator.is_better`. No registry is needed.               |
+
+Not guaranteed:
+
+- **Thread safety.** A record and a manager are not thread-safe. Use one record per thread or a
+  lock.
+- **Values are stored by reference.** `add_value` does not copy the value, and `to_dict` and `clone`
+  share the value objects between the copies. Store scalars or immutable objects.
+- **Order of the `step` values.** `step` is a label, it is not checked to increase.
+- **Truthiness.** `Record` defines `__len__`, so an empty record is falsy: write
+  `record.is_empty()`, not `if record:`.
+
 ## Common Patterns
 
 ### Pattern 1: Basic Training Loop
@@ -139,6 +167,10 @@ record = ComparableRecord("f1_components", F1Comparator())
 record.add_value((precision, recall))
 ```
 
+A comparator only implements `is_better`. The first value of a record is the best value, so the
+comparator does not need an initial value. If the comparator has some arguments, override `to_dict`
+so the record can be saved and loaded: `{**super().to_dict(), "tolerance": self._tolerance}`.
+
 ## Performance Considerations
 
 ### Memory Usage
@@ -216,22 +248,37 @@ for epoch in range(epochs):
 
 ## State Management
 
-Records support serialization for checkpointing:
+A record is saved with `to_dict()`: it is one flat dict with the arguments of the constructor (the
+full name of the class, the name, `max_size`, the recent values as `elements` and, for a comparable
+record, the `comparator` and the best pair as `best`). The dict can be written to JSON, if the
+values are numbers or strings.
+
+```pycon
+
+>>> import json
+>>> from minrecord import BaseRecord, MinScalarRecord
+>>> record = MinScalarRecord("loss", max_size=2)
+>>> record.update([(0, 1.0), (1, 5.0), (2, 6.0)])
+>>> record.to_dict()
+{'_target_': 'minrecord.comparable.MinScalarRecord', 'name': 'loss', 'max_size': 2, 'elements': ((1, 5.0), (2, 6.0)), 'best': (0, 1.0)}
+>>> new_record = BaseRecord.from_dict(json.loads(json.dumps(record.to_dict())))
+>>> new_record.equal(record)
+True
+>>> new_record.get_best_value()
+1.0
+
+```
+
+`from_dict` creates a new record, with the validation of the constructor. `load_dict` loads the
+dict in an existing record, in place, for the objects that other parts of your code hold. It builds
+the new record first, so the record is not changed if the dict is invalid or if it is the dict of a
+record of another type:
 
 ```python
-# Save state
-state = record.to_dict()
-torch.save(state, "record_state.pt")
-
-# Load state in a new record
-state = torch.load("record_state.pt")
-record = BaseRecord.from_dict(state)
-
-# Or load state in place (the record is not changed if the state is invalid)
 record.load_dict(state)
 ```
 
-For RecordManager:
+For `RecordManager`:
 
 ```python
 # Save entire manager
@@ -242,10 +289,13 @@ new_manager = RecordManager()
 new_manager.load_state_dict(manager_state)
 ```
 
-The state of a manager is a dict of records dicts, so it can be written to JSON. `load_state_dict` loads
-the data of a known key in the existing record (the objects that you hold are updated), creates the
-records of the new keys, and does not change the manager if one entry is invalid. Two managers can
-be compared with `manager1.equal(manager2)` or `coola.equality.objects_are_equal`.
+The state of a manager is a dict of records dicts, so it can be written to JSON. `load_state_dict`
+loads the data of a known key in the existing record (the objects that you hold are updated),
+creates the records of the new keys, and does not change the manager if one entry is invalid. Two
+managers can be compared with `manager1.equal(manager2)` or `coola.equality.objects_are_equal`.
+
+The dict is not compatible with the one of the versions before 0.4.0 (`{"config": ..., "state": ...}`),
+see the [release notes](release_notes.md).
 
 ## Debugging Tips
 
@@ -278,6 +328,7 @@ assert record1.equal(record2)
 ## See Also
 
 - [Quickstart Guide](quickstart.md) for basic usage
+- [Release notes](release_notes.md) for the breaking changes
 - [FAQ](faq.md) for common questions and troubleshooting
 - API Reference:
   - [minrecord](refs/root.md) - Main package

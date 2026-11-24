@@ -28,6 +28,7 @@ nav:
       - quickstart.md
       - usage_guide.md
       - faq.md
+      - release_notes.md
   - Reference:
       - minrecord: refs/root.md
       - minrecord.base: refs/base.md
