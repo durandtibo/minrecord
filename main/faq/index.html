@@ -11,7 +11,7 @@
         <link rel="canonical" href="https://durandtibo.github.io/minrecord/main/faq/">
       
       
-        <link rel="prev" href="../usage_guide/">
+        <link rel="prev" href="../design/">
       
       
         <link rel="next" href="../release_notes/">
@@ -546,6 +546,34 @@
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -902,6 +930,28 @@
   
     <nav class="md-nav" aria-label="Error Handling">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-do-i-save-and-resume-a-record-or-a-manager" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How do I save and resume a record or a manager?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-do-i-implement-early-stopping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How do I implement early stopping?
+      
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#what-is-emptyrecorderror" class="md-nav__link">
@@ -1795,6 +1845,28 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#how-do-i-save-and-resume-a-record-or-a-manager" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How do I save and resume a record or a manager?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-do-i-implement-early-stopping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How do I implement early stopping?
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#what-is-emptyrecorderror" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2032,8 +2104,8 @@ are improving.</p>
 <h3 id="what-python-versions-are-supported">What Python versions are supported?<a class="headerlink" href="#what-python-versions-are-supported" title="Permanent link">&para;</a></h3>
 <p>Python 3.11 and higher are officially supported.</p>
 <h3 id="do-i-need-pytorch-or-other-ml-frameworks">Do I need PyTorch or other ML frameworks?<a class="headerlink" href="#do-i-need-pytorch-or-other-ml-frameworks" title="Permanent link">&para;</a></h3>
-<p>No, <code>minrecord</code> has minimal dependencies. It only requires <code>coola</code>, which is used for equality
-testing.</p>
+<p>No, <code>minrecord</code> has minimal dependencies. It only requires <code>coola</code>, which is used for equality, string
+formatting and the creation of objects from a dictionary.</p>
 <h2 id="usage-questions">Usage Questions<a class="headerlink" href="#usage-questions" title="Permanent link">&para;</a></h2>
 <h3 id="when-should-i-use-record-vs-comparablerecord">When should I use Record vs ComparableRecord?<a class="headerlink" href="#when-should-i-use-record-vs-comparablerecord" title="Permanent link">&para;</a></h3>
 <ul>
@@ -2055,8 +2127,12 @@ testing.</p>
 <p>No, <code>max_size</code> is fixed at creation. If you need to change it:</p>
 <ol>
 <li>Create a new record with the desired <code>max_size</code></li>
-<li>Optionally transfer values using <code>update(old_record.get_most_recent())</code></li>
+<li>Transfer the values using <code>new_record.update(old_record.get_most_recent())</code>. The best value is
+   recomputed from the transferred values only: to keep a best value that has left the recent
+   values, pass it with
+   <code>best=(old_record.get_best_step(), old_record.get_best_value())</code> (it requires <code>elements</code>).</li>
 </ol>
+<p>Changing the default with <code>set_max_size</code> only affects the records created afterwards.</p>
 <h3 id="what-happens-when-the-record-is-full">What happens when the record is full?<a class="headerlink" href="#what-happens-when-the-record-is-full" title="Permanent link">&para;</a></h3>
 <p>The oldest value is automatically removed when adding a new value. The record uses a <code>deque</code>
 internally with a fixed maximum length.</p>
@@ -2067,8 +2143,8 @@ internally with a fixed maximum length.</p>
 </code></pre></div>
 <p>If the best value is not in the elements anymore (for example when a record is resumed), pass it
 with <code>best=(step, value)</code>. <code>best</code> must be a pair and it requires at least one element (<code>ValueError</code>
-otherwise), because a record has a best value if and only if it has a value. Use <code>to_dict()</code> and <code>BaseRecord.from_dict()</code> to save and resume a
-record: the best value is included.</p>
+otherwise), because a record has a best value if and only if it has a value. Use <code>to_dict()</code> and
+<code>BaseRecord.from_dict()</code> to save and resume a record: the best value is included.</p>
 <h2 id="comparators-improvements">Comparators &amp; Improvements<a class="headerlink" href="#comparators-improvements" title="Permanent link">&para;</a></h2>
 <h3 id="how-does-has_improved-work">How does has_improved() work?<a class="headerlink" href="#how-does-has_improved-work" title="Permanent link">&para;</a></h3>
 <p><code>has_improved()</code> returns <code>True</code> if the last added value is equal to or better than the best value
@@ -2097,7 +2173,9 @@ NaN values are equal (<code>equal</code> treats NaN as equal to NaN), also after
 </code></pre></div>
 <h3 id="why-does-has_improved-return-true-for-equal-values">Why does has_improved() return True for equal values?<a class="headerlink" href="#why-does-has_improved-return-true-for-equal-values" title="Permanent link">&para;</a></h3>
 <p>By design, equal values are considered improvements. This is useful when a metric plateaus at the
-optimal value.</p>
+optimal value, and it is required to rebuild a record exactly from <code>to_dict()</code> (see
+<a href="../design/#ties-count-as-improvements">Design</a>). If you only want to act on a strict improvement,
+compare the new value with the previous best value before adding it.</p>
 <h3 id="can-i-create-custom-comparators">Can I create custom comparators?<a class="headerlink" href="#can-i-create-custom-comparators" title="Permanent link">&para;</a></h3>
 <p>Yes! Implement <code>BaseComparator</code>, it has only one abstract method. The first value of a record is
 always the best value, so a comparator does not need an initial value. A new value that is equal to
@@ -2149,6 +2227,15 @@ not use it.</p>
 <span class="n">manager</span><span class="o">.</span><span class="n">add_record</span><span class="p">(</span><span class="n">Record</span><span class="p">(</span><span class="s2">"custom_metric"</span><span class="p">))</span>
 </code></pre></div>
 <h2 id="error-handling">Error Handling<a class="headerlink" href="#error-handling" title="Permanent link">&para;</a></h2>
+<h3 id="how-do-i-save-and-resume-a-record-or-a-manager">How do I save and resume a record or a manager?<a class="headerlink" href="#how-do-i-save-and-resume-a-record-or-a-manager" title="Permanent link">&para;</a></h3>
+<p>Use <code>to_dict()</code> / <code>BaseRecord.from_dict()</code> for a record and <code>state_dict()</code> / <code>load_state_dict()</code> for a
+manager. The dictionaries can be written to JSON. See the
+<a href="../usage_guide/#state-management">usage guide</a> and the
+<a href="../design/#load_dict-replaces-the-whole-state">design choices</a>.</p>
+<h3 id="how-do-i-implement-early-stopping">How do I implement early stopping?<a class="headerlink" href="#how-do-i-implement-early-stopping" title="Permanent link">&para;</a></h3>
+<p>Use <code>get_best_step()</code>: it is the step of the best value, also when the pair has left the recent
+values. See <a href="../usage_guide/#pattern-3-early-stopping">Pattern 3</a> of the usage guide. It needs a
+numeric <code>step</code>.</p>
 <h3 id="what-is-emptyrecorderror">What is EmptyRecordError?<a class="headerlink" href="#what-is-emptyrecorderror" title="Permanent link">&para;</a></h3>
 <p>This error occurs when you try to get a value from an empty record:</p>
 <div class="highlight"><pre><span></span><code><span class="n">record</span> <span class="o">=</span> <span class="n">Record</span><span class="p">(</span><span class="s2">"my_metric"</span><span class="p">)</span>
@@ -2171,12 +2258,13 @@ not use it.</p>
 <h3 id="how-many-records-can-i-have">How many records can I have?<a class="headerlink" href="#how-many-records-can-i-have" title="Permanent link">&para;</a></h3>
 <p>There's no hard limit. Each record has minimal overhead. With max_size=10:</p>
 <ul>
-<li>Memory per record: about 1 KB + stored values (a <code>MinScalarRecord</code> takes 1,000 bytes empty and
-  1,950 bytes with 10 floats)</li>
-<li>1000 records with scalars: about 2 MB</li>
+<li>Memory per record: about 1 KB when empty, and about 3 KB for a <code>MinScalarRecord</code> that holds 10
+  <code>(step, float)</code> pairs (measured with <code>tracemalloc</code> on Python 3.14; it depends on the Python version
+  and on the values)</li>
+<li>1000 records with 10 scalars each: about 3 MB</li>
 </ul>
 <h3 id="is-minrecord-thread-safe">Is minrecord thread-safe?<a class="headerlink" href="#is-minrecord-thread-safe" title="Permanent link">&para;</a></h3>
-<p>No, records are not thread-safe. If using multiple threads:</p>
+<p>No, records and managers are not thread-safe. If using multiple threads:</p>
 <ul>
 <li>Use separate records per thread, or</li>
 <li>Implement your own locking mechanism</li>

@@ -546,6 +546,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../faq/" class="md-nav__link">
         
   
@@ -1181,11 +1209,15 @@
 
         <p>Implement a generic record to store the recent values.</p>
 <p>Internally, this class uses a <code>deque</code> to keep the most recent
-values added in the record. Note that this class does not allow
-to get the best value because it is not possible to define a
-generic rule to know the best object. Please see
-<code>MinScalarRecord</code> and <code>MaxScalarRecord</code> that can compute the
-best value for scalars.</p>
+values added in the record: when the record is full, adding a value
+drops the oldest one. Note that this class does not allow to get
+the best value because it is not possible to define a generic rule
+to know the best object: <code>get_best_value</code>, <code>get_best_step</code> and
+<code>has_improved</code> raise <code>NotAComparableRecordError</code>. Please see
+<code>MinScalarRecord</code>, <code>MaxScalarRecord</code> and <code>ComparableRecord</code>
+that can compute the best value. The record has a length (the
+number of stored pairs), so an empty record is falsy: use
+<code>is_empty</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>

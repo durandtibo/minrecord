@@ -546,6 +546,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../faq/" class="md-nav__link">
         
   
@@ -1321,9 +1349,10 @@ record has a best value if and only if it has a value.
             </td>
             <td>
               <div class="doc-md-description">
-                <p>if <code>comparator</code> is a dictionary that is not the
-dictionary of a comparator (<code>_target_</code> is missing, or it
-is not a <code>BaseComparator</code>).</p>
+                <p>if <code>name</code> is not a <code>str</code>, or if <code>comparator</code>
+is a dictionary that is not the dictionary of a comparator
+(<code>_target_</code> is missing, or it is not a
+<code>BaseComparator</code>).</p>
               </div>
             </td>
           </tr>
@@ -1407,7 +1436,8 @@ is given without <code>elements</code>.</p>
         <p>A specific implementation to track the max value of a scalar
 record.</p>
 <p>This record uses the <code>MaxScalarComparator</code> to find the
-best value of the record.</p>
+best value of the record: the largest value, a NaN never being
+better than a number.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1506,6 +1536,16 @@ means there is no value yet.</p>
         </tr>
       </thead>
       <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="TypeError">TypeError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>if <code>name</code> is not a <code>str</code>.</p>
+              </div>
+            </td>
+          </tr>
           <tr class="doc-section-item">
             <td>
                   <code><span title="ValueError">ValueError</span></code>
@@ -1587,7 +1627,8 @@ is given without <code>elements</code>.</p>
         <p>A specific implementation to track the min value of a scalar
 record.</p>
 <p>This record uses the <code>MinScalarComparator</code> to find the
-best value of the record.</p>
+best value of the record: the smallest value, a NaN never being
+better than a number.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1686,6 +1727,16 @@ means there is no value yet.</p>
         </tr>
       </thead>
       <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="TypeError">TypeError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>if <code>name</code> is not a <code>str</code>.</p>
+              </div>
+            </td>
+          </tr>
           <tr class="doc-section-item">
             <td>
                   <code><span title="ValueError">ValueError</span></code>

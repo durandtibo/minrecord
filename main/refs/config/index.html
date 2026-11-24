@@ -546,6 +546,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../faq/" class="md-nav__link">
         
   
@@ -1188,6 +1216,8 @@
 
         <p>Get the current default maximum size of values to track in each
 record.</p>
+<p>The default is 10. It is read when a record is created, and it can
+be changed with <code>set_max_size</code>.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -1212,7 +1242,6 @@ record.</p>
           </tr>
       </tbody>
     </table>
-        <p>This value can be changed by using <code>set_max_size</code>.</p>
 
 
 <details class="example" open>
@@ -1240,7 +1269,7 @@ record.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Reset the default maximum size to its initial value.</p>
+        <p>Reset the default maximum size to its initial value (10).</p>
 
 
 <details class="example" open>
@@ -1325,7 +1354,8 @@ each record. Must be a positive integer.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If <code>max_size</code> is not a positive integer.</p>
+                <p>If <code>max_size</code> is not a positive integer, or if it
+is larger than <code>sys.maxsize</code>. The default is not changed.</p>
               </div>
             </td>
           </tr>

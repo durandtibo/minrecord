@@ -14,7 +14,7 @@
         <link rel="prev" href="../quickstart/">
       
       
-        <link rel="next" href="../faq/">
+        <link rel="next" href="../design/">
       
       
         
@@ -631,10 +631,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#properties" class="md-nav__link">
+  <a href="#guarantees-and-limits" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Properties
+        Guarantees and Limits
       
     </span>
   </a>
@@ -867,6 +867,34 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -1350,10 +1378,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#properties" class="md-nav__link">
+  <a href="#guarantees-and-limits" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Properties
+        Guarantees and Limits
       
     </span>
   </a>
@@ -1629,13 +1657,14 @@ with comparison logic:</p>
 <li>Use comparators to define what "better" means</li>
 </ul>
 <h3 id="memory-management">Memory Management<a class="headerlink" href="#memory-management" title="Permanent link">&para;</a></h3>
-<p>By default, records keep only the last 10 values. This is configurable:</p>
+<p>By default, records keep only the last 10 values. This is configurable, per record or for the records
+created afterwards (<code>reset_max_size()</code> restores the default):</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">minrecord</span><span class="w"> </span><span class="kn">import</span> <span class="n">Record</span><span class="p">,</span> <span class="n">get_max_size</span><span class="p">,</span> <span class="n">set_max_size</span>
 
 <span class="c1"># Check default</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">get_max_size</span><span class="p">())</span>  <span class="c1"># 10</span>
 
-<span class="c1"># Change globally for new records</span>
+<span class="c1"># Change the default of the records created after this call</span>
 <span class="n">set_max_size</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
 
 <span class="c1"># Or set per record</span>
@@ -1647,116 +1676,18 @@ with comparison logic:</p>
 <li>Best values are tracked separately and never lost</li>
 <li>Recent values are usually sufficient for monitoring</li>
 </ul>
-<h2 id="properties">Properties<a class="headerlink" href="#properties" title="Permanent link">&para;</a></h2>
-<p>These properties are guaranteed by the base classes, so every record has them.</p>
-<table>
-<thead>
-<tr>
-<th>Property</th>
-<th>Statement</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Bounded memory</td>
-<td>A record keeps at most <code>max_size</code> pairs <code>(step, value)</code>, with <code>1 &lt;= max_size &lt;= sys.maxsize</code>. The oldest pair is dropped first. Adding a value is O(1).</td>
-</tr>
-<tr>
-<td>Best is never lost</td>
-<td>The best pair <code>(step, value)</code> of a comparable record is stored apart from the window: it survives the eviction of the pair that produced it, <code>clone</code> and <code>to_dict</code>/<code>from_dict</code>.</td>
-</tr>
-<tr>
-<td>No confusable sentinel</td>
-<td>The absence of a best value is the best pair <code>None</code>. It is never a value that a record can hold, and <code>inf</code>/<code>-inf</code> are never stored as a stand-in.</td>
-</tr>
-<tr>
-<td>Ties improve</td>
-<td>A value equal to the best value counts as an improvement. The comparison is <strong>reflexive</strong>: <code>is_better(new_value=x, old_value=x)</code> is <code>True</code> for all <code>x</code>, NaN included.</td>
-</tr>
-<tr>
-<td>NaN never wins</td>
-<td>A NaN value is never better than a number. A NaN best value is replaced by any value (a number, or another NaN as a tie).</td>
-</tr>
-<tr>
-<td>One snapshot</td>
-<td><code>to_dict()</code> returns the arguments of the constructor, content included (window as <code>elements</code>, best as <code>best</code>). <code>improved</code> is derived from the values, never stored.</td>
-</tr>
-<tr>
-<td>Round trip is exact</td>
-<td>For every record <code>r</code>, also after a JSON round trip and when it holds NaN: <code>from_dict(to_dict()).equal(r)</code>, <code>r.clone().equal(r)</code>, the clone has the same <code>has_improved()</code> and the same best pair. A clone is independent.</td>
-</tr>
-<tr>
-<td>Consistent state</td>
-<td>A comparable record has a best pair if and only if it has a value. <code>best</code> is a pair (a <code>tuple</code> or a <code>list</code> of length 2) and requires <code>elements</code>.</td>
-</tr>
-<tr>
-<td>Safe to load</td>
-<td><code>from_dict</code>, <code>load_dict</code>, <code>load_state_dict</code> and the comparator dict only build objects of the expected type, and anything that is not a dict is a <code>TypeError</code>. A <code>_target_</code> inside a stored value is data: it is never instantiated.</td>
-</tr>
-<tr>
-<td>Fails early</td>
-<td>An input that cannot work is rejected <strong>by the call that receives it</strong> and never stored: a value that the comparator cannot compare, a <code>max_size</code> that a deque cannot hold, a <code>name</code> that is not a <code>str</code>, a manager key that nobody registered. The package never creates a record that the caller did not ask for.</td>
-</tr>
-<tr>
-<td>Atomic</td>
-<td><code>add_value</code>, <code>load_dict</code> and the manager <code>load_state_dict</code> leave the record, or the manager, as it was if they raise. <code>update</code> is a loop of <code>add_value</code>: the elements before the failing one are kept.</td>
-</tr>
-<tr>
-<td>Typed errors</td>
-<td><code>EmptyRecordError</code> for a value asked from an empty record, <code>NotAComparableRecordError</code> for a best value, a best step or an improvement asked from a record that cannot compare, <code>ValueError</code> for an invalid <code>max_size</code> or <code>best</code>, <code>TypeError</code> for a <code>name</code>, a dict or a comparator of the wrong type, <code>KeyError</code> for an unknown manager key.</td>
-</tr>
-<tr>
-<td>Contract is enforced</td>
-<td>The methods that must not be overridden (<code>clone</code>, <code>equal</code>, <code>update</code>, <code>from_dict</code>, <code>load_dict</code>) are <code>@final</code>.</td>
-</tr>
-<tr>
-<td>Readable and stable text</td>
-<td><code>repr</code>/<code>str</code> of a record and of a comparator are deterministic and show the arguments (no memory address).</td>
-</tr>
-<tr>
-<td>No hidden global</td>
-<td>The default <code>max_size</code> is read when a record is <strong>created</strong>. It is the only global setting (<code>get_max_size</code>, <code>set_max_size</code>, <code>reset_max_size</code>) and it only accepts values that a record can use.</td>
-</tr>
-<tr>
-<td>Equality is snapshot equality</td>
-<td><code>equal</code> is the equality of the <code>to_dict</code> output of two records (same type) and of the <code>state_dict</code> of two managers. A NaN is equal to a NaN, also for <code>objects_are_equal(..., equal_nan=False)</code>: this is the one deliberate difference with <code>coola</code>.</td>
-</tr>
-<tr>
-<td>Extensible</td>
-<td>A new record type implements the 6 abstract members of <code>BaseRecord</code>, keeps its whole state in <code>vars(self)</code> and accepts what its <code>to_dict</code> returns. A new notion of "better" implements the one method <code>BaseComparator.is_better</code>. No registry is needed.</td>
-</tr>
-<tr>
-<td>Consistent with <code>coola</code></td>
-<td>Records, comparators and managers work with <code>objects_are_equal</code>; <code>to_dict</code> works with <code>coola.factory.factory</code>; the string forms use <code>coola.formatting</code>.</td>
-</tr>
-<tr>
-<td>Keyword-only options</td>
-<td>Every option after the identifying arguments (<code>name</code>, <code>comparator</code>, <code>records</code>) is keyword-only.</td>
-</tr>
-<tr>
-<td>Minimal</td>
-<td>One dependency (<code>coola</code>), no optional dependency, no I/O, no logging, no thread, no global state beyond <code>max_size</code>.</td>
-</tr>
-</tbody>
-</table>
-<p>Not guaranteed:</p>
+<p><code>max_size</code> is fixed when the record is created. To change it, create a new record and add the
+values of the old one (<code>new.update(old.get_most_recent())</code>).</p>
+<h2 id="guarantees-and-limits">Guarantees and Limits<a class="headerlink" href="#guarantees-and-limits" title="Permanent link">&para;</a></h2>
+<p>Every record keeps at most <code>max_size</code> values, keeps the best pair apart from them, is rebuilt exactly
+from <code>to_dict</code>, and rejects invalid inputs in the call that receives them. The
+<a href="../design/">design page</a> lists the guarantees, explains the design choices with their trade-offs, and
+describes what is not guaranteed (thread safety, values stored by reference, <code>copy.copy</code>, ...).</p>
+<p>Three points are worth knowing before you start:</p>
 <ul>
-<li><strong>Thread safety.</strong> A record and a manager are not thread-safe. Use one record per thread or a
-  lock.</li>
-<li><strong>Values are stored by reference.</strong> <code>add_value</code> does not copy the value, and <code>to_dict</code> and <code>clone</code>
-  share the value objects between the copies. Store scalars or immutable objects.</li>
-<li><strong>Order of the <code>step</code> values.</strong> <code>step</code> is a label: it is not checked to increase, nor to be a
-  number. Early stopping with <code>get_best_step</code> needs a numeric step.</li>
-<li><strong>Truthiness.</strong> <code>Record</code> and <code>RecordManager</code> define <code>__len__</code>, so an empty one is falsy: write
-  <code>record.is_empty()</code>, not <code>if record:</code>.</li>
-<li><strong><code>load_dict</code> replaces the whole state.</strong> The name and the <code>max_size</code> of the record are replaced
-  too: a record named <code>a</code> that loads the dict of a record named <code>b</code> is named <code>b</code>. Check the name
-  before if it must stay.</li>
-<li><strong>Untrusted dicts beyond the type.</strong> <code>from_dict</code> imports the module that <code>_target_</code> names. It
-  never calls anything but a record class, but a dict from an untrusted source can still make the
-  process import a module.</li>
-<li><strong><code>copy.copy(record)</code> is not a clone.</strong> A shallow copy shares the window, so <code>add_value</code> on the
-  copy changes the original. <code>clone()</code> and <code>copy.deepcopy</code> are independent: use <code>clone()</code>.</li>
+<li><strong>A value that equals the best value is an improvement.</strong> <code>has_improved()</code> is <code>True</code> on a plateau.</li>
+<li><strong>A NaN is never better than a number.</strong> It can only be the best value if it is the first one.</li>
+<li><strong>An empty record is falsy.</strong> Write <code>record.is_empty()</code>, not <code>if record:</code>.</li>
 </ul>
 <h2 id="common-patterns">Common Patterns<a class="headerlink" href="#common-patterns" title="Permanent link">&para;</a></h2>
 <h3 id="pattern-1-basic-training-loop">Pattern 1: Basic Training Loop<a class="headerlink" href="#pattern-1-basic-training-loop" title="Permanent link">&para;</a></h3>
@@ -1782,15 +1713,22 @@ with comparison logic:</p>
 <span class="n">manager</span><span class="o">.</span><span class="n">add_record</span><span class="p">(</span><span class="n">MaxScalarRecord</span><span class="p">(</span><span class="s2">"train/accuracy"</span><span class="p">))</span>
 <span class="n">manager</span><span class="o">.</span><span class="n">add_record</span><span class="p">(</span><span class="n">MaxScalarRecord</span><span class="p">(</span><span class="s2">"val/accuracy"</span><span class="p">))</span>
 
+<span class="c1"># get_record raises KeyError for a key that is not registered. To create the</span>
+<span class="c1"># records on demand, pass a factory: RecordManager(default_factory=MinScalarRecord)</span>
+
 <span class="c1"># Add values to each record</span>
 <span class="n">manager</span><span class="o">.</span><span class="n">get_record</span><span class="p">(</span><span class="s2">"train/loss"</span><span class="p">)</span><span class="o">.</span><span class="n">add_value</span><span class="p">(</span><span class="n">train_loss</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="n">epoch</span><span class="p">)</span>
 <span class="n">manager</span><span class="o">.</span><span class="n">get_record</span><span class="p">(</span><span class="s2">"val/loss"</span><span class="p">)</span><span class="o">.</span><span class="n">add_value</span><span class="p">(</span><span class="n">val_loss</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="n">epoch</span><span class="p">)</span>
 <span class="n">manager</span><span class="o">.</span><span class="n">get_record</span><span class="p">(</span><span class="s2">"train/accuracy"</span><span class="p">)</span><span class="o">.</span><span class="n">add_value</span><span class="p">(</span><span class="n">train_acc</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="n">epoch</span><span class="p">)</span>
 <span class="n">manager</span><span class="o">.</span><span class="n">get_record</span><span class="p">(</span><span class="s2">"val/accuracy"</span><span class="p">)</span><span class="o">.</span><span class="n">add_value</span><span class="p">(</span><span class="n">val_acc</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="n">epoch</span><span class="p">)</span>
 
-<span class="c1"># Get best values for logging</span>
-<span class="n">best_values</span> <span class="o">=</span> <span class="n">manager</span><span class="o">.</span><span class="n">get_best_values</span><span class="p">()</span>
+<span class="c1"># Get the best values and the last values for logging</span>
+<span class="n">best_values</span> <span class="o">=</span> <span class="n">manager</span><span class="o">.</span><span class="n">get_best_values</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">"best/"</span><span class="p">)</span>
+<span class="n">last_values</span> <span class="o">=</span> <span class="n">manager</span><span class="o">.</span><span class="n">get_last_values</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">"last/"</span><span class="p">)</span>
 </code></pre></div>
+<p><code>get_best_values</code> skips the empty records and the records that are not comparable, and
+<code>get_last_values</code> skips the empty records. The same functions exist for any mapping of records:
+<code>minrecord.get_best_values(records)</code> and <code>minrecord.get_last_values(records)</code>.</p>
 <h3 id="pattern-3-early-stopping">Pattern 3: Early Stopping<a class="headerlink" href="#pattern-3-early-stopping" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">minrecord</span><span class="w"> </span><span class="kn">import</span> <span class="n">MinScalarRecord</span>
 
@@ -1852,8 +1790,10 @@ so the record can be saved and loaded: <code>{**super().to_dict(), "tolerance": 
 <ol>
 <li><strong>Set appropriate max_size</strong>: Balance between memory and information needs</li>
 <li><strong>Use RecordManager</strong> for multiple metrics to keep code organized</li>
-<li><strong>Reuse records</strong> across training runs by loading/saving state</li>
-<li><strong>Avoid storing large objects</strong>: Records are meant for scalars or small objects</li>
+<li><strong>Resume a run</strong> by saving <code>manager.state_dict()</code> (or <code>record.to_dict()</code>) in your checkpoint and
+   loading it back</li>
+<li><strong>Avoid storing large objects</strong>: Records store the values by reference and are meant for scalars
+   or small objects</li>
 </ol>
 <h2 id="integration-with-ml-frameworks">Integration with ML Frameworks<a class="headerlink" href="#integration-with-ml-frameworks" title="Permanent link">&para;</a></h2>
 <h3 id="pytorch-example">PyTorch Example<a class="headerlink" href="#pytorch-example" title="Permanent link">&para;</a></h3>
@@ -1945,7 +1885,8 @@ manager that the state does not mention is kept. It does not change the manager 
 invalid (the entries are built and checked first, then loaded). Two
 managers can be compared with <code>manager1.equal(manager2)</code> or <code>coola.equality.objects_are_equal</code>.</p>
 <p>The dict is not compatible with the one of the versions before 0.4.0 (<code>{"config": ..., "state": ...}</code>),
-see the <a href="../release_notes/">release notes</a>.</p>
+see the <a href="../release_notes/">release notes</a>. The <a href="../design/">design page</a> explains the trade-offs of
+<code>from_dict</code>, <code>load_dict</code> and <code>load_state_dict</code>.</p>
 <h2 id="debugging-tips">Debugging Tips<a class="headerlink" href="#debugging-tips" title="Permanent link">&para;</a></h2>
 <h3 id="check-if-metrics-are-improving">Check if metrics are improving<a class="headerlink" href="#check-if-metrics-are-improving" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="n">record</span> <span class="o">=</span> <span class="n">MinScalarRecord</span><span class="p">(</span><span class="s2">"loss"</span><span class="p">)</span>
@@ -1968,6 +1909,7 @@ see the <a href="../release_notes/">release notes</a>.</p>
 <h2 id="see-also">See Also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
 <ul>
 <li><a href="../quickstart/">Quickstart Guide</a> for basic usage</li>
+<li><a href="../design/">Design</a> for the guarantees and the design choices</li>
 <li><a href="../release_notes/">Release notes</a> for the breaking changes</li>
 <li><a href="../faq/">FAQ</a> for common questions and troubleshooting</li>
 <li>API Reference:</li>
@@ -1975,9 +1917,11 @@ see the <a href="../release_notes/">release notes</a>.</p>
 <li><a href="../refs/base/">minrecord.base</a> - Base classes and exceptions</li>
 <li><a href="../refs/comparable/">minrecord.comparable</a> - Comparable record implementations</li>
 <li><a href="../refs/comparator/">minrecord.comparator</a> - Comparator classes</li>
+<li><a href="../refs/config/">minrecord.config</a> - Default <code>max_size</code></li>
 <li><a href="../refs/functional/">minrecord.functional</a> - Utility functions</li>
 <li><a href="../refs/generic/">minrecord.generic</a> - Generic record implementation</li>
 <li><a href="../refs/manager/">minrecord.manager</a> - Record manager</li>
+<li><a href="../refs/utils/">minrecord.utils</a> - Validation and factory helpers</li>
 </ul>
 
 

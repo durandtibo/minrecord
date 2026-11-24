@@ -549,6 +549,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../faq/" class="md-nav__link">
         
   
@@ -649,6 +677,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#migrating-from-03" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Migrating from 0.3
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#breaking-changes" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -675,17 +714,6 @@
     <span class="md-ellipsis">
       
         New
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#documentation" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Documentation
       
     </span>
   </a>
@@ -1090,6 +1118,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#migrating-from-03" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Migrating from 0.3
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#breaking-changes" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1116,17 +1155,6 @@
     <span class="md-ellipsis">
       
         New
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#documentation" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Documentation
       
     </span>
   </a>
@@ -1162,160 +1190,125 @@
 <h2 id="unreleased-040">Unreleased (0.4.0)<a class="headerlink" href="#unreleased-040" title="Permanent link">&para;</a></h2>
 <p>This release simplifies the design of the records and has <strong>breaking changes</strong>. The API is not
 stable yet (see <a href="../#api-stability">API stability</a>), so there is no deprecation period and no
-compatibility layer.</p>
+compatibility layer. The <a href="../design/">design page</a> explains the current behavior.</p>
+<h3 id="migrating-from-03">Migrating from 0.3<a class="headerlink" href="#migrating-from-03" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Before</th>
+<th>Now</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>record.config_dict()</code>, <code>record.state_dict()</code>, <code>record.load_state_dict(...)</code></td>
+<td><code>record.to_dict()</code>, <code>BaseRecord.from_dict(data)</code> (new record), <code>record.load_dict(data)</code> (in place)</td>
+</tr>
+<tr>
+<td><code>{"config": ..., "state": ...}</code></td>
+<td>One flat dict: <code>_target_</code>, <code>name</code>, <code>max_size</code>, <code>elements</code> and, for a comparable record, <code>comparator</code> and <code>best</code></td>
+</tr>
+<tr>
+<td><code>MinScalarRecord.from_elements(name, elements)</code></td>
+<td><code>MinScalarRecord(name, elements=elements)</code></td>
+</tr>
+<tr>
+<td><code>best_value=...</code>, <code>improved=...</code></td>
+<td><code>best=(step, value)</code> (a pair, with at least one element). <code>has_improved()</code> is derived from the values</td>
+</tr>
+<tr>
+<td><code>record.is_better(...)</code></td>
+<td><code>comparator.is_better(new_value=..., old_value=...)</code></td>
+</tr>
+<tr>
+<td><code>BaseComparator.get_initial_best_value</code></td>
+<td>Removed: the first value of a record is the best value</td>
+</tr>
+<tr>
+<td><code>BaseRecord._get_best_value</code>, <code>_has_improved</code> hooks</td>
+<td>Override <code>get_best_value</code>, <code>get_best_step</code>, <code>has_improved</code> and <code>is_comparable</code></td>
+</tr>
+<tr>
+<td><code>manager.get_record("new")</code> created a <code>Record</code></td>
+<td><code>KeyError</code>. Use <code>RecordManager(default_factory=Record)</code> (or another record class) to create records on demand</td>
+</tr>
+<tr>
+<td><code>minrecord.config.Config</code>, <code>get_default_config</code></td>
+<td><code>get_max_size</code>, <code>set_max_size</code>, <code>reset_max_size</code></td>
+</tr>
+<tr>
+<td><code>minrecord.utils.value.MutableValue</code></td>
+<td>Removed</td>
+</tr>
+</tbody>
+</table>
+<p>The checkpoints of the previous versions are not read.</p>
 <h3 id="breaking-changes">Breaking changes<a class="headerlink" href="#breaking-changes" title="Permanent link">&para;</a></h3>
 <p>Records:</p>
 <ul>
-<li>A record is rebuilt from one snapshot: <code>to_dict()</code> returns the arguments of the constructor
-  (<code>_target_</code>, <code>name</code>, <code>max_size</code>, <code>elements</code> and, for a comparable record, <code>comparator</code> and
-  <code>best</code>). It replaces <code>{"config": ..., "state": ...}</code>. The checkpoints of the previous versions
-  are not read.</li>
-<li><code>config_dict</code>, <code>state_dict</code> and <code>load_state_dict</code> are removed from the records. Use <code>to_dict</code>,
-  <code>BaseRecord.from_dict</code> (new record) and <code>record.load_dict</code> (in place, atomic). The manager keeps
-  <code>state_dict</code> and <code>load_state_dict</code>.</li>
-<li><code>ComparableRecord.from_elements</code>, <code>MaxScalarRecord.from_elements</code>, <code>MinScalarRecord.from_elements</code>
-  are removed. Use the <code>elements</code> argument of the constructor, which adds the values with
-  <code>add_value</code>.</li>
-<li>The <code>best_value</code> and <code>improved</code> arguments are removed. A new <code>best=(step, value)</code> argument is the
-  best pair that left the recent values. <code>has_improved()</code> is derived from the values.</li>
-<li>The <code>best</code> argument must be a pair <code>(step, value)</code> and requires <code>elements</code>: <code>best</code> of the wrong
-  length, or <code>best</code> without any element, raises <code>ValueError</code>. A record had an empty window and a best
-  value, and <code>best=(a, b, c)</code> was truncated. A record that is saved with <code>to_dict</code> always has
-  elements with its best pair.</li>
-<li>The options <code>elements</code>, <code>max_size</code> and <code>best</code> of <code>Record</code>, <code>ComparableRecord</code>, <code>MaxScalarRecord</code>
-  and <code>MinScalarRecord</code> are keyword-only.</li>
-<li><code>ComparableRecord.is_better</code> is removed. Use the comparator.</li>
+<li><code>elements</code>, <code>max_size</code> and <code>best</code> of <code>Record</code>, <code>ComparableRecord</code>, <code>MaxScalarRecord</code> and
+  <code>MinScalarRecord</code> are keyword-only.</li>
+<li><code>best</code> must be a <code>tuple</code> or a <code>list</code> of length 2 and requires <code>elements</code>, otherwise <code>ValueError</code>.</li>
 <li><code>BaseRecord</code> has 6 abstract members (<code>name</code>, <code>add_value</code>, <code>get_last_value</code>, <code>get_most_recent</code>,
-  <code>is_empty</code>, <code>to_dict</code>). <code>clone</code>, <code>equal</code>, <code>update</code>, <code>from_dict</code>, <code>load_dict</code>, <code>is_comparable</code>,
-  <code>get_best_value</code> and <code>has_improved</code> are concrete, and the hooks <code>_get_best_value</code> and
-  <code>_has_improved</code> are removed. A custom record writes fewer methods.</li>
+  <code>is_empty</code>, <code>to_dict</code>). <code>clone</code>, <code>equal</code>, <code>update</code>, <code>from_dict</code> and <code>load_dict</code> are <code>@final</code>.</li>
 <li>The first value of a comparable record is compared with itself, so a value that the comparator
   cannot compare (<code>None</code>, a string, <code>10**400</code>) is rejected by the <code>add_value</code> that receives it
-  (<code>TypeError</code> or <code>OverflowError</code>, from the comparator) and the record stays empty. It was stored
-  and became the best value, and every later <code>add_value</code> raised. A comparator that is not reflexive
-  (<code>&gt;</code> instead of <code>&gt;=</code>) now gives <code>has_improved() is False</code> for the first value.</li>
-<li><code>clone</code>, <code>equal</code>, <code>update</code>, <code>from_dict</code> and <code>load_dict</code> of <code>BaseRecord</code> are <code>@final</code>: a type
-  checker rejects a subclass that overrides one.</li>
-<li><code>best</code> must be a <code>tuple</code> or a <code>list</code> of length 2. A <code>set</code> or a <code>str</code> of two items was accepted as a
-  pair and now raises <code>ValueError</code>.</li>
-<li><code>BaseComparator.equal</code> treats NaN as equal to NaN, as the records do.</li>
-<li>The equality of the records, the comparators and the managers is the equality of their snapshot
-  (<code>to_dict</code>, <code>state_dict</code>). A NaN is equal to a NaN also with <code>objects_are_equal(...,
-  equal_nan=False)</code>: this is the one deliberate difference with <code>coola</code>, and it is documented.</li>
-<li><code>BaseComparator</code> has a <code>repr</code> built from <code>to_dict</code> (<code>ToleranceComparator(tolerance=0.1)</code>), so
-  <code>str(record)</code> no longer contains a memory address.</li>
-<li><code>equal</code> requires the same type.</li>
-<li>
-<p><code>equal</code> of the records and of the manager treats NaN as equal to NaN, so a record that holds a NaN
-  is equal to its copy after a JSON round trip.</p>
-</li>
-<li>
-<p><code>Record(name)</code> raises <code>TypeError</code> if <code>name</code> is not a <code>str</code> (<code>None</code> and <code>3</code> were accepted, and a
-  <code>None</code> name became the key <code>"null"</code> after a JSON round trip).</p>
-</li>
+  (<code>TypeError</code> or <code>OverflowError</code>, from the comparator) and the record stays empty.</li>
+<li><code>Record(name)</code> raises <code>TypeError</code> if <code>name</code> is not a <code>str</code>.</li>
+<li>An invalid <code>max_size</code> (not a positive <code>int</code>, a <code>bool</code>, or larger than <code>sys.maxsize</code>) raises
+  <code>ValueError</code>.</li>
+<li><code>equal</code> requires the same type. The equality of records, comparators and managers is the equality
+  of their snapshot (<code>to_dict</code>, <code>state_dict</code>), and a NaN is equal to a NaN, also with
+  <code>objects_are_equal(..., equal_nan=False)</code>.</li>
+<li><code>BaseRecord.from_dict</code> returns <code>Self</code> and raises <code>TypeError</code> if <code>_target_</code> is missing or is not the
+  class (or a subclass of the class) that it is called on. <code>load_dict</code> and
+  <code>RecordManager.load_state_dict</code> raise <code>TypeError</code> for a dict that is not the dict of a record, or
+  that is the dict of another type of record.</li>
 </ul>
 <p>Comparators:</p>
 <ul>
 <li><code>BaseComparator</code> has one abstract method, <code>is_better(*, new_value, old_value)</code>, which is
-  keyword-only. <code>get_initial_best_value</code> is removed: the first value of a record is the best value.
-  <code>to_dict</code> and <code>equal</code> are concrete, a comparator with arguments overrides <code>to_dict</code>.</li>
-<li>A NaN value is never better than a number, and a NaN best value is replaced by any value (a
-  number, or another NaN as a tie). The comparison is reflexive: <code>is_better(new_value=x,
-  old_value=x)</code> is <code>True</code> for every <code>x</code>, NaN included. <strong>A custom comparator that is strict (<code>&gt;</code>
-  or <code>&lt;</code>) breaks this contract</strong>: a record rebuilt from <code>to_dict</code> or <code>clone</code> would report a wrong
-  <code>has_improved()</code>. Use <code>&gt;=</code> or <code>&lt;=</code>.</li>
+  keyword-only. <code>to_dict</code> and <code>equal</code> are concrete: a comparator with arguments overrides <code>to_dict</code>.</li>
+<li>The comparison must be reflexive: <code>is_better(new_value=x, old_value=x)</code> is <code>True</code> for every <code>x</code>. <strong>A
+  custom comparator that is strict (<code>&gt;</code> or <code>&lt;</code>) breaks this contract</strong>: use <code>&gt;=</code> or <code>&lt;=</code>.</li>
+<li>A NaN is never better than a number, and a NaN best value is replaced by any value.</li>
+<li><code>BaseComparator</code> has a <code>repr</code> built from <code>to_dict</code>, so <code>str(record)</code> does not contain a memory
+  address.</li>
+<li>The comparator of <code>ComparableRecord</code> must be a <code>BaseComparator</code> or its dict, otherwise <code>TypeError</code>.</li>
 </ul>
 <p>Manager and functions:</p>
 <ul>
 <li><code>exist_ok</code> (<code>RecordManager.add_record</code>), and <code>prefix</code> and <code>suffix</code> (<code>RecordManager.get_best_values</code>,
   <code>get_best_values</code>, <code>get_last_values</code>) are keyword-only.</li>
-<li><code>RecordManager(records)</code> copies the dict.</li>
-<li><code>RecordManager.get_record(key)</code> raises <code>KeyError</code> for a key that nobody registered. It created an
-  empty <code>Record</code> (never a comparable one), so a typo in a metric name silently lost the best value.
-  The new keyword-only argument <code>default_factory</code> (a function of the key that returns a record, as
-  for <code>collections.defaultdict</code>) restores the creation, for example
-  <code>RecordManager(default_factory=Record)</code> or <code>RecordManager(default_factory=MinScalarRecord)</code>. The
-  factory is not part of the state: <code>state_dict</code>, <code>equal</code> and <code>load_state_dict</code> do not use it.
-  <code>minrecord.manager</code> no longer imports <code>Record</code>.</li>
-</ul>
-<p>Configuration and utilities:</p>
-<ul>
-<li><code>minrecord.config.Config</code> and <code>get_default_config</code> are removed. Use <code>get_max_size</code>, <code>set_max_size</code>
-  and <code>reset_max_size</code>.</li>
-<li><code>minrecord.utils.value.MutableValue</code> is removed.</li>
-<li>An invalid <code>max_size</code> (not a positive <code>int</code>, or a <code>bool</code>) raises <code>ValueError</code>.</li>
-</ul>
-<p>Loading:</p>
-<ul>
-<li><code>BaseRecord.from_dict</code> returns <code>Self</code> and raises <code>TypeError</code> if <code>_target_</code> is missing or is not the
-  class (or a subclass of the class) that it is called on: <code>from_dict</code> does not call an arbitrary
-  importable function any more, and <code>MinScalarRecord.from_dict(Record("x").to_dict())</code> raises
-  instead of returning a <code>Record</code>. <code>load_dict</code> and the manager <code>load_state_dict</code> raise <code>TypeError</code>
-  for a dict that is not the dict of a record.</li>
-<li>The comparator dict of <code>ComparableRecord</code> must be the dict of a <code>BaseComparator</code>, otherwise
-  <code>TypeError</code> (it was <code>TypeError</code> for a missing <code>_target_</code>, with another message, and any callable
-  was accepted otherwise).</li>
+<li><code>RecordManager(records)</code> copies the mapping.</li>
+<li><code>RecordManager.get_record(key)</code> raises <code>KeyError</code> for a key that nobody registered. The new
+  keyword-only <code>default_factory</code> argument creates the records on demand. The factory is not part of
+  the state.</li>
 </ul>
 <h3 id="fixes">Fixes<a class="headerlink" href="#fixes" title="Permanent link">&para;</a></h3>
 <ul>
-<li><code>max_size</code> larger than <code>sys.maxsize</code> raises <code>ValueError</code> (it was an <code>OverflowError</code>, and
-  <code>set_max_size(2**63)</code> succeeded and made every later <code>Record("a")</code> raise).</li>
-<li>A configuration that is not a dict (<code>BaseRecord.from_dict(None)</code>, <code>record.load_dict([])</code>,
-  <code>manager.load_state_dict({"a": None})</code>, <code>ComparableRecord("x", MinScalarComparator)</code>) raises
-  <code>TypeError</code> (it was <code>AttributeError</code>).</li>
-<li><code>set_max_size</code> changes the maximum size of the records created after the call. The default was
-  evaluated at import.</li>
+<li><code>set_max_size</code> changes the maximum size of the records created after the call (the default was
+  evaluated at import), and a value larger than <code>sys.maxsize</code> is rejected.</li>
 <li><code>clone()</code> works for <code>MaxScalarRecord</code> and <code>MinScalarRecord</code>.</li>
-<li>A falsy best value (<code>0.0</code>) is kept. The best value of a record created from some elements is
+<li>A falsy best value (<code>0.0</code>) is kept, and the best value of a record created from some elements is
   correct.</li>
-<li>The best value of an empty record is not <code>inf</code> or <code>-inf</code> any more: <code>get_best_value</code> raises
-  <code>EmptyRecordError</code>.</li>
-<li>The comparator of a comparable record is serializable, so the snapshot of a record with a custom
-  comparator can be written to JSON.</li>
+<li><code>get_best_value</code> of an empty record raises <code>EmptyRecordError</code> instead of returning <code>inf</code> or <code>-inf</code>.</li>
 <li>A comparator that raises in <code>add_value</code> leaves the record unchanged.</li>
 <li><code>RecordManager.load_state_dict</code> does not change the manager if an entry is invalid.</li>
-<li><code>RecordManager.load_state_dict</code> validates the state by building each record with
-  <code>BaseRecord.from_dict</code> (it cloned the existing records before). The data of a key that is already
-  in the manager is then loaded with <code>load_dict</code>, so an existing key is built twice, once to validate
-  and once to load. Its merge semantics is documented: a record that the state does not mention is
-  kept.</li>
-<li><code>minrecord.config</code> has no <code>global</code> statement, and <code>src</code> has no <code>noqa</code>.</li>
-<li><code>MaxScalarRecord</code> and <code>MinScalarRecord</code> share a private base class (<code>_ScalarRecord</code>) that builds
-  the comparator from a class attribute, so a new scalar record is a docstring and one line. Their
-  signatures and their <code>_target_</code> (<code>minrecord.comparable.MaxScalarRecord</code>) do not change.</li>
-<li><code>has_improved()</code> of a record that is rebuilt (<code>from_dict</code>, <code>clone</code>) is the one of the original,
-  also when its first value is NaN. A NaN equal to the best NaN is a tie.</li>
-<li>A record that holds a NaN is equal to its JSON round trip.</li>
+<li>A configuration that is not a dict raises <code>TypeError</code> (it was <code>AttributeError</code>).</li>
+<li><code>has_improved()</code> of a rebuilt record (<code>from_dict</code>, <code>clone</code>) is the one of the original, also when
+  its first value is NaN.</li>
 </ul>
 <h3 id="new">New<a class="headerlink" href="#new" title="Permanent link">&para;</a></h3>
 <ul>
-<li><code>RecordManager.get_last_values</code> and <code>RecordManager.equal</code> (the managers work with
-  <code>coola.equality.objects_are_equal</code>).</li>
+<li><code>get_best_step()</code> returns the step of the best value (the latest step among the ties), also if the
+  pair is not in the recent values anymore.</li>
+<li><code>RecordManager.get_last_values</code> and <code>RecordManager.equal</code>.</li>
 <li><code>reset_max_size</code> is exported at the root of the package.</li>
-<li><code>minrecord.utils.validation.check_max_size</code> and <code>check_name</code>.</li>
-<li><code>get_best_step()</code> returns the step of the best value of a comparable record (the latest step among
-  the ties), also if the pair is not in the recent values anymore. It raises <code>EmptyRecordError</code> for an
-  empty record and <code>NotAComparableRecordError</code> for a record that cannot compare. The code that
-  needs "which epoch was the best" does not need its own copy any more.</li>
-<li><code>minrecord.utils.factory.instantiate(config, cls)</code>: builds an object from its dict if the
-  object named by <code>_target_</code> is <code>cls</code> or a subclass of <code>cls</code>.</li>
+<li><code>minrecord.utils.validation.check_max_size</code> and <code>check_name</code>, and
+  <code>minrecord.utils.factory.instantiate(config, cls)</code>.</li>
 <li><code>ComparableRecord</code> accepts the comparator as an object or as its dict.</li>
-</ul>
-<h3 id="documentation">Documentation<a class="headerlink" href="#documentation" title="Permanent link">&para;</a></h3>
-<ul>
-<li>Removed the features that the documentation promised and that do not exist (<code>minrecord[all]</code>,
-  the <code>examples/</code> directory, "batch updates").</li>
-<li>Added the properties of the records to the <a href="../usage_guide/">usage guide</a>, and rewrote the
-  sections about custom comparators and serialization.</li>
-<li>Fixed the sentences of the <a href="../quickstart/">quickstart</a> that contradicted the code (<code>get_last_value</code>
-  instead of <code>get_best_value</code> for a <code>Record</code>, <code>add_value</code>, <code>NotAComparableRecordError</code>, typos).</li>
-<li>Replaced the PyTorch Lightning example of the <a href="../faq/">FAQ</a> by one that works with Lightning 2.x.</li>
-<li>The badges of the home page are the ones of the <code>README.md</code>.</li>
-<li>Narrowed the Atomic property: <code>update</code> keeps the elements before a rejected one, and documented
-  it. Documented that <code>load_dict</code> replaces the whole state (name and <code>max_size</code> included), that the
-  state of a custom record must live in <code>vars(self)</code>, and that <code>RecordManager</code> is falsy when empty.</li>
-<li>The early stopping pattern of the usage guide uses <code>get_best_step</code>, so the patience survives
-  <code>to_dict</code>/<code>from_dict</code>. The properties are linked from the reference of the root package.</li>
+<li>The <a href="../design/">design page</a> lists the guarantees and the design choices.</li>
 </ul>
 
 

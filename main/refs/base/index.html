@@ -546,6 +546,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../faq/" class="md-nav__link">
         
   
@@ -1532,16 +1560,16 @@
 
 
         <p>Define the base class to implement a record.</p>
-<p>The record tracks the value added as well as the step
-when the value is added. The goal of this class is to track the
-recent record because the loggers (e.g. MLFlow or Tensorboard)
+<p>A record tracks the values added to it as well as the step when
+each value was added. The goal of this class is to keep the recent
+values in memory because the loggers (e.g. MLFlow or Tensorboard)
 do not allow to get the last value or the best value. The record
-keeps in memory a recent record of pairs (step, value)
-where step is the index of the step when the value was added. The
-length of the recent record depends on the concrete
-implementation.</p>
-<p>To implement your own record, you will need to define the
-following members:</p>
+keeps in memory a recent history of pairs <code>(step, value)</code> where
+<code>step</code> is the index of the step when the value was added (or
+<code>None</code>). The length of the recent history depends on the
+concrete implementation.</p>
+<p>To implement your own record, you need to define the following
+members:</p>
 <div class="highlight"><pre><span></span><code>- ``name``
 - ``add_value``
 - ``get_last_value``
@@ -1551,22 +1579,26 @@ following members:</p>
 </code></pre></div>
 <p>The other methods are derived from them. <code>clone</code>, <code>equal</code>,
 <code>update</code>, <code>from_dict</code> and <code>load_dict</code> are <code>@final</code>, so a
-type checker rejects an override. A comparable record overrides <code>is_comparable</code>, <code>get_best_value</code>,
-<code>get_best_step</code> and <code>has_improved</code>.</p>
+type checker rejects an override. A comparable record also
+overrides <code>is_comparable</code>, <code>get_best_value</code>, <code>get_best_step</code>
+and <code>has_improved</code>.</p>
 <p>The contract of a record is:</p>
 <div class="highlight"><pre><span></span><code>1. ``to_dict`` returns exactly the arguments of the constructor
     that rebuild the record, including its content, and the
     full name of the class with the key ``_target_``. Thus
     ``BaseRecord.from_dict(record.to_dict()).equal(record)``.
 2. The constructor accepts what ``to_dict`` returns, validates
-    its arguments and raises before any object exists.
+    its arguments and raises before any object exists. The
+    whole state of the record lives in ``vars(self)`` (no
+    ``__slots__``), because ``load_dict`` replaces it.
 3. ``get_best_value``, ``get_best_step`` and ``has_improved`` raise
     ``NotAComparableRecordError`` if the record is not
     comparable, and ``EmptyRecordError`` if the record is
     comparable and empty.
 </code></pre></div>
 <p>The values are stored by reference: <code>to_dict</code> and <code>clone</code> share
-the value objects with the original record.</p>
+the value objects with the original record. A record is not
+thread-safe.</p>
 
 
 <details class="example" open>
@@ -2057,7 +2089,7 @@ record.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>if the record is empty</p>
+                <p>if the record is empty.</p>
               </div>
             </td>
           </tr>
@@ -2150,7 +2182,7 @@ record.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>if the record is empty</p>
+                <p>if the record is empty.</p>
               </div>
             </td>
           </tr>
@@ -2388,7 +2420,7 @@ record.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>if the record is empty</p>
+                <p>if the record is empty.</p>
               </div>
             </td>
           </tr>
@@ -2426,8 +2458,8 @@ record.</p>
 
         <p>Indicate if it is possible to compare the values in the
 record.</p>
-<p>Note that it is possible to compute the best value only for
-records that are comparable.</p>
+<p>The best value, the best step and the improvement flag are
+available only for the records that are comparable.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -2775,7 +2807,7 @@ The step can be <code>None</code> if there is no step.</p>
 
 
 
-        <p>Raise an error if the record is empty.</p>
+        <p>Raise an error if a value is asked from an empty record.</p>
 
 
 
@@ -2806,8 +2838,9 @@ The step can be <code>None</code> if there is no step.</p>
 
 
 
-        <p>Raise an error if it is not possible to compare the values in
-the record.</p>
+        <p>Raise an error if the best value, the best step or the
+improvement flag is asked from a record that cannot compare its
+values (e.g. <code>Record</code>).</p>
 
 
 

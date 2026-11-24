@@ -546,6 +546,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../faq/" class="md-nav__link">
         
   
@@ -1354,6 +1382,12 @@
 
 
         <p>Implement a simple record manager.</p>
+<p>The manager stores records by key (by default, the name of the
+record) and gives the operations that work on all of them: the best
+values, the last values, and saving and loading the whole group. It
+can hold different types of records (<code>Record</code>, <code>MinScalarRecord</code>,
+custom records, ...). A manager is not thread-safe, and an empty
+manager is falsy because it defines <code>__len__</code>.</p>
 <p>This class proposes an approach to manage a group of records, but it
 is possible to use other approaches. If this class does not fit your
 needs, feel free to use another approach.</p>
@@ -2041,7 +2075,10 @@ modified (also if the factory raises).</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The records with their associated keys.</p>
+                <p>The records with their associated keys. It is a shallow
+copy: adding a record to the returned dict does not
+add it to the manager, but the records are the same
+objects. This method never creates a record.</p>
               </div>
             </td>
           </tr>
@@ -2076,7 +2113,7 @@ modified (also if the factory raises).</p>
 
     <div class="doc doc-contents ">
 
-        <p>Indicate if the engine has a record for the given key.</p>
+        <p>Indicate if the manager has a record for the given key.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2125,7 +2162,9 @@ modified (also if the factory raises).</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p><code>True</code> if the record exists, <code>False</code> otherwise</p>
+                <p><code>True</code> if a record is registered for the key, <code>False</code>
+otherwise. This method never creates a record, also if
+the manager has a <code>default_factory</code>.</p>
               </div>
             </td>
           </tr>
@@ -2274,6 +2313,10 @@ not the data of a record.</p>
 
         <p>Return a dictionary containing state values of all the
 records.</p>
+<p>The dictionary maps each key to the output of <code>to_dict</code> of
+its record, so it can be written to JSON if the values can. It
+is the input of <code>load_state_dict</code>. The <code>default_factory</code> is
+not part of the state.</p>
 
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -2301,10 +2344,13 @@ records.</p>
 
 <details class="example" open>
   <summary>Example</summary>
-  <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">minrecord</span><span class="w"> </span><span class="kn">import</span> <span class="n">RecordManager</span>
+  <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">minrecord</span><span class="w"> </span><span class="kn">import</span> <span class="n">RecordManager</span><span class="p">,</span> <span class="n">MinScalarRecord</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">manager</span> <span class="o">=</span> <span class="n">RecordManager</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">manager</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()</span>
 <span class="go">{}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">manager</span><span class="o">.</span><span class="n">add_record</span><span class="p">(</span><span class="n">MinScalarRecord</span><span class="p">(</span><span class="s2">"loss"</span><span class="p">,</span> <span class="n">elements</span><span class="o">=</span><span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">)]))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">manager</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()</span>
+<span class="go">{'loss': {'_target_': 'minrecord.comparable.MinScalarRecord', 'name': 'loss', 'max_size': 10, 'elements': ((0, 1.5),), 'best': (0, 1.5)}}</span>
 </code></pre></div>
 </details>
 

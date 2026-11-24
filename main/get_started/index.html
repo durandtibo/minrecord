@@ -615,6 +615,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../faq/" class="md-nav__link">
         
   
@@ -1112,12 +1140,11 @@ can skip it. You can use <code>uv</code> to create a virtual environment:</p>
 <p>This example uses <code>uv</code> to create a virtual environment, but you can use other tools or
 configurations. Then, you should install the required package to use <code>minrecord</code> with the following
 command:</p>
-<div class="highlight"><pre><span></span><code>inv<span class="w"> </span>install
+<div class="highlight"><pre><span></span><code>inv<span class="w"> </span>env.install
 </code></pre></div>
-<p>This command will install all the required packages. You can also use this command to update the
-required packages. This command will check if there is a more recent package available and will
-install it. Finally, you can test the installation with the following command:</p>
-<div class="highlight"><pre><span></span><code>inv<span class="w"> </span>unit-test<span class="w"> </span>--cov
+<p>This command installs all the required packages (and <code>inv env.update</code> updates them). Finally, you
+can test the installation with the following command:</p>
+<div class="highlight"><pre><span></span><code>inv<span class="w"> </span>test.unit<span class="w"> </span>--cov
 </code></pre></div>
 
 

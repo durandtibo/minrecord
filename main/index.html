@@ -652,6 +652,34 @@
   
   
     <li class="md-nav__item">
+      <a href="design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="faq/" class="md-nav__link">
         
   
@@ -1188,10 +1216,11 @@
 
 <h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
 <p><code>minrecord</code> is a minimalist Python library to record values in a ML workflow.
-In particular, it provides functionalities to track the best value, or the most recent values by
-storing a limiting number of values.
-It is possible to customize the library e.g. it is possible to define a new logic to track the best
-value.</p>
+A record stores the most recent values (a bounded number of <code>(step, value)</code> pairs) and, for a
+comparable record, the best value, which is kept even after it leaves the recent values.
+A record manager groups several records, and every record can be saved to and restored from a
+dictionary. The logic that defines the best value is customizable with a comparator.
+<code>minrecord</code> only depends on <code>coola</code>.</p>
 <h3 id="key-features">Key Features<a class="headerlink" href="#key-features" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>📊 Track Best Values</strong>: Automatically track the best value seen during training</li>
@@ -1199,8 +1228,10 @@ value.</p>
 <li><strong>✅ Improvement Detection</strong>: Easily check if your model is still improving</li>
 <li><strong>🎯 Flexible Comparators</strong>: Define custom logic to determine what "better" means</li>
 <li><strong>🗂️ Record Manager</strong>: Organize and manage multiple metrics efficiently</li>
-<li><strong>💾 Serialization</strong>: Save and load record states for checkpointing</li>
-<li><strong>🚀 Minimal Dependencies</strong>: Lightweight with only essential dependencies</li>
+<li><strong>💾 Serialization</strong>: Save and load record states (<code>to_dict</code>, <code>from_dict</code>) for checkpointing</li>
+<li><strong>🚀 Minimal Dependencies</strong>: Lightweight, with <code>coola</code> as the only dependency</li>
+<li><strong>🛡️ Strict by Design</strong>: Invalid inputs are rejected when they are received, and a failed call leaves
+  the record unchanged</li>
 </ul>
 <p>Below is an example to show how to track the best scalar value when the best value is the maximum
 value and when the best value is the minimum value.</p>
@@ -1221,6 +1252,7 @@ value and when the best value is the minimum value.</p>
 <li><strong><a href="get_started/">Get Started</a></strong>: Installation instructions</li>
 <li><strong><a href="quickstart/">Quickstart</a></strong>: Quick overview of the main features</li>
 <li><strong><a href="usage_guide/">Usage Guide</a></strong>: Detailed patterns and best practices</li>
+<li><strong><a href="design/">Design</a></strong>: Guarantees, design choices and their trade-offs</li>
 <li><strong><a href="faq/">FAQ</a></strong>: Frequently asked questions and troubleshooting</li>
 <li><strong><a href="release_notes/">Release notes</a></strong>: Changes and breaking changes</li>
 <li><strong><a href="refs/root/">API Reference</a></strong>: Detailed API documentation</li>
