@@ -835,11 +835,6 @@ dependencies = [
     { name = "coola" },
 ]
 
-[package.optional-dependencies]
-objectory = [
-    { name = "objectory" },
-]
-
 [package.dev-dependencies]
 dev = [
     { name = "codespell" },
@@ -867,11 +862,7 @@ docs = [
 ]
 
 [package.metadata]
-requires-dist = [
-    { name = "coola", specifier = ">=2.0.0a5,<3.0" },
-    { name = "objectory", marker = "extra == 'objectory'", specifier = ">=0.3.0,<1.0" },
-]
-provides-extras = ["objectory"]
+requires-dist = [{ name = "coola", specifier = ">=2.0.0a5,<3.0" }]
 
 [package.metadata.requires-dev]
 dev = [
@@ -1040,15 +1031,6 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/e6/99/d27cfc9518f49e4cbc25c683ec7cf8704a9d31311341c291c0e78ddf791b/nodeenv-1.12.0.tar.gz", hash = "sha256:4ea7f88339310afebc3253f2c7a91b94bacf97d73a36a5c108962abdfaca501e", size = 131292, upload-time = "2026-10-31T19:03:18.847Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/2d/6a/8a9ac7d5e2f7cf53c459bfef90ebc17a2f8cd54b665af96799d4c534840e/nodeenv-1.12.0-py3-none-any.whl", hash = "sha256:80644d65c10cc2be12e3e4b54b3367ff288c7ad24ae75c2dcc65454fc7449d4d", size = 39442, upload-time = "2026-10-31T19:03:17.427Z" },
-]
-
-[[package]]
-name = "objectory"
-version = "0.3.1"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/20/38/f46a0603c7f59ffea5c44d0bd2f484c1ed2ecbd44a0c3b6cd61ef41d781e/objectory-0.3.1.tar.gz", hash = "sha256:c3b4f387db31470058d8b34d930daeaacb25eb09384c1e266eaf62ca5b15fc8b", size = 16595, upload-time = "2025-12-19T09:13:32.658Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/d5/4d/35db369f225cc44df8fd1a7b06b332da3aefe5ed5b9db512046bf195d0a8/objectory-0.3.1-py3-none-any.whl", hash = "sha256:663a433c7c8ac4971617a61be4f0a9c258bd518bea00bf9eb3f337504ac4c7ce", size = 20701, upload-time = "2025-12-19T09:13:33.809Z" },
 ]
 
 [[package]]
