@@ -1,7 +1,7 @@
 # Instructions for coding agents
 
 `minrecord` is a minimalist library to record values in a machine learning workflow. It supports
-Python 3.11 and later. It depends on `coola` (2.x) and has one optional dependency, `objectory`.
+Python 3.11 and later. It depends on `coola` (2.x) and has no optional dependency.
 
 ## Environment
 
@@ -69,11 +69,9 @@ Python 3.11 and later. It depends on `coola` (2.x) and has one optional dependen
   to catch the error (see `EmptyRecordError` and `NotAComparableRecordError` in
   `minrecord.base`).
 - Keep new options keyword-only (`*`).
-- `objectory` is an optional library: it is never imported at module level in `src`, except in the
-  `if TYPE_CHECKING:` blocks or behind the helpers of `minrecord.utils.imports`
-  (`is_objectory_available`, `check_objectory`, `objectory_available`). Provide a fallback in
-  `minrecord/utils/fallback/` when the code must work without it. Do the same for any new
-  optional library.
+- `minrecord` has no optional dependency. If one is added, never import it at module level in `src`
+  (use `if TYPE_CHECKING:` or a lazy import helper) and provide a fallback when the code must work
+  without it.
 - Every function, public or private (leading underscore), needs a docstring and its own unit
   tests. Private functions are not exempt. An override that adds nothing to the docstring of the
   method it overrides (same behaviour, arguments and exceptions) has no docstring: it inherits the
@@ -94,10 +92,9 @@ Python 3.11 and later. It depends on `coola` (2.x) and has one optional dependen
   `tests/unit/<package>/test_<module>.py` for a subpackage such as `utils`). Helpers shared by the
   unit tests are in `tests/unit/helpers.py`. Integration tests are in `tests/integration/`, with
   the same layout.
-- Do not use local imports inside tests (for example `import objectory` in a test body). Import
-  at the top of the module; use the marks of `minrecord.testing` (`objectory_available`,
-  `objectory_not_available`) for optional libraries, and guard the import of an optional library
-  with `if is_objectory_available():` as the existing tests do.
+- Do not use local imports inside tests (for example `import numpy` in a test body). Import
+  at the top of the module; guard the import of an optional library with `pytest.importorskip` or a
+  skip mark.
 - One behaviour per test: a test has one `assert` or one `pytest.raises`. Split a test that checks
   several things (equal, different, negative, ...) into several tests.
 - A test may combine `pytest.raises` (or `pytest.warns`) with an `assert` that checks the state
