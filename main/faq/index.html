@@ -1983,7 +1983,7 @@ are improving.</p>
 <div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>minrecord<span class="o">[</span>all<span class="o">]</span>
 </code></pre></div>
 <h3 id="what-python-versions-are-supported">What Python versions are supported?<a class="headerlink" href="#what-python-versions-are-supported" title="Permanent link">&para;</a></h3>
-<p>Python 3.10 and higher are officially supported.</p>
+<p>Python 3.11 and higher are officially supported.</p>
 <h3 id="do-i-need-pytorch-or-other-ml-frameworks">Do I need PyTorch or other ML frameworks?<a class="headerlink" href="#do-i-need-pytorch-or-other-ml-frameworks" title="Permanent link">&para;</a></h3>
 <p>No, <code>minrecord</code> has minimal dependencies. It only requires <code>coola</code>, which is used for equality
 testing.</p>
@@ -1991,12 +1991,10 @@ testing.</p>
 <h3 id="when-should-i-use-record-vs-comparablerecord">When should I use Record vs ComparableRecord?<a class="headerlink" href="#when-should-i-use-record-vs-comparablerecord" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>Use <code>Record</code></strong> when you only need to track recent values</li>
-<li><strong>Use <code>ComparableRecord</code>/<code>MinScalarRecord</code>/<code>MaxScalarRecord</code></strong> when you need to:<ul>
+<li><strong>Use <code>ComparableRecord</code>/<code>MinScalarRecord</code>/<code>MaxScalarRecord</code></strong> when you need to:</li>
 <li>Track the best value</li>
 <li>Check if values are improving</li>
 <li>Implement early stopping</li>
-</ul>
-</li>
 </ul>
 <h3 id="how-do-i-choose-max_size">How do I choose max_size?<a class="headerlink" href="#how-do-i-choose-max_size" title="Permanent link">&para;</a></h3>
 <p>Consider:</p>

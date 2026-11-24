@@ -1314,7 +1314,7 @@
                 <code>elements</code>
             </td>
             <td>
-                  <code><span title="collections.abc.Iterable">Iterable</span>[<span title="tuple">tuple</span>[<span title="int">int</span> | None, <span title="minrecord.comparable.T">T</span>]]</code>
+                  <code><span title="collections.abc.Iterable">Iterable</span>[<span title="tuple">tuple</span>[<span title="float">float</span> | None, <span title="minrecord.comparable.T">T</span>]]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1539,7 +1539,7 @@ otherwise <code>False</code>.</p>
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="minrecord.comparable.ComparableRecord" href="#minrecord.comparable.ComparableRecord">ComparableRecord</a>[<span title="numbers.Number">Number</span>]</code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="minrecord.comparable.ComparableRecord" href="#minrecord.comparable.ComparableRecord">ComparableRecord</a>[<span title="float">float</span>]</code></p>
 
 
 
@@ -1581,7 +1581,7 @@ best value of the record.</p>
                 <code>elements</code>
             </td>
             <td>
-                  <code><span title="collections.abc.Iterable">Iterable</span>[<span title="tuple">tuple</span>[<span title="int">int</span> | None, <span title="minrecord.comparable.T">T</span>]]</code>
+                  <code><span title="collections.abc.Iterable">Iterable</span>[<span title="tuple">tuple</span>[<span title="float">float</span> | None, <span title="float">float</span>]]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1602,7 +1602,7 @@ the step and its associated value.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The maximum number of elements to store inthe record.</p>
+                <p>The maximum number of elements to store in the record.</p>
               </div>
             </td>
             <td>
@@ -1614,7 +1614,7 @@ the step and its associated value.</p>
                 <code>best_value</code>
             </td>
             <td>
-                  <code><span title="minrecord.comparable.T">T</span> | None</code>
+                  <code><span title="float">float</span> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1694,8 +1694,9 @@ best value of the <code>comparator</code> is used.</p>
 
 <a href="#minrecord.comparable.MaxScalarRecord.from_elements" class="headerlink" title="Permanent link">&para;</a></h4>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">from_elements</span><span class="p">(</span>
-    <span class="n">name</span><span class="p">:</span> <span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n">elements</span><span class="p">:</span> <span class="n"><span title="collections.abc.Iterable">Iterable</span></span><span class="p">[</span><span class="n"><span title="tuple">tuple</span></span><span class="p">[</span><span class="n"><span title="float">float</span></span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n"><span title="minrecord.comparable.T">T</span></span><span class="p">]]</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="typing_extensions.Self">Self</span></span>
+    <span class="n">name</span><span class="p">:</span> <span class="n"><span title="str">str</span></span><span class="p">,</span>
+    <span class="n">elements</span><span class="p">:</span> <span class="n"><span title="collections.abc.Iterable">Iterable</span></span><span class="p">[</span><span class="n"><span title="tuple">tuple</span></span><span class="p">[</span><span class="n"><span title="float">float</span></span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n"><span title="float">float</span></span><span class="p">]],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="typing.Self">Self</span></span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -1735,7 +1736,7 @@ best value of the <code>comparator</code> is used.</p>
                 <code>elements</code>
             </td>
             <td>
-                  <code><span title="collections.abc.Iterable">Iterable</span>[<span title="tuple">tuple</span>[<span title="float">float</span> | None, <span title="minrecord.comparable.T">T</span>]]</code>
+                  <code><span title="collections.abc.Iterable">Iterable</span>[<span title="tuple">tuple</span>[<span title="float">float</span> | None, <span title="float">float</span>]]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1762,7 +1763,7 @@ the step and its associated value.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="typing_extensions.Self">Self</span></code>
+                  <code><span title="typing.Self">Self</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1812,7 +1813,7 @@ the step and its associated value.</p>
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="minrecord.comparable.ComparableRecord" href="#minrecord.comparable.ComparableRecord">ComparableRecord</a>[<span title="numbers.Number">Number</span>]</code></p>
+              Bases: <code><a class="autorefs autorefs-internal" title="minrecord.comparable.ComparableRecord" href="#minrecord.comparable.ComparableRecord">ComparableRecord</a>[<span title="float">float</span>]</code></p>
 
 
 
@@ -1854,7 +1855,7 @@ best value of the record.</p>
                 <code>elements</code>
             </td>
             <td>
-                  <code><span title="collections.abc.Iterable">Iterable</span>[<span title="tuple">tuple</span>[<span title="int">int</span> | None, <span title="minrecord.comparable.T">T</span>]]</code>
+                  <code><span title="collections.abc.Iterable">Iterable</span>[<span title="tuple">tuple</span>[<span title="float">float</span> | None, <span title="float">float</span>]]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1875,7 +1876,7 @@ the step and its associated value.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The maximum number of elements to store inthe record.</p>
+                <p>The maximum number of elements to store in the record.</p>
               </div>
             </td>
             <td>
@@ -1887,7 +1888,7 @@ the step and its associated value.</p>
                 <code>best_value</code>
             </td>
             <td>
-                  <code><span title="minrecord.comparable.T">T</span> | None</code>
+                  <code><span title="float">float</span> | None</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1967,8 +1968,9 @@ best  value of the <code>comparator</code> is used.</p>
 
 <a href="#minrecord.comparable.MinScalarRecord.from_elements" class="headerlink" title="Permanent link">&para;</a></h4>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">from_elements</span><span class="p">(</span>
-    <span class="n">name</span><span class="p">:</span> <span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n">elements</span><span class="p">:</span> <span class="n"><span title="collections.abc.Iterable">Iterable</span></span><span class="p">[</span><span class="n"><span title="tuple">tuple</span></span><span class="p">[</span><span class="n"><span title="float">float</span></span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n"><span title="minrecord.comparable.T">T</span></span><span class="p">]]</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="typing_extensions.Self">Self</span></span>
+    <span class="n">name</span><span class="p">:</span> <span class="n"><span title="str">str</span></span><span class="p">,</span>
+    <span class="n">elements</span><span class="p">:</span> <span class="n"><span title="collections.abc.Iterable">Iterable</span></span><span class="p">[</span><span class="n"><span title="tuple">tuple</span></span><span class="p">[</span><span class="n"><span title="float">float</span></span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n"><span title="float">float</span></span><span class="p">]],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="typing.Self">Self</span></span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2008,7 +2010,7 @@ best  value of the <code>comparator</code> is used.</p>
                 <code>elements</code>
             </td>
             <td>
-                  <code><span title="collections.abc.Iterable">Iterable</span>[<span title="tuple">tuple</span>[<span title="float">float</span> | None, <span title="minrecord.comparable.T">T</span>]]</code>
+                  <code><span title="collections.abc.Iterable">Iterable</span>[<span title="tuple">tuple</span>[<span title="float">float</span> | None, <span title="float">float</span>]]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2035,7 +2037,7 @@ the step and its associated value.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="typing_extensions.Self">Self</span></code>
+                  <code><span title="typing.Self">Self</span></code>
             </td>
             <td>
               <div class="doc-md-description">
