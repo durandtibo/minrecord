@@ -4,7 +4,7 @@ from __future__ import annotations
 
 __all__ = ["ComparableRecord", "MaxScalarRecord", "MinScalarRecord"]
 
-from typing import TYPE_CHECKING, Any, Self, TypeVar
+from typing import TYPE_CHECKING, Any, TypeVar
 
 from coola.formatting.structure import str_indent, str_mapping
 
@@ -25,17 +25,29 @@ T = TypeVar("T")
 class ComparableRecord(Record[T]):
     r"""Implement a record of comparable values.
 
+    The best value is stored apart from the recent values: it is kept
+    when the pair ``(step, value)`` that produced it leaves the recent
+    values. The first value added to the record is the best value. A
+    value that is equal to the best value counts as an improvement.
+
     Args:
         name: The name of the record.
         comparator: The comparator to use to find the best value.
         elements: The initial elements. Each element is a tuple with
-            the step and its associated value.
+            the step and its associated value. The elements are added
+            with ``add_value``, so the best value and the improvement
+            flag are computed from them, and only the last
+            ``max_size`` elements are kept.
         max_size: The maximum number of elements to store in the record.
             If ``None``, the default maximum size (see ``get_max_size``)
             at the time of the creation of the record is used.
-        best_value: The initial best value. If ``None``, the initial
-            best value of the ``comparator`` is used.
-        improved: Indicate if the last value is the best value or not.
+        best: The best pair ``(step, value)`` before the ``elements``
+            are added. It is useful when the best value is not in the
+            ``elements`` anymore, because it has been removed from the
+            recent values. ``None`` means there is no value yet.
+
+    Raises:
+        ValueError: if ``max_size`` is not a positive integer.
 
     Example:
         ```pycon
@@ -54,20 +66,19 @@ class ComparableRecord(Record[T]):
         ```
     """
 
-    # The arguments cannot become keyword-only without a breaking change.
-    def __init__(  # noqa: PLR0917
+    def __init__(
         self,
         name: str,
         comparator: BaseComparator[T],
+        *,
         elements: Iterable[tuple[float | None, T]] = (),
         max_size: int | None = None,
-        best_value: T | None = None,
-        improved: bool = False,
+        best: tuple[float | None, T] | None = None,
     ) -> None:
-        super().__init__(name=name, elements=elements, max_size=max_size)
         self._comparator = comparator
-        self._best_value: T = best_value or self._comparator.get_initial_best_value()
-        self._improved = bool(improved)
+        self._best: tuple[float | None, T] | None = None if best is None else (best[0], best[1])
+        self._improved = False
+        super().__init__(name, elements=elements, max_size=max_size)
 
     def __str__(self) -> str:
         args = str_indent(
@@ -76,7 +87,7 @@ class ComparableRecord(Record[T]):
                     "name": self.name,
                     "max_size": self.max_size,
                     "comparator": self._comparator,
-                    "best_value": self._best_value,
+                    "best": self._best,
                     "improved": self._improved,
                     "record": self.get_most_recent(),
                 }
@@ -85,20 +96,13 @@ class ComparableRecord(Record[T]):
         return f"{self.__class__.__qualname__}(\n  {args}\n)"
 
     def add_value(self, value: T, step: float | None = None) -> None:
-        self._improved = self.is_better(new_value=value, old_value=self._best_value)
-        if self._improved:
-            self._best_value = value
+        # The comparison is done first because the comparator can raise an
+        # error: the record is not modified if it happens.
+        improved = self._best is None or self.is_better(old_value=self._best[1], new_value=value)
         super().add_value(value, step)
-
-    def clone(self) -> ComparableRecord[T]:
-        return self.__class__(
-            name=self.name,
-            elements=self._record,
-            max_size=self.max_size,
-            comparator=self._comparator,
-            best_value=self._best_value,
-            improved=self._improved,
-        )
+        self._improved = improved
+        if improved:
+            self._best = (step, value)
 
     def is_better(self, old_value: T, new_value: T) -> bool:
         r"""Indicate if the new value is better than the old value.
@@ -125,13 +129,13 @@ class ComparableRecord(Record[T]):
         """
         return self._comparator.is_better(new_value=new_value, old_value=old_value)
 
-    def _get_best_value(self) -> T:
-        if self.is_empty():
+    def get_best_value(self) -> T:
+        if self._best is None:
             msg = "The record is empty so it is not possible to get the best value."
             raise EmptyRecordError(msg)
-        return self._best_value
+        return self._best[1]
 
-    def _has_improved(self) -> bool:
+    def has_improved(self) -> bool:
         if self.is_empty():
             msg = "The record is empty."
             raise EmptyRecordError(msg)
@@ -140,29 +144,8 @@ class ComparableRecord(Record[T]):
     def is_comparable(self) -> bool:
         return True
 
-    def config_dict(self) -> dict[str, Any]:
-        config = super().config_dict()
-        config["max_size"] = self.max_size
-        config["comparator"] = self._comparator
-        return config
-
-    def load_state_dict(self, state_dict: dict[str, Any]) -> None:
-        super().load_state_dict(state_dict)
-        self._improved = state_dict["improved"]
-        self._best_value = state_dict["best_value"]
-
-    def state_dict(self) -> dict[str, Any]:
-        state = super().state_dict()
-        state.update({"improved": self._improved, "best_value": self._best_value})
-        return state
-
-    @classmethod
-    def from_elements(
-        cls, name: str, comparator: BaseComparator[T], elements: Iterable[tuple[float | None, T]]
-    ) -> Self:
-        record = cls(name=name, comparator=comparator)
-        record.update(elements)
-        return record
+    def to_dict(self) -> dict[str, Any]:
+        return {**super().to_dict(), "comparator": self._comparator, "best": self._best}
 
 
 class MaxScalarRecord(ComparableRecord[float]):
@@ -175,13 +158,18 @@ class MaxScalarRecord(ComparableRecord[float]):
     Args:
         name: The name of the record.
         elements: The initial elements. Each element is a tuple with
-            the step and its associated value.
+            the step and its associated value. The elements are added
+            with ``add_value``, so the best value and the improvement
+            flag are computed from them, and only the last
+            ``max_size`` elements are kept.
         max_size: The maximum number of elements to store in the record.
             If ``None``, the default maximum size (see ``get_max_size``)
             at the time of the creation of the record is used.
-        best_value: The initial best value. If ``None``, the initial
-            best value of the ``comparator`` is used.
-        improved: Indicate if the last value is the best value or not.
+        best: The best pair ``(step, value)`` before the ``elements``
+            are added. ``None`` means there is no value yet.
+
+    Raises:
+        ValueError: if ``max_size`` is not a positive integer.
 
     Example:
         ```pycon
@@ -195,6 +183,8 @@ class MaxScalarRecord(ComparableRecord[float]):
         42.0
         >>> record.get_best_value()
         64.0
+        >>> MaxScalarRecord("value", elements=[(None, 64.0), (None, 42.0)]).get_best_value()
+        64.0
 
         ```
     """
@@ -202,65 +192,19 @@ class MaxScalarRecord(ComparableRecord[float]):
     def __init__(
         self,
         name: str,
+        *,
         elements: Iterable[tuple[float | None, float]] = (),
         max_size: int | None = None,
-        best_value: float | None = None,
-        improved: bool = False,
+        best: tuple[float | None, float] | None = None,
     ) -> None:
         super().__init__(
-            name=name,
-            comparator=MaxScalarComparator(),
-            elements=elements,
-            max_size=max_size,
-            best_value=best_value,
-            improved=improved,
+            name, MaxScalarComparator(), elements=elements, max_size=max_size, best=best
         )
 
-    def config_dict(self) -> dict[str, Any]:
-        config = super().config_dict()
-        del config["comparator"]
-        return config
-
-    def clone(self) -> MaxScalarRecord:
-        # The scalar records have no ``comparator`` argument, so the state is
-        # copied after the creation. It keeps a falsy best value (e.g. ``0.0``).
-        record = self.__class__(name=self.name, elements=self._record, max_size=self.max_size)
-        record._best_value = self._best_value
-        record._improved = self._improved
-        return record
-
-    @classmethod
-    # The scalar records have no ``comparator`` argument. Changing the signature of the
-    # inherited method is a breaking change, so the override is kept as it is.
-    def from_elements(  # ty: ignore[incompatible-method-override]  # pyright: ignore[reportIncompatibleMethodOverride]
-        cls, name: str, elements: Iterable[tuple[float | None, float]]
-    ) -> Self:
-        r"""Instantiate a ``MaxScalarRecord`` object from the elements.
-
-        Args:
-            name: The name of the record.
-            elements: The initial elements. Each element is a tuple with
-                the step and its associated value.
-
-        Returns:
-            The instantiated record.
-
-        Example:
-            ```pycon
-            >>> from minrecord import MaxScalarRecord
-            >>> record = MaxScalarRecord.from_elements("value", ((None, 64.0), (None, 42.0)))
-            >>> record.get_most_recent()
-            ((None, 64.0), (None, 42.0))
-            >>> record.get_last_value()
-            42.0
-            >>> record.get_best_value()
-            64.0
-
-            ```
-        """
-        record = cls(name)
-        record.update(elements)
-        return record
+    def to_dict(self) -> dict[str, Any]:
+        data = super().to_dict()
+        del data["comparator"]
+        return data
 
 
 class MinScalarRecord(ComparableRecord[float]):
@@ -273,13 +217,18 @@ class MinScalarRecord(ComparableRecord[float]):
     Args:
         name: The name of the record.
         elements: The initial elements. Each element is a tuple with
-            the step and its associated value.
+            the step and its associated value. The elements are added
+            with ``add_value``, so the best value and the improvement
+            flag are computed from them, and only the last
+            ``max_size`` elements are kept.
         max_size: The maximum number of elements to store in the record.
             If ``None``, the default maximum size (see ``get_max_size``)
             at the time of the creation of the record is used.
-        best_value: The initial best value. If ``None``, the initial
-            best  value of the ``comparator`` is used.
-        improved: Indicate if the last value is the best value or not.
+        best: The best pair ``(step, value)`` before the ``elements``
+            are added. ``None`` means there is no value yet.
+
+    Raises:
+        ValueError: if ``max_size`` is not a positive integer.
 
     Example:
         ```pycon
@@ -293,6 +242,8 @@ class MinScalarRecord(ComparableRecord[float]):
         42.0
         >>> record.get_best_value()
         42.0
+        >>> MinScalarRecord("value", elements=[(None, 64.0), (None, 42.0)]).get_best_value()
+        42.0
 
         ```
     """
@@ -300,62 +251,16 @@ class MinScalarRecord(ComparableRecord[float]):
     def __init__(
         self,
         name: str,
+        *,
         elements: Iterable[tuple[float | None, float]] = (),
         max_size: int | None = None,
-        best_value: float | None = None,
-        improved: bool = False,
+        best: tuple[float | None, float] | None = None,
     ) -> None:
         super().__init__(
-            name=name,
-            comparator=MinScalarComparator(),
-            elements=elements,
-            max_size=max_size,
-            best_value=best_value,
-            improved=improved,
+            name, MinScalarComparator(), elements=elements, max_size=max_size, best=best
         )
 
-    def config_dict(self) -> dict[str, Any]:
-        config = super().config_dict()
-        del config["comparator"]
-        return config
-
-    def clone(self) -> MinScalarRecord:
-        # The scalar records have no ``comparator`` argument, so the state is
-        # copied after the creation. It keeps a falsy best value (e.g. ``0.0``).
-        record = self.__class__(name=self.name, elements=self._record, max_size=self.max_size)
-        record._best_value = self._best_value
-        record._improved = self._improved
-        return record
-
-    @classmethod
-    # The scalar records have no ``comparator`` argument. Changing the signature of the
-    # inherited method is a breaking change, so the override is kept as it is.
-    def from_elements(  # ty: ignore[incompatible-method-override]  # pyright: ignore[reportIncompatibleMethodOverride]
-        cls, name: str, elements: Iterable[tuple[float | None, float]]
-    ) -> Self:
-        r"""Instantiate a ``MaxScalarRecord`` object from the elements.
-
-        Args:
-            name: The name of the record.
-            elements: The initial elements. Each element is a tuple with
-                the step and its associated value.
-
-        Returns:
-            The instantiated record.
-
-        Example:
-            ```pycon
-            >>> from minrecord import MinScalarRecord
-            >>> record = MinScalarRecord.from_elements("value", ((None, 64.0), (None, 42.0)))
-            >>> record.get_most_recent()
-            ((None, 64.0), (None, 42.0))
-            >>> record.get_last_value()
-            42.0
-            >>> record.get_best_value()
-            42.0
-
-            ```
-        """
-        record = cls(name)
-        record.update(elements)
-        return record
+    def to_dict(self) -> dict[str, Any]:
+        data = super().to_dict()
+        del data["comparator"]
+        return data

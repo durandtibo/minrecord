@@ -5,7 +5,7 @@ import logging
 
 from coola.equality import objects_are_equal
 
-from minrecord import Record
+from minrecord import BaseRecord, MinScalarRecord, Record
 
 logger: logging.Logger = logging.getLogger(__name__)
 
@@ -42,9 +42,19 @@ def check_record() -> None:
     assert objects_are_equal(Record("loss"), Record("loss"))
 
 
+def check_comparable_record() -> None:
+    logger.info("Checking MinScalarRecord...")
+    record = MinScalarRecord("loss", max_size=2, elements=[(0, 1.0), (1, 5.0), (2, 6.0)])
+    assert record.get_best_value() == 1.0
+    assert record.get_most_recent() == ((1, 5.0), (2, 6.0))
+    assert record.clone().equal(record)
+    assert BaseRecord.from_dict(record.to_dict()).equal(record)
+
+
 def main() -> None:
     check_imports()
     check_record()
+    check_comparable_record()
 
 
 if __name__ == "__main__":

@@ -226,12 +226,15 @@ Records support serialization for checkpointing:
 
 ```python
 # Save state
-state = record.state_dict()
+state = record.to_dict()
 torch.save(state, "record_state.pt")
 
-# Load state
+# Load state in a new record
 state = torch.load("record_state.pt")
-record.load_state_dict(state)
+record = BaseRecord.from_dict(state)
+
+# Or load state in place (the record is not changed if the state is invalid)
+record.load_dict(state)
 ```
 
 For RecordManager:
@@ -268,8 +271,8 @@ print(f"Number of stored values: {len(record)}")
 
 ```python
 # Useful for testing
-record1 = MinScalarRecord.from_elements("loss", [(0, 1.5), (1, 1.3)])
-record2 = MinScalarRecord.from_elements("loss", [(0, 1.5), (1, 1.3)])
+record1 = MinScalarRecord("loss", elements=[(0, 1.5), (1, 1.3)])
+record2 = MinScalarRecord("loss", elements=[(0, 1.5), (1, 1.3)])
 assert record1.equal(record2)
 ```
 

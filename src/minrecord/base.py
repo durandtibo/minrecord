@@ -9,11 +9,11 @@ __all__ = [
 ]
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any, Generic, TypeVar
+from typing import TYPE_CHECKING, Any, Generic, Self, TypeVar
 
+from coola.equality import objects_are_equal
 from coola.equality.tester import EqualEqualityTester, get_default_registry
 from coola.factory import OBJECT_TARGET, factory
-from coola.utils.introspection import get_qualified_class_name
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -35,24 +35,35 @@ class BaseRecord(ABC, Generic[T]):
     implementation.
 
     To implement your own record, you will need to define the
-    following methods:
+    following members:
 
+        - ``name``
         - ``add_value``
         - ``get_last_value``
         - ``get_most_recent``
-        - ``is_comparable``
         - ``is_empty``
-        - ``update``
-        - ``load_state_dict``
-        - ``state_dict``
+        - ``to_dict``
 
-    If it is a comparable record, you will need to implement
-    the following methods too:
+    The other methods are derived from them and must not be overridden
+    (``clone``, ``equal``, ``update``, ``from_dict`` and ``load_dict``),
+    except by a comparable record that overrides ``is_comparable``,
+    ``get_best_value`` and ``has_improved``.
 
-        - ``_get_best_value``
-        - ``_has_improved``
+    The contract of a record is:
 
-    You may also need to extend the ``config_dict`` method.
+        1. ``to_dict`` returns exactly the arguments of the constructor
+            that rebuild the record, including its content, and the
+            full name of the class with the key ``_target_``. Thus
+            ``BaseRecord.from_dict(record.to_dict()).equal(record)``.
+        2. The constructor accepts what ``to_dict`` returns, validates
+            its arguments and raises before any object exists.
+        3. ``get_best_value`` and ``has_improved`` raise
+            ``NotAComparableRecordError`` if the record is not
+            comparable, and ``EmptyRecordError`` if the record is
+            comparable and empty.
+
+    The values are stored by reference: ``to_dict`` and ``clone`` share
+    the value objects with the original record.
 
     Example:
         ```pycon
@@ -93,100 +104,14 @@ class BaseRecord(ABC, Generic[T]):
         """
 
     @abstractmethod
-    def clone(self) -> BaseRecord[T]:
-        r"""Clone the current record.
-
-        Returns:
-            A copy of the current record.
-
-        Example:
-            ```pycon
-            >>> from minrecord import Record
-            >>> record = Record("loss")
-            >>> record_cloned = record.clone()
-            >>> record_cloned
-            Record(name=loss, max_size=10, size=0)
-
-            ```
-        """
-
-    @abstractmethod
-    def equal(self, other: Any) -> bool:
-        r"""Indicate if two records are equal or not.
-
-        Args:
-            other: The object to compare.
-
-        Returns:
-            ``True`` if the records are equal, ``False`` otherwise.
-
-        Example:
-            ```pycon
-            >>> from minrecord import Record
-            >>> record1 = Record("loss")
-            >>> record2 = Record("accuracy")
-            >>> record3 = Record("loss")
-            >>> record1.equal(record2)
-            False
-            >>> record1.equal(record1)
-            True
-
-            ```
-        """
-
-    def get_best_value(self) -> T:
-        r"""Get the best value of this record.
-
-        It is possible to get the best value only if it is a
-        comparable record i.e. it is possible to compare the
-        values in the record.
-
-        Returns:
-            The best value of this record.
-
-        Raises:
-            NotAComparableRecord: if it is not a comparable record.
-            EmptyRecordError: if the record is empty
-
-        Example:
-            ```pycon
-            >>> from minrecord import MaxScalarRecord
-            >>> record = MaxScalarRecord("accuracy")
-            >>> record.add_value(value=2, step=0)
-            >>> record.add_value(value=4, step=1)
-            >>> record.get_best_value()
-            4
-
-            ```
-        """
-        if not self.is_comparable():
-            msg = (
-                "It is not possible to get the best value because it is not possible to compare "
-                f"the values in {self.name} record"
-            )
-            raise NotAComparableRecordError(msg)
-        return self._get_best_value()
-
-    def _get_best_value(self) -> T:
-        r"""Get the best value of this record.
-
-        You need to implement this method for a comparable record.
-
-        Returns:
-            The best value of this record.
-
-        Raises:
-            NotImplementedError: if this method is not implemented.
-        """
-        msg = "_get_best_value method is not implemented"
-        raise NotImplementedError(msg)
-
-    @abstractmethod
     def get_last_value(self) -> T:
         r"""Get the last value.
 
         Returns:
             The last value added in the record.
+
+        Raises:
+            EmptyRecordError: if the record is empty.
 
         Example:
             ```pycon
@@ -227,6 +152,129 @@ class BaseRecord(ABC, Generic[T]):
             ```
         """
 
+    @abstractmethod
+    def is_empty(self) -> bool:
+        r"""Indicate if the record is empty or not.
+
+        Returns:
+            ``True`` if the record is empty, otherwise ``False``.
+
+        Example:
+            ```pycon
+            >>> from minrecord import Record
+            >>> record = Record("loss")
+            >>> record.is_empty()
+            True
+
+            ```
+        """
+
+    @abstractmethod
+    def to_dict(self) -> dict[str, Any]:
+        r"""Export the current record to a dictionary.
+
+        The dictionary contains the full name of the class (key
+        ``_target_``) and the arguments of the constructor that
+        re-create the record with the same content. It can be used as
+        input of ``from_dict`` or ``load_dict``, or as the arguments of
+        ``coola.factory.factory``.
+
+        Returns:
+            A dictionary with the arguments of the constructor.
+
+        Example:
+            ```pycon
+            >>> from minrecord import Record
+            >>> Record("loss", elements=[(0, 1.5)], max_size=3).to_dict()
+            {'_target_': 'minrecord.generic.Record', 'name': 'loss', 'max_size': 3, 'elements': ((0, 1.5),)}
+
+            ```
+        """
+
+    def clone(self) -> Self:
+        r"""Clone the current record.
+
+        The clone is independent: adding values to it does not change
+        the original record. The values are shared, not copied.
+
+        Returns:
+            A copy of the current record.
+
+        Example:
+            ```pycon
+            >>> from minrecord import Record
+            >>> record = Record("loss")
+            >>> record_cloned = record.clone()
+            >>> record_cloned
+            Record(name=loss, max_size=10, size=0)
+
+            ```
+        """
+        kwargs = self.to_dict()
+        del kwargs[OBJECT_TARGET]
+        return type(self)(**kwargs)
+
+    def equal(self, other: Any) -> bool:
+        r"""Indicate if two records are equal or not.
+
+        Two records are equal if they have the same type and the same
+        ``to_dict`` output.
+
+        Args:
+            other: The object to compare.
+
+        Returns:
+            ``True`` if the records are equal, ``False`` otherwise.
+
+        Example:
+            ```pycon
+            >>> from minrecord import Record
+            >>> record1 = Record("loss")
+            >>> record2 = Record("accuracy")
+            >>> record3 = Record("loss")
+            >>> record1.equal(record2)
+            False
+            >>> record1.equal(record3)
+            True
+
+            ```
+        """
+        if type(other) is not type(self):
+            return False
+        return objects_are_equal(self.to_dict(), other.to_dict())
+
+    def get_best_value(self) -> T:
+        r"""Get the best value of this record.
+
+        It is possible to get the best value only if it is a
+        comparable record i.e. it is possible to compare the
+        values in the record.
+
+        Returns:
+            The best value of this record.
+
+        Raises:
+            NotAComparableRecordError: if it is not a comparable
+                record.
+            EmptyRecordError: if the record is empty
+
+        Example:
+            ```pycon
+            >>> from minrecord import MaxScalarRecord
+            >>> record = MaxScalarRecord("accuracy")
+            >>> record.add_value(value=2, step=0)
+            >>> record.add_value(value=4, step=1)
+            >>> record.get_best_value()
+            4
+
+            ```
+        """
+        msg = (
+            "It is not possible to get the best value because it is not possible to compare "
+            f"the values in {self.name} record"
+        )
+        raise NotAComparableRecordError(msg)
+
     def has_improved(self) -> bool:
         r"""Indicate if the last value is the best value.
 
@@ -239,7 +287,8 @@ class BaseRecord(ABC, Generic[T]):
                 otherwise ``False``.
 
         Raises:
-            NotAComparableRecord: if it is not a comparable record.
+            NotAComparableRecordError: if it is not a comparable
+                record.
             EmptyRecordError: if the record is empty
 
         Example:
@@ -253,30 +302,12 @@ class BaseRecord(ABC, Generic[T]):
 
             ```
         """
-        if not self.is_comparable():
-            msg = (
-                "It is not possible to indicate if the last value is the best value because it "
-                f"is not possible to compare the values in {self.name} record"
-            )
-            raise NotAComparableRecordError(msg)
-        return self._has_improved()
+        msg = (
+            "It is not possible to indicate if the last value is the best value because it "
+            f"is not possible to compare the values in {self.name} record"
+        )
+        raise NotAComparableRecordError(msg)
 
-    def _has_improved(self) -> bool:
-        r"""Indicate if the last value is the best value.
-
-        You need to implement this method for a comparable record.
-
-        Returns:
-            ``True`` if the last value is the best value,
-                otherwise ``False``.
-
-        Raises:
-            NotImplementedError: if this method is not implemented
-        """
-        msg = "_has_improved method is not implemented"
-        raise NotImplementedError(msg)
-
-    @abstractmethod
     def is_comparable(self) -> bool:
         r"""Indicate if it is possible to compare the values in the
         record.
@@ -297,25 +328,8 @@ class BaseRecord(ABC, Generic[T]):
 
             ```
         """
+        return False
 
-    @abstractmethod
-    def is_empty(self) -> bool:
-        r"""Indicate if the record is empty or not.
-
-        Returns:
-            ``True`` if the record is empty, otherwise ``False``.
-
-        Example:
-            ```pycon
-            >>> from minrecord import Record
-            >>> record = Record("loss")
-            >>> record.is_empty()
-            True
-
-            ```
-        """
-
-    @abstractmethod
     def update(self, elements: Iterable[tuple[float | None, T]]) -> None:
         r"""Update the record by adding the elements.
 
@@ -334,81 +348,21 @@ class BaseRecord(ABC, Generic[T]):
 
             ```
         """
-
-    def config_dict(self) -> dict[str, Any]:
-        r"""Get the config of the record.
-
-        The config dictionary should contain all the values necessary
-        to instantiate a record with the same parameters
-        with ``coola.factory.factory``. It is expected to contain values
-        like the full name of the class and the arguments of the
-        constructor. This dictionary should not contain the state
-        values. It is possible to get the state values with the
-        ``state_dict`` method.
-
-        Returns:
-            The config of the record.
-
-        Example:
-            ```pycon
-            >>> from coola.factory import factory
-            >>> from minrecord import Record
-            >>> config = Record("loss").config_dict()
-            >>> record = factory(**config)  # Note that the state is not copied.
-            >>> record
-            Record(name=loss, max_size=10, size=0)
-
-            ```
-        """
-        return {OBJECT_TARGET: get_qualified_class_name(self.__class__), "name": self.name}
-
-    @abstractmethod
-    def load_state_dict(self, state_dict: dict[str, Any]) -> None:
-        r"""Set up the record from a dictionary containing the state
-        values.
-
-        Args:
-            state_dict: A dictionary containing state keys with values.
-
-        Example:
-            ```pycon
-            >>> from minrecord import Record
-            >>> record = Record("loss")
-            >>> record.load_state_dict({"record": ((0, 42.0),)})
-            >>> record.get_last_value()
-            42.0
-
-            ```
-        """
-
-    @abstractmethod
-    def state_dict(self) -> dict[str, Any]:
-        r"""Get a dictionary containing the state values of the record.
-
-        Returns:
-            The state values in a dict.
-
-        Example:
-            ```pycon
-            >>> from minrecord import Record
-            >>> record = Record("loss")
-            >>> record.add_value(42.0, step=0)
-            >>> state = record.state_dict()
-            >>> state
-            {'record': ((0, 42.0),)}
-
-            ```
-        """
+        for step, value in elements:
+            self.add_value(value, step)
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> BaseRecord[T]:
         r"""Instantiate a record from a dictionary.
 
+        This method is equivalent to ``coola.factory.factory(**data)``,
+        so the constructor validates the arguments. The dictionary is
+        not modified.
+
         Args:
             data: The dictionary that is used to instantiate the
-                record. The dictionary is expected to contain the
-                parameters to create instantiate the record and the
-                state of the record.
+                record. It is expected to have the structure of the
+                output of ``to_dict``.
 
         Returns:
             The instantiated record.
@@ -419,12 +373,10 @@ class BaseRecord(ABC, Generic[T]):
             >>> from coola.factory import OBJECT_TARGET
             >>> record = BaseRecord.from_dict(
             ...     {
-            ...         "config": {
-            ...             OBJECT_TARGET: "minrecord.Record",
-            ...             "name": "loss",
-            ...             "max_size": 7,
-            ...         },
-            ...         "state": {"record": ((0, 1), (1, 5))},
+            ...         OBJECT_TARGET: "minrecord.Record",
+            ...         "name": "loss",
+            ...         "max_size": 7,
+            ...         "elements": ((0, 1), (1, 5)),
             ...     }
             ... )
             >>> record
@@ -432,33 +384,42 @@ class BaseRecord(ABC, Generic[T]):
 
             ```
         """
-        obj = factory(**data["config"])
-        obj.load_state_dict(data["state"])
-        return obj
+        return factory(**data)
 
-    def to_dict(self) -> dict[str, Any]:
-        r"""Export the current record to a dictionary.
+    def load_dict(self, data: dict[str, Any]) -> None:
+        r"""Load a dictionary in the current record, in place.
 
-        This method exports all the information to re-create the
-        record with the same state. The returned dictionary
-        can be used as input of the ``from_dict`` method to resume the
-        record.
+        The new record is built first from the dictionary (with
+        ``from_dict``), so the record is not modified if the
+        dictionary is invalid.
 
-        Returns:
-            A dictionary with the config and the state of the
-                record.
+        Args:
+            data: The dictionary to load. It is expected to have the
+                structure of the output of ``to_dict`` of a record of
+                the same type.
+
+        Raises:
+            TypeError: if the dictionary is the dictionary of a
+                record of another type.
 
         Example:
             ```pycon
-            >>> from minrecord import BaseRecord, Record
-            >>> record_dict = Record("loss").to_dict()
-            >>> record = BaseRecord.from_dict(record_dict)
-            >>> record
-            Record(name=loss, max_size=10, size=0)
+            >>> from minrecord import Record
+            >>> record = Record("loss")
+            >>> record.load_dict(Record("loss", elements=[(0, 42.0)]).to_dict())
+            >>> record.get_last_value()
+            42.0
 
             ```
         """
-        return {"config": self.config_dict(), "state": self.state_dict()}
+        other = self.from_dict(data)
+        if type(other) is not type(self):
+            msg = (
+                f"Cannot load the data of a {type(other).__qualname__} record in a "
+                f"{type(self).__qualname__} record"
+            )
+            raise TypeError(msg)
+        vars(self).update(vars(other))
 
 
 class EmptyRecordError(Exception):

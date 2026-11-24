@@ -161,11 +161,11 @@ def test_record_manager_load_state_dict_with_existing_record() -> None:
     manager.load_state_dict(
         {
             "loss": {
-                "state": {
-                    "record": ((0, 10), (1, 9), (2, 8), (3, 7), (4, 6)),
-                    "improved": True,
-                    "best_value": 6,
-                },
+                OBJECT_TARGET: "minrecord.comparable.MinScalarRecord",
+                "name": "loss",
+                "max_size": 10,
+                "elements": ((0, 10), (1, 9), (2, 8), (3, 7), (4, 6)),
+                "best": (4, 6),
             }
         }
     )
@@ -180,16 +180,11 @@ def test_record_manager_load_state_dict_without_record() -> None:
     manager.load_state_dict(
         {
             "loss": {
-                "config": {
-                    OBJECT_TARGET: "minrecord.comparable.MinScalarRecord",
-                    "name": "loss",
-                    "max_size": 10,
-                },
-                "state": {
-                    "record": ((0, 10), (1, 9), (2, 8), (3, 7), (4, 6)),
-                    "improved": True,
-                    "best_value": 6,
-                },
+                OBJECT_TARGET: "minrecord.comparable.MinScalarRecord",
+                "name": "loss",
+                "max_size": 10,
+                "elements": ((0, 10), (1, 9), (2, 8), (3, 7), (4, 6)),
+                "best": (4, 6),
             }
         },
     )

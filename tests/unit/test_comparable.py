@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import pytest
 from coola.equality import objects_are_equal
-from coola.factory import OBJECT_TARGET, factory
+from coola.factory import OBJECT_TARGET
 
 from minrecord import (
     BaseRecord,
@@ -19,7 +19,7 @@ from minrecord import (
 from minrecord.config import reset_max_size
 
 if TYPE_CHECKING:
-    from collections.abc import Generator
+    from collections.abc import Generator, Iterable
 
 
 @pytest.fixture
@@ -30,312 +30,310 @@ def _reset_max_size() -> Generator[None, None, None]:
     reset_max_size()
 
 
+def create_max_record(
+    *,
+    elements: Iterable[tuple[float | None, float]] = (),
+    max_size: int | None = None,
+    best: tuple[float | None, float] | None = None,
+) -> ComparableRecord[float]:
+    return ComparableRecord[float](
+        "accuracy", MaxScalarComparator(), elements=elements, max_size=max_size, best=best
+    )
+
+
 ######################################
 #     Tests for ComparableRecord     #
 ######################################
 
 
 def test_comparable_record_repr() -> None:
-    assert (
-        repr(ComparableRecord[float]("accuracy", comparator=MaxScalarComparator()))
-        == "ComparableRecord(name=accuracy, max_size=10, size=0)"
-    )
+    assert repr(create_max_record()) == "ComparableRecord(name=accuracy, max_size=10, size=0)"
 
 
 def test_comparable_record_str() -> None:
-    assert str(ComparableRecord[float]("accuracy", comparator=MaxScalarComparator())).startswith(
-        "ComparableRecord("
-    )
+    assert str(create_max_record()).startswith("ComparableRecord(")
 
 
 @pytest.mark.parametrize("name", ["name", "accuracy", ""])
 def test_comparable_record_name(name: str) -> None:
-    assert ComparableRecord[float](name, comparator=MaxScalarComparator()).name == name
+    assert ComparableRecord[float](name, MaxScalarComparator()).name == name
 
 
 @pytest.mark.parametrize("max_size", [1, 5])
 def test_comparable_record_max_size(max_size: int) -> None:
-    assert (
-        ComparableRecord[float](
-            "accuracy", comparator=MaxScalarComparator(), max_size=max_size
-        ).max_size
-        == max_size
-    )
+    assert create_max_record(max_size=max_size).max_size == max_size
 
 
 def test_comparable_record_max_size_incorrect() -> None:
     with pytest.raises(ValueError, match=r"max_size must be a positive integer"):
-        ComparableRecord[float]("accuracy", MaxScalarComparator(), max_size=0)
+        create_max_record(max_size=0)
 
 
-def test_comparable_record_add_value() -> None:
-    record = ComparableRecord[float]("accuracy", MaxScalarComparator())
-    record.add_value(2)
-    record.add_value(4, step=1)
-    assert record.equal(
-        ComparableRecord[float](
-            name="accuracy",
-            comparator=MaxScalarComparator(),
-            elements=((None, 2), (1, 4)),
-            best_value=4,
-            improved=True,
-        ),
-    )
+def test_comparable_record_options_keyword_only() -> None:
+    record_class: Any = ComparableRecord
+    with pytest.raises(TypeError, match=r"takes 3 positional arguments but 4 were given"):
+        record_class("accuracy", MaxScalarComparator(), [(0, 1)])
 
 
-def test_comparable_record_clone() -> None:
-    record = ComparableRecord(
-        name="accuracy",
-        comparator=MaxScalarComparator(),
-        elements=((None, 2), (1, 4)),
-        best_value=4,
-        improved=True,
-        max_size=20,
-    )
-    record_cloned = record.clone()
-    assert record is not record_cloned
-    assert record.equal(record_cloned)
+def test_comparable_record_add_value_first_value_is_best() -> None:
+    record = create_max_record()
+    record.add_value(-5.0, step=3)
+    assert record.get_best_value() == -5.0
 
 
-def test_comparable_record_clone_empty() -> None:
-    record = ComparableRecord[float](name="loss", comparator=MinScalarComparator())
-    record_cloned = record.clone()
-    assert record is not record_cloned
-    assert record.equal(record_cloned)
-
-
-def test_comparable_record_get_best_value() -> None:
-    assert (
-        ComparableRecord[float](
-            "accuracy", comparator=MaxScalarComparator(), elements=[(0, 1)], best_value=4
-        ).get_best_value()
-        == 4
-    )
-
-
-def test_comparable_record_get_best_value_last_is_best() -> None:
-    record = ComparableRecord[float]("accuracy", comparator=MaxScalarComparator())
-    record.add_value(2, step=0)
-    record.add_value(4, step=1)
-    assert record.get_best_value() == 4
-
-
-def test_comparable_record_get_best_value_last_is_not_best() -> None:
-    record = ComparableRecord[float]("accuracy", comparator=MaxScalarComparator())
-    record.add_value(2, step=0)
-    record.add_value(1, step=1)
-    assert record.get_best_value() == 2
-
-
-def test_comparable_record_get_best_value_empty() -> None:
-    record = ComparableRecord[float]("accuracy", MaxScalarComparator())
-    with pytest.raises(EmptyRecordError, match=r"The record is empty."):
-        record.get_best_value()
-
-
-def test_comparable_record_get_most_recent() -> None:
-    assert ComparableRecord[float](
-        "accuracy", MaxScalarComparator(), elements=[(1, 123)]
-    ).get_most_recent() == ((1, 123),)
-
-
-def test_comparable_record_get_most_recent_empty() -> None:
-    assert ComparableRecord[float]("accuracy", MaxScalarComparator()).get_most_recent() == ()
-
-
-def test_comparable_record_get_most_recent_max_size_3() -> None:
-    record = ComparableRecord("accuracy", comparator=MaxScalarComparator(), max_size=3)
-    for i in range(10):
-        record.add_value(100 - i)
-    assert record.equal(
-        ComparableRecord(
-            "accuracy",
-            comparator=MaxScalarComparator(),
-            max_size=3,
-            elements=((None, 93), (None, 92), (None, 91)),
-            best_value=100,
-            improved=False,
-        )
-    )
-
-
-def test_comparable_record_get_last_value() -> None:
-    assert (
-        ComparableRecord(
-            "accuracy",
-            comparator=MaxScalarComparator(),
-            max_size=3,
-            elements=((None, 1), (None, 3)),
-        ).get_last_value()
-        == 3
-    )
-
-
-def test_comparable_record_get_last_value_empty() -> None:
-    record = ComparableRecord("accuracy", comparator=MaxScalarComparator())
-    with pytest.raises(EmptyRecordError, match=r"'accuracy' record is empty."):
-        record.get_last_value()
-
-
-def test_comparable_record_has_improved_true() -> None:
-    record = ComparableRecord[float]("accuracy", comparator=MaxScalarComparator())
-    record.add_value(2, step=0)
-    record.add_value(4, step=1)
+def test_comparable_record_add_value_first_value_has_improved() -> None:
+    record = create_max_record()
+    record.add_value(-5.0)
     assert record.has_improved()
 
 
-def test_comparable_record_has_improved_false() -> None:
-    record = ComparableRecord[float]("accuracy", comparator=MaxScalarComparator())
-    record.add_value(2, step=0)
-    record.add_value(1, step=1)
+def test_comparable_record_add_value_better_value() -> None:
+    record = create_max_record()
+    record.add_value(2.0, step=0)
+    record.add_value(4.0, step=1)
+    assert record.to_dict()["best"] == (1, 4.0)
+
+
+def test_comparable_record_add_value_tie_improves() -> None:
+    record = create_max_record()
+    record.add_value(2.0, step=0)
+    record.add_value(2.0, step=1)
+    assert record.has_improved()
+
+
+def test_comparable_record_add_value_tie_updates_best_step() -> None:
+    record = create_max_record()
+    record.add_value(2.0, step=0)
+    record.add_value(2.0, step=1)
+    assert record.to_dict()["best"] == (1, 2.0)
+
+
+def test_comparable_record_add_value_worse_value() -> None:
+    record = create_max_record()
+    record.add_value(2.0, step=0)
+    record.add_value(1.0, step=1)
+    assert record.to_dict()["best"] == (0, 2.0)
+
+
+def test_comparable_record_add_value_worse_value_has_not_improved() -> None:
+    record = create_max_record()
+    record.add_value(2.0, step=0)
+    record.add_value(1.0, step=1)
     assert not record.has_improved()
 
 
-def test_comparable_record_has_improved_empty() -> None:
-    record = ComparableRecord("accuracy", comparator=MaxScalarComparator())
+def test_comparable_record_add_value_best_outlives_eviction() -> None:
+    record = create_max_record(max_size=2)
+    for step, value in enumerate([9.0, 1.0, 2.0, 3.0]):
+        record.add_value(value, step=step)
+    assert record.get_most_recent() == ((2, 2.0), (3, 3.0))
+    assert record.to_dict()["best"] == (0, 9.0)
+
+
+def test_comparable_record_add_value_comparator_error_leaves_record_unchanged() -> None:
+    record = create_max_record(elements=[(0, 1.0)])
+    value: Any = "a"
+    with pytest.raises(TypeError, match=r"not supported between instances of"):
+        record.add_value(value, step=1)
+    assert record.equal(create_max_record(elements=[(0, 1.0)]))
+
+
+def test_comparable_record_add_value_comparator_error_keeps_improved_flag() -> None:
+    record = create_max_record(elements=[(0, 1.0)])
+    value: Any = "a"
+    with pytest.raises(TypeError, match=r"not supported between instances of"):
+        record.add_value(value, step=1)
+    assert record.has_improved()
+
+
+def test_comparable_record_init_elements_best_value() -> None:
+    assert create_max_record(elements=[(0, 1.0), (1, 3.0), (2, 2.0)]).get_best_value() == 3.0
+
+
+def test_comparable_record_init_elements_has_improved_false() -> None:
+    assert not create_max_record(elements=[(0, 1.0), (1, 3.0), (2, 2.0)]).has_improved()
+
+
+def test_comparable_record_init_elements_has_improved_true() -> None:
+    assert create_max_record(elements=[(0, 1.0), (1, 3.0)]).has_improved()
+
+
+def test_comparable_record_init_elements_longer_than_max_size() -> None:
+    record = create_max_record(max_size=2, elements=[(0, 9.0), (1, 1.0), (2, 2.0)])
+    assert record.get_most_recent() == ((1, 1.0), (2, 2.0))
+    assert record.get_best_value() == 9.0
+
+
+def test_comparable_record_init_elements_same_state_as_add_value() -> None:
+    record = create_max_record(max_size=3)
+    for step, value in enumerate([4.0, 7.0, 7.0, 1.0, 5.0]):
+        record.add_value(value, step=step)
+    assert record.equal(
+        create_max_record(max_size=3, elements=list(enumerate([4.0, 7.0, 7.0, 1.0, 5.0])))
+    )
+
+
+def test_comparable_record_init_best_zero_is_kept() -> None:
+    assert create_max_record(best=(None, 0.0)).get_best_value() == 0.0
+
+
+def test_comparable_record_init_best_zero_not_replaced_by_worse() -> None:
+    record = create_max_record(best=(3, 0.0), elements=[(4, -1.0)])
+    assert record.get_best_value() == 0.0
+
+
+def test_comparable_record_init_best_outside_window() -> None:
+    record = create_max_record(max_size=1, best=(0, 9.0), elements=[(2, 2.0)])
+    assert record.to_dict()["best"] == (0, 9.0)
+
+
+def test_comparable_record_init_best_list_is_converted_to_tuple() -> None:
+    best: Any = [1, 2.0]
+    assert ComparableRecord[float]("accuracy", MaxScalarComparator(), best=best).to_dict()[
+        "best"
+    ] == (1, 2.0)
+
+
+def test_comparable_record_init_best_without_elements_is_empty() -> None:
+    assert create_max_record(best=(0, 9.0)).is_empty()
+
+
+def test_comparable_record_init_best_without_elements_get_best_value() -> None:
+    assert create_max_record(best=(0, 9.0)).get_best_value() == 9.0
+
+
+def test_comparable_record_clone() -> None:
+    record = create_max_record(elements=((None, 2.0), (1, 4.0)), max_size=20)
+    assert record.clone().equal(record)
+
+
+def test_comparable_record_clone_is_new_object() -> None:
+    record = create_max_record()
+    assert record.clone() is not record
+
+
+def test_comparable_record_clone_empty() -> None:
+    assert create_max_record().clone().equal(create_max_record())
+
+
+CLONE_CASES = [([3.0, 2.0, 2.0], True), ([1.0, 2.0], False), ([3.0, 1.0], True)]
+
+
+def create_min_record_from_values(values: list[float], max_size: int) -> ComparableRecord[float]:
+    record = ComparableRecord[float]("loss", MinScalarComparator(), max_size=max_size)
+    for step, value in enumerate(values):
+        record.add_value(value, step=step)
+    return record
+
+
+@pytest.mark.parametrize(("values", "expected"), CLONE_CASES)
+@pytest.mark.parametrize("max_size", [1, 2, 5])
+def test_comparable_record_clone_has_improved(
+    values: list[float], expected: bool, max_size: int
+) -> None:
+    assert create_min_record_from_values(values, max_size).clone().has_improved() is expected
+
+
+@pytest.mark.parametrize("values", [values for values, _ in CLONE_CASES])
+@pytest.mark.parametrize("max_size", [1, 2, 5])
+def test_comparable_record_clone_best(values: list[float], max_size: int) -> None:
+    record = create_min_record_from_values(values, max_size)
+    assert record.clone().to_dict()["best"] == record.to_dict()["best"]
+
+
+def test_comparable_record_clone_is_independent() -> None:
+    record = create_max_record(elements=[(0, 1.0)])
+    clone = record.clone()
+    clone.add_value(5.0, step=1)
+    assert record.get_best_value() == 1.0
+
+
+def test_comparable_record_get_best_value_empty() -> None:
     with pytest.raises(EmptyRecordError, match=r"The record is empty."):
-        record.has_improved()
+        create_max_record().get_best_value()
+
+
+def test_comparable_record_get_last_value() -> None:
+    assert create_max_record(elements=((None, 1.0), (None, 3.0))).get_last_value() == 3.0
+
+
+def test_comparable_record_get_last_value_empty() -> None:
+    with pytest.raises(EmptyRecordError, match=r"'accuracy' record is empty."):
+        create_max_record().get_last_value()
+
+
+def test_comparable_record_get_most_recent() -> None:
+    assert create_max_record(elements=[(1, 123.0)]).get_most_recent() == ((1, 123.0),)
+
+
+def test_comparable_record_has_improved_empty() -> None:
+    with pytest.raises(EmptyRecordError, match=r"The record is empty."):
+        create_max_record().has_improved()
 
 
 def test_comparable_record_is_better_true() -> None:
-    assert ComparableRecord("accuracy", comparator=MaxScalarComparator()).is_better(
-        new_value=0.2, old_value=0.1
-    )
+    assert create_max_record().is_better(new_value=0.2, old_value=0.1)
 
 
 def test_comparable_record_is_better_false() -> None:
-    assert not ComparableRecord("accuracy", comparator=MaxScalarComparator()).is_better(
-        new_value=0.1, old_value=0.2
-    )
+    assert not create_max_record().is_better(new_value=0.1, old_value=0.2)
 
 
 def test_comparable_record_is_comparable() -> None:
-    assert ComparableRecord("accuracy", comparator=MaxScalarComparator()).is_comparable()
+    assert create_max_record().is_comparable()
 
 
 def test_comparable_record_is_empty_true() -> None:
-    assert ComparableRecord("accuracy", comparator=MaxScalarComparator()).is_empty()
+    assert create_max_record().is_empty()
 
 
 def test_comparable_record_is_empty_false() -> None:
-    assert not ComparableRecord(
-        "accuracy", comparator=MaxScalarComparator(), elements=[(None, 5)]
-    ).is_empty()
+    assert not create_max_record(elements=[(None, 5.0)]).is_empty()
 
 
-def test_comparable_record_config_dict() -> None:
+def test_comparable_record_equal_false_different_best() -> None:
+    assert not create_max_record(elements=[(0, 1.0)]).equal(
+        create_max_record(elements=[(0, 1.0)], best=(0, 5.0))
+    )
+
+
+def test_comparable_record_equal_false_different_comparator() -> None:
+    assert not create_max_record().equal(ComparableRecord[float]("accuracy", MinScalarComparator()))
+
+
+def test_comparable_record_to_dict() -> None:
     assert objects_are_equal(
-        ComparableRecord("accuracy", comparator=MaxScalarComparator()).config_dict(),
+        create_max_record(elements=[(0, 1.0), (1, 3.0), (2, 2.0)], max_size=2).to_dict(),
         {
             OBJECT_TARGET: "minrecord.comparable.ComparableRecord",
             "name": "accuracy",
-            "max_size": 10,
+            "max_size": 2,
+            "elements": ((1, 3.0), (2, 2.0)),
             "comparator": MaxScalarComparator(),
+            "best": (1, 3.0),
         },
     )
 
 
-def test_comparable_record_config_dict_create_new_record() -> None:
-    assert factory(
-        **ComparableRecord(
-            "accuracy", MaxScalarComparator(), max_size=5, elements=[(0, 1)]
-        ).config_dict()
-    ).equal(ComparableRecord("accuracy", MaxScalarComparator(), max_size=5))
-
-
-def test_comparable_record_load_state_dict_empty() -> None:
-    record = ComparableRecord("accuracy", comparator=MaxScalarComparator())
-    record.load_state_dict({"record": (), "improved": False, "best_value": -float("inf")})
-    assert record.equal(ComparableRecord("accuracy", comparator=MaxScalarComparator()))
-
-
-def test_comparable_record_load_state_dict_max_size_2() -> None:
-    record = ComparableRecord("accuracy", MaxScalarComparator(), max_size=2)
-    record.load_state_dict({"record": ((0, 1), (1, 5)), "improved": True, "best_value": 5})
-    record.add_value(7, step=2)
-    assert record.equal(
-        ComparableRecord(
-            "accuracy",
-            comparator=MaxScalarComparator(),
-            max_size=2,
-            elements=((1, 5), (2, 7)),
-            best_value=7,
-            improved=True,
-        )
-    )
-
-
-def test_comparable_record_load_state_dict_reset() -> None:
-    record = ComparableRecord("accuracy", MaxScalarComparator(), elements=[(0, 7)])
-    record.load_state_dict({"record": ((0, 4), (1, 5)), "improved": True, "best_value": 5})
-    assert record.equal(
-        ComparableRecord(
-            "accuracy",
-            comparator=MaxScalarComparator(),
-            elements=((0, 4), (1, 5)),
-            best_value=5,
-            improved=True,
-        )
-    )
-
-
-def test_comparable_record_state_dict() -> None:
-    assert ComparableRecord(
-        "accuracy",
-        MaxScalarComparator(),
-        elements=((0, 1), (1, 5)),
-        best_value=5,
-        improved=True,
-    ).state_dict() == {
-        "record": ((0, 1), (1, 5)),
-        "improved": True,
-        "best_value": 5,
-    }
-
-
-def test_comparable_record_state_dict_empty() -> None:
-    assert ComparableRecord("accuracy", MaxScalarComparator()).state_dict() == {
-        "record": (),
-        "improved": False,
-        "best_value": -float("inf"),
-    }
+def test_comparable_record_to_dict_empty_best_is_none() -> None:
+    assert create_max_record().to_dict()["best"] is None
 
 
 def test_comparable_record_to_dict_from_dict() -> None:
-    assert BaseRecord.from_dict(
-        ComparableRecord(
-            "accuracy",
-            MaxScalarComparator(),
-            max_size=5,
-            elements=[(0, 1)],
-            best_value=1,
-            improved=True,
-        ).to_dict()
-    ).equal(
-        ComparableRecord(
-            "accuracy",
-            MaxScalarComparator(),
-            max_size=5,
-            elements=[(0, 1)],
-            best_value=1,
-            improved=True,
-        )
-    )
+    record = create_max_record(max_size=2, elements=[(0, 9.0), (1, 1.0), (2, 2.0)])
+    assert BaseRecord.from_dict(record.to_dict()).equal(record)
 
 
-def test_comparable_record_from_elements() -> None:
-    record = ComparableRecord.from_elements(
-        name="accuracy", comparator=MaxScalarComparator(), elements=[(0, 2), (1, 4), (None, 3)]
-    )
-    assert record.equal(
-        ComparableRecord(
-            name="accuracy",
-            comparator=MaxScalarComparator(),
-            elements=[(0, 2), (1, 4), (None, 3)],
-            improved=False,
-            best_value=4,
-        )
-    )
+def test_comparable_record_to_dict_from_dict_has_improved() -> None:
+    record = create_max_record(max_size=2, elements=[(0, 9.0), (1, 1.0), (2, 2.0)])
+    assert not BaseRecord.from_dict(record.to_dict()).has_improved()
+
+
+def test_comparable_record_load_dict() -> None:
+    record = create_max_record(elements=[(0, 1.0)])
+    other = create_max_record(max_size=2, elements=[(0, 9.0), (1, 1.0), (2, 2.0)])
+    record.load_dict(other.to_dict())
+    assert record.equal(other)
 
 
 #####################################
@@ -343,40 +341,61 @@ def test_comparable_record_from_elements() -> None:
 #####################################
 
 
-def test_max_scalar_record_equal_true() -> None:
+@pytest.mark.parametrize("cls", [MaxScalarRecord, MinScalarRecord])
+def test_scalar_record_to_dict_has_no_comparator(cls: Any) -> None:
+    assert "comparator" not in cls("loss").to_dict()
+
+
+def test_max_scalar_record_to_dict() -> None:
     assert MaxScalarRecord(
-        "accuracy", elements=((None, 1.9), (1, 1.2), (2, 0.8)), best_value=0.8, improved=True
-    ).equal(
-        MaxScalarRecord(
-            "accuracy", elements=((None, 1.9), (1, 1.2), (2, 0.8)), best_value=0.8, improved=True
-        )
+        "accuracy", max_size=2, elements=[(0, 1.0), (1, 5.0), (2, 4.0)]
+    ).to_dict() == {
+        OBJECT_TARGET: "minrecord.comparable.MaxScalarRecord",
+        "name": "accuracy",
+        "max_size": 2,
+        "elements": ((1, 5.0), (2, 4.0)),
+        "best": (1, 5.0),
+    }
+
+
+def test_min_scalar_record_to_dict() -> None:
+    assert MinScalarRecord(
+        "loss", max_size=2, elements=[(0, 5.0), (1, 1.0), (2, 4.0)]
+    ).to_dict() == {
+        OBJECT_TARGET: "minrecord.comparable.MinScalarRecord",
+        "name": "loss",
+        "max_size": 2,
+        "elements": ((1, 1.0), (2, 4.0)),
+        "best": (1, 1.0),
+    }
+
+
+def test_max_scalar_record_equal_true() -> None:
+    assert MaxScalarRecord("accuracy", elements=((None, 1.9), (1, 1.2), (2, 0.8))).equal(
+        MaxScalarRecord("accuracy", elements=((None, 1.9), (1, 1.2), (2, 0.8)))
     )
-
-
-def test_max_scalar_record_equal_true_empty() -> None:
-    assert MaxScalarRecord("accuracy").equal(MaxScalarRecord("accuracy"))
 
 
 def test_max_scalar_record_equal_false_different_values() -> None:
-    assert not MaxScalarRecord(
-        "accuracy", elements=((None, 1.9), (1, 1.2), (2, 0.8)), best_value=0.8, improved=True
-    ).equal(
-        MaxScalarRecord(
-            "accuracy", elements=((None, 1.9), (1, 1.2), (2, 0.5)), best_value=0.5, improved=True
-        )
+    assert not MaxScalarRecord("accuracy", elements=((None, 1.9), (1, 1.2))).equal(
+        MaxScalarRecord("accuracy", elements=((None, 1.9), (1, 0.5)))
     )
-
-
-def test_max_scalar_record_equal_false_different_names() -> None:
-    assert not MaxScalarRecord("accuracy").equal(MaxScalarRecord("f1"))
-
-
-def test_max_scalar_record_equal_false_different_max_sizes() -> None:
-    assert not MaxScalarRecord("accuracy").equal(MaxScalarRecord("accuracy", max_size=2))
 
 
 def test_max_scalar_record_equal_false_different_types() -> None:
     assert not MaxScalarRecord("accuracy").equal(MinScalarRecord("accuracy"))
+
+
+def test_max_scalar_record_init_elements() -> None:
+    record = MaxScalarRecord("accuracy", elements=[(0, 2.0), (1, 4.0), (None, 3.0)])
+    assert (record.get_best_value(), record.has_improved()) == (4.0, False)
+
+
+def test_max_scalar_record_init_elements_longer_than_max_size() -> None:
+    assert (
+        MaxScalarRecord("accuracy", max_size=1, elements=[(0, 9.0), (1, 2.0)]).get_best_value()
+        == 9.0
+    )
 
 
 def test_max_scalar_record_get_best_value_last_is_best() -> None:
@@ -394,68 +413,54 @@ def test_max_scalar_record_get_best_value_last_is_not_best() -> None:
 
 
 def test_max_scalar_record_to_dict_from_dict() -> None:
-    assert BaseRecord.from_dict(
-        MaxScalarRecord(
-            "accuracy", max_size=5, elements=[(0, 1)], best_value=1, improved=True
-        ).to_dict()
-    ).equal(MaxScalarRecord("accuracy", max_size=5, elements=[(0, 1)], best_value=1, improved=True))
+    record = MaxScalarRecord("accuracy", max_size=2, elements=[(0, 9.0), (1, 1.0), (2, 2.0)])
+    assert BaseRecord.from_dict(record.to_dict()).equal(record)
 
 
-def test_max_scalar_record_from_elements() -> None:
-    record = MaxScalarRecord.from_elements(name="accuracy", elements=[(0, 2), (1, 4), (None, 3)])
-    assert record.equal(
-        MaxScalarRecord(
-            name="accuracy", elements=[(0, 2), (1, 4), (None, 3)], improved=False, best_value=4
-        )
-    )
+def test_max_scalar_record_load_dict() -> None:
+    record = MaxScalarRecord("accuracy")
+    other = MaxScalarRecord("accuracy", max_size=2, elements=[(0, 9.0), (1, 1.0), (2, 2.0)])
+    record.load_dict(other.to_dict())
+    assert record.equal(other)
 
 
-######################################
+#####################################
 #     Tests for MinScalarRecord     #
-######################################
+#####################################
 
 
 def test_min_scalar_record_equal_true() -> None:
-    assert MinScalarRecord(
-        "loss", elements=((None, 35), (1, 42), (2, 50)), best_value=50, improved=True
-    ).equal(
-        MinScalarRecord(
-            "loss", elements=((None, 35), (1, 42), (2, 50)), best_value=50, improved=True
-        )
+    assert MinScalarRecord("loss", elements=((None, 35.0), (1, 42.0))).equal(
+        MinScalarRecord("loss", elements=((None, 35.0), (1, 42.0)))
     )
-
-
-def test_min_scalar_record_equal_true_empty() -> None:
-    assert MinScalarRecord("loss").equal(MinScalarRecord("loss"))
 
 
 def test_min_scalar_record_equal_false_different_values() -> None:
-    assert not MinScalarRecord(
-        "loss", elements=((None, 35), (1, 42), (2, 50)), best_value=50, improved=True
-    ).equal(
-        MinScalarRecord(
-            "loss", elements=((None, 35), (1, 42), (2, 51)), best_value=51, improved=True
-        )
+    assert not MinScalarRecord("loss", elements=((None, 35.0), (1, 42.0))).equal(
+        MinScalarRecord("loss", elements=((None, 35.0), (1, 50.0)))
     )
-
-
-def test_min_scalar_record_equal_false_different_names() -> None:
-    assert not MinScalarRecord("loss").equal(MinScalarRecord("error"))
-
-
-def test_min_scalar_record_equal_false_different_max_sizes() -> None:
-    assert not MinScalarRecord("loss").equal(MinScalarRecord("loss", max_size=2))
 
 
 def test_min_scalar_record_equal_false_different_types() -> None:
     assert not MinScalarRecord("loss").equal(MaxScalarRecord("loss"))
 
 
+def test_min_scalar_record_init_elements() -> None:
+    record = MinScalarRecord("loss", elements=[(0, 2.0), (1, 4.0), (None, 3.0)])
+    assert (record.get_best_value(), record.has_improved()) == (2.0, False)
+
+
+def test_min_scalar_record_init_elements_longer_than_max_size() -> None:
+    assert (
+        MinScalarRecord("loss", max_size=1, elements=[(0, 1.0), (1, 2.0)]).get_best_value() == 1.0
+    )
+
+
 def test_min_scalar_record_get_best_value_last_is_best() -> None:
     record = MinScalarRecord("loss")
-    record.add_value(2, step=0)
-    record.add_value(1, step=1)
-    assert record.get_best_value() == 1
+    record.add_value(4, step=0)
+    record.add_value(2, step=1)
+    assert record.get_best_value() == 2
 
 
 def test_min_scalar_record_get_best_value_last_is_not_best() -> None:
@@ -466,20 +471,15 @@ def test_min_scalar_record_get_best_value_last_is_not_best() -> None:
 
 
 def test_min_scalar_record_to_dict_from_dict() -> None:
-    assert BaseRecord.from_dict(
-        MinScalarRecord(
-            "loss", max_size=5, elements=[(0, 1)], best_value=1, improved=True
-        ).to_dict()
-    ).equal(MinScalarRecord("loss", max_size=5, elements=[(0, 1)], best_value=1, improved=True))
+    record = MinScalarRecord("loss", max_size=2, elements=[(0, 1.0), (1, 5.0), (2, 4.0)])
+    assert BaseRecord.from_dict(record.to_dict()).equal(record)
 
 
-def test_min_scalar_record_from_elements() -> None:
-    record = MinScalarRecord.from_elements(name="loss", elements=[(0, 2), (1, 4), (None, 3)])
-    assert record.equal(
-        MinScalarRecord(
-            name="loss", elements=[(0, 2), (1, 4), (None, 3)], improved=False, best_value=2
-        )
-    )
+def test_min_scalar_record_load_dict() -> None:
+    record = MinScalarRecord("loss")
+    other = MinScalarRecord("loss", max_size=2, elements=[(0, 1.0), (1, 5.0), (2, 4.0)])
+    record.load_dict(other.to_dict())
+    assert record.equal(other)
 
 
 ##########################################

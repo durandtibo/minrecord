@@ -43,8 +43,8 @@ def get_best_values(
         ...     MaxScalarRecord,
         ...     get_best_values,
         ... )
-        >>> record1 = MinScalarRecord.from_elements("loss", elements=[(None, 1.9), (None, 1.2)])
-        >>> record2 = MaxScalarRecord.from_elements("accuracy", elements=[(None, 42), (None, 35)])
+        >>> record1 = MinScalarRecord("loss", elements=[(None, 1.9), (None, 1.2)])
+        >>> record2 = MaxScalarRecord("accuracy", elements=[(None, 42), (None, 35)])
         >>> get_best_values({"loss": record1, "accuracy": record2})
         {'loss': 1.2, 'accuracy': 42}
         >>> get_best_values({"loss": record1, "accuracy": record2}, prefix="best/")
@@ -92,8 +92,8 @@ def get_last_values(
         ...     MaxScalarRecord,
         ...     get_last_values,
         ... )
-        >>> record1 = MinScalarRecord.from_elements("loss", elements=[(None, 1.9), (None, 1.2)])
-        >>> record2 = MaxScalarRecord.from_elements("accuracy", elements=[(None, 42), (None, 35)])
+        >>> record1 = MinScalarRecord("loss", elements=[(None, 1.9), (None, 1.2)])
+        >>> record2 = MaxScalarRecord("accuracy", elements=[(None, 42), (None, 35)])
         >>> get_last_values({"loss": record1, "accuracy": record2})
         {'loss': 1.2, 'accuracy': 35}
         >>> get_last_values({"loss": record1, "accuracy": record2}, prefix="last/")

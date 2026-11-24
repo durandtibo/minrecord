@@ -258,37 +258,13 @@ True
 :warning: Calling `has_improved` or `get_best_value` on non-comparable record raises
 a `NotAComparableRecord` exception.
 
-**:warning: Note about constructors:** the constructor of `ComparableRecord` works slightly
-differently from `Record`.
-If you pass some elements to the constructor, you also need to pass the `best_value` and `improved`
-arguments to have the correct behavior.
-It is not a mistake but the expected behavior as the best value can be outside of the values store
-in the record.
+The `elements` argument of the constructor adds the values with `add_value`, so the best value and
+`has_improved` are correct when a record is created from some elements.
 
 ```pycon
 
 >>> from minrecord import MinScalarRecord
->>> # Incorrect behavior
 >>> record = MinScalarRecord("loss", elements=[(0, 42), (None, 45), (2, 46)])
->>> record.add_value(50)
->>> record.get_best_value()
-50
->>> # Correct behavior
->>> record = MinScalarRecord("loss")
->>> record.update([(0, 42), (None, 45), (2, 46)])
->>> record.add_value(50)
->>> record.get_best_value()
-42
-
-```
-
-To automatically instantiate the record based on the input elements, you can use the `from_elements`
-class method.
-
-```pycon
-
->>> from minrecord import MinScalarRecord
->>> record = MinScalarRecord.from_elements("loss", elements=[(0, 42), (None, 45), (2, 46)])
 >>> record.add_value(50)
 >>> record.get_best_value()
 42

@@ -76,24 +76,18 @@ No, `max_size` is fixed at creation. If you need to change it:
 The oldest value is automatically removed when adding a new value. The record uses a `deque`
 internally with a fixed maximum length.
 
-### Why does ComparableRecord constructor behave differently?
+### Can I create a record from some values?
 
-If you pass `elements` to `ComparableRecord`, you must also pass `best_value` and `improved` to
-maintain correctness. This is because the best value might not be in the recent history.
-
-**Recommended approach:**
+Yes, pass them with `elements`. They are added with `add_value`, so the best value and
+`has_improved()` are correct, and only the last `max_size` elements are kept:
 
 ```python
-# Good: Use from_elements
-record = MinScalarRecord.from_elements("loss", [(0, 1.5), (1, 1.3)])
-
-# Or: Add values after creation
-record = MinScalarRecord("loss")
-record.update([(0, 1.5), (1, 1.3)])
-
-# Avoid: Passing elements to constructor without best_value
-record = MinScalarRecord("loss", elements=[(0, 1.5), (1, 1.3)])  # ⚠️
+record = MinScalarRecord("loss", elements=[(0, 1.5), (1, 1.3)])
 ```
+
+If the best value is not in the elements anymore (for example when a record is resumed), pass it
+with `best=(step, value)`. Use `to_dict()` and `BaseRecord.from_dict()` to save and resume a
+record: the best value is included.
 
 ## Comparators & Improvements
 
@@ -301,15 +295,15 @@ class MyModel(pl.LightningModule):
 
 ### Values seem incorrect after loading state
 
-Make sure to use `from_elements()` or properly initialize `best_value`:
+Load the whole dict returned by `to_dict()` (it contains the best value and the recent values), or
+create the record from its values:
 
 ```python
 # Correct
-record = MinScalarRecord.from_elements("loss", elements)
+record = BaseRecord.from_dict(state)
 
 # Also correct
-record = MinScalarRecord("loss")
-record.update(elements)
+record = MinScalarRecord("loss", elements=elements)
 ```
 
 ### get_best_values() returns fewer items than expected
