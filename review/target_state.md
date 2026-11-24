@@ -4,13 +4,13 @@ This document describes the design that `minrecord` should have, then the change
 current implementation (`main`, `7f311f8`) to get there. It replaces the previous version of this
 review: the eight steps of that version (#526 to #534) are merged, so the design it described (one
 snapshot, one comparator method, no `Config` singleton, no sentinel that a real value can be
-confused with) **is** the current code. What is left is the gap between that code and the properties that the documentation promises. The design
-follows the properties of `docs/docs/usage_guide.md` (**Properties**), the key features of
-`docs/docs/index.md`, the answers of `faq.md` and the rules of `CLAUDE.md`, and it stays aligned
-with `coola` (2.x), the only dependency. Its aim is a small package that is easy to maintain: **one
-record contract, one snapshot that rebuilds an object, one comparator method, no global state beyond
-`max_size`**. Breaking changes are accepted, and the future state is more important than the past
-one.
+confused with) **is** the current code. What is left is the gap between that code and the properties
+that the documentation promises. The design follows the properties of `docs/docs/usage_guide.md`
+(**Properties**), the key features of `docs/docs/index.md`, the answers of `faq.md` and the rules of
+`CLAUDE.md`, and it stays aligned with `coola` (2.x), the only dependency. Its aim is a small
+package that is easy to maintain: **one record contract, one snapshot that rebuilds an object, one
+comparator method, no global state beyond `max_size`**. Breaking changes are accepted, and the
+future state is more important than the past one.
 
 Evidence comes from probes on `main` and from a throw-away prototype of the fixes (Python 3.14,
 `coola` 2.0.0a5, scripts kept outside the repository). Items marked **[verified]** were reproduced;
