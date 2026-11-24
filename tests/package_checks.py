@@ -21,8 +21,10 @@ def check_imports() -> None:
         "minrecord.get_best_values",
         "minrecord.get_last_values",
         "minrecord.get_max_size",
+        "minrecord.reset_max_size",
         "minrecord.set_max_size",
         "minrecord.utils",
+        "minrecord.utils.validation.check_max_size",
     ]
     for a in objects_to_import:
         module_path, name = a.rsplit(".", maxsplit=1)

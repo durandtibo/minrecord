@@ -8,15 +8,12 @@ __all__ = [
     "MinScalarComparator",
 ]
 
-import logging
 from abc import ABC, abstractmethod
 from typing import Any, Generic, TypeVar
 
 from coola.equality.tester import EqualEqualityTester, get_default_registry
 
 T = TypeVar("T")
-
-logger: logging.Logger = logging.getLogger(__name__)
 
 
 class BaseComparator(ABC, Generic[T]):

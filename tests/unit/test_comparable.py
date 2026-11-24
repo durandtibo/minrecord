@@ -64,7 +64,7 @@ def test_comparable_record_max_size(max_size: int) -> None:
 
 
 def test_comparable_record_max_size_incorrect() -> None:
-    with pytest.raises(ValueError, match=r"Record size must be greater than 0"):
+    with pytest.raises(ValueError, match=r"max_size must be a positive integer"):
         ComparableRecord[float]("accuracy", MaxScalarComparator(), max_size=0)
 
 

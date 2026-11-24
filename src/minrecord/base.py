@@ -8,7 +8,6 @@ __all__ = [
     "NotAComparableRecordError",
 ]
 
-import logging
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
@@ -21,8 +20,6 @@ if TYPE_CHECKING:
 
 
 T = TypeVar("T")
-
-logger: logging.Logger = logging.getLogger(__name__)
 
 
 class BaseRecord(ABC, Generic[T]):

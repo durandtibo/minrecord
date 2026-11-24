@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import pytest
 from coola.equality import objects_are_equal
@@ -51,9 +51,16 @@ def test_record_init_max_size(max_size: int) -> None:
     assert Record("loss", max_size=max_size).max_size == max_size
 
 
-def test_record_init_max_size_incorrect() -> None:
-    with pytest.raises(ValueError, match=r"Record size must be greater than 0"):
-        Record("loss", max_size=0)
+@pytest.mark.parametrize("max_size", [0, -1])
+def test_record_init_max_size_not_positive(max_size: int) -> None:
+    with pytest.raises(ValueError, match=r"max_size must be a positive integer"):
+        Record("loss", max_size=max_size)
+
+
+@pytest.mark.parametrize("max_size", [2.5, True])
+def test_record_init_max_size_not_an_integer(max_size: Any) -> None:
+    with pytest.raises(ValueError, match=r"max_size must be a positive integer"):
+        Record("loss", max_size=max_size)
 
 
 def test_record_add_value() -> None:

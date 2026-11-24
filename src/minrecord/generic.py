@@ -12,6 +12,7 @@ from coola.formatting.structure import str_indent, str_mapping
 
 from minrecord.base import BaseRecord, EmptyRecordError
 from minrecord.config import get_max_size
+from minrecord.utils.validation import check_max_size
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -59,13 +60,8 @@ class Record(BaseRecord[T]):
     ) -> None:
         super().__init__()
         self._name = name
-        if max_size is None:
-            max_size = get_max_size()
-        if max_size <= 0:
-            msg = f"Record size must be greater than 0 (received: {max_size})"
-            raise ValueError(msg)
-        self._max_size = max_size
-        self._record = deque(elements, maxlen=max_size)
+        self._max_size = check_max_size(get_max_size() if max_size is None else max_size)
+        self._record = deque(elements, maxlen=self._max_size)
 
     def __len__(self) -> int:
         return len(self._record)
@@ -104,7 +100,7 @@ class Record(BaseRecord[T]):
             return False
         return objects_are_equal(self.to_dict(), other.to_dict())
 
-    def get_last_value(self) -> Any:
+    def get_last_value(self) -> T:
         if self.is_empty():
             msg = f"'{self.name}' record is empty."
             raise EmptyRecordError(msg)
