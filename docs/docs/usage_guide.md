@@ -199,7 +199,7 @@ for epoch in range(epochs):
 
 ```python
 import wandb
-from minrecord import RecordManager
+from minrecord import RecordManager, get_last_values
 
 manager = RecordManager()
 # ... add records ...
@@ -214,7 +214,7 @@ for epoch in range(epochs):
     wandb.log(
         {
             "epoch": epoch,
-            **manager.get_last_values(prefix="current/"),
+            **get_last_values(manager.get_records(), prefix="current/"),
             **manager.get_best_values(prefix="best/"),
         }
     )
@@ -276,7 +276,6 @@ assert record1.equal(record2)
 ## See Also
 
 - [Quickstart Guide](quickstart.md) for basic usage
-- [Examples](https://github.com/durandtibo/minrecord/tree/main/examples) for complete working examples
 - [FAQ](faq.md) for common questions and troubleshooting
 - API Reference:
   - [minrecord](refs/root.md) - Main package

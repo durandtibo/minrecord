@@ -87,13 +87,7 @@ a [virtual environment](https://packaging.python.org/guides/installing-using-pip
 pip install minrecord
 ```
 
-To make the package as slim as possible, only the minimal packages required to use `minrecord` are
-installed.
-To include all the dependencies, you can use the following command:
-
-```shell
-pip install minrecord[all]
-```
+`minrecord` has no optional dependency: only `coola` is installed with it.
 
 Please check the [get started page](https://durandtibo.github.io/minrecord/get_started) to see how
 to
