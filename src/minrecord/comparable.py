@@ -221,6 +221,14 @@ class MaxScalarRecord(ComparableRecord[float]):
         del config["comparator"]
         return config
 
+    def clone(self) -> MaxScalarRecord:
+        # The scalar records have no ``comparator`` argument, so the state is
+        # copied after the creation. It keeps a falsy best value (e.g. ``0.0``).
+        record = self.__class__(name=self.name, elements=self._record, max_size=self.max_size)
+        record._best_value = self._best_value
+        record._improved = self._improved
+        return record
+
     @classmethod
     # The scalar records have no ``comparator`` argument. Changing the signature of the
     # inherited method is a breaking change, so the override is kept as it is.
@@ -310,6 +318,14 @@ class MinScalarRecord(ComparableRecord[float]):
         config = super().config_dict()
         del config["comparator"]
         return config
+
+    def clone(self) -> MinScalarRecord:
+        # The scalar records have no ``comparator`` argument, so the state is
+        # copied after the creation. It keeps a falsy best value (e.g. ``0.0``).
+        record = self.__class__(name=self.name, elements=self._record, max_size=self.max_size)
+        record._best_value = self._best_value
+        record._improved = self._improved
+        return record
 
     @classmethod
     # The scalar records have no ``comparator`` argument. Changing the signature of the
