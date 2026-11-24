@@ -233,8 +233,9 @@ if record.is_comparable():
 
 There's no hard limit. Each record has minimal overhead. With max_size=10:
 
-- Memory per record: ~200-500 bytes + stored values
-- 1000 records with scalars: ~1-2 MB
+- Memory per record: about 1 KB + stored values (a `MinScalarRecord` takes 1,000 bytes empty and
+  1,950 bytes with 10 floats)
+- 1000 records with scalars: about 2 MB
 
 ### Is minrecord thread-safe?
 

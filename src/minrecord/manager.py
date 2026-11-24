@@ -123,8 +123,11 @@ class RecordManager:
         r"""Indicate if two managers are equal or not.
 
         Two managers are equal if they have the same type and the same
-        records (same keys and equal records). A NaN value is equal to
-        a NaN value, as for ``BaseRecord.equal``.
+        records (same keys and equal ``to_dict`` output): the equality
+        of a manager is the equality of its ``state_dict``. A NaN value
+        is equal to a NaN value, also when ``objects_are_equal`` is
+        called with ``equal_nan=False``, as for ``BaseRecord.equal``.
+        The ``default_factory`` is not compared.
 
         Args:
             other: The object to compare.
@@ -306,6 +309,13 @@ class RecordManager:
         (``BaseRecord.from_dict``). A record of the manager that the
         state does not mention is kept. The manager is not modified if
         one entry is invalid.
+
+        The data of every entry is first validated by building a
+        record with ``BaseRecord.from_dict``. The data of a key that
+        is already in the manager is then loaded with ``load_dict``,
+        which builds the record again, so an existing key is built
+        twice. The cost is one more constructor call for a window of
+        at most ``max_size`` pairs.
 
         Args:
             state_dict: A dict with the new state values. It has the

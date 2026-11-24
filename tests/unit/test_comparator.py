@@ -164,3 +164,7 @@ def test_min_scalar_comparator_is_better(
     new_value: float, old_value: float, expected: bool
 ) -> None:
     assert MinScalarComparator().is_better(new_value=new_value, old_value=old_value) is expected
+
+
+def test_base_comparator_objects_are_equal_nan_argument_ignores_equal_nan() -> None:
+    assert objects_are_equal(ToleranceComparator(NAN), ToleranceComparator(NAN), equal_nan=False)

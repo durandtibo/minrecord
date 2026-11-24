@@ -273,3 +273,8 @@ def test_base_record_load_dict_not_a_dict_leaves_record_unchanged() -> None:
     with pytest.raises(TypeError, match=r"Expected the configuration of a BaseRecord \(a dict\)"):
         record.load_dict(config)
     assert record.equal(Record("loss", elements=[(0, 7)]))
+
+
+def test_base_record_objects_are_equal_nan_ignores_equal_nan() -> None:
+    record = Record("loss", elements=[(0, float("nan"))])
+    assert objects_are_equal(record, record.clone(), equal_nan=False)
