@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import sys
 from typing import TYPE_CHECKING
 
 import pytest
@@ -63,3 +64,9 @@ def test_reset_max_size_restores_default() -> None:
     set_max_size(3)
     reset_max_size()
     assert get_max_size() == 10
+
+
+def test_set_max_size_too_large_does_not_poison_the_default() -> None:
+    with pytest.raises(ValueError, match=r"max_size must be at most"):
+        set_max_size(sys.maxsize + 1)
+    assert Record("loss").max_size == 10

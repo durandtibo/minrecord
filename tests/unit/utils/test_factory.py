@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from typing import Any
 
 import pytest
@@ -74,3 +75,32 @@ def test_instantiate_does_not_modify_config() -> None:
     config: dict[str, Any] = {OBJECT_TARGET: "minrecord.Record", "name": "loss"}
     instantiate(config, BaseRecord)
     assert config == {OBJECT_TARGET: "minrecord.Record", "name": "loss"}
+
+
+@pytest.mark.parametrize("config", [None, [], "minrecord.Record", MinScalarComparator, 3])
+def test_instantiate_not_a_dict_raises(config: Any) -> None:
+    with pytest.raises(TypeError, match=r"Expected the configuration of a BaseRecord \(a dict\)"):
+        instantiate(config, BaseRecord)
+
+
+def test_instantiate_not_a_dict_message_shows_the_value() -> None:
+    config: Any = None
+    with pytest.raises(TypeError, match=r"\(a dict\), got None$"):
+        instantiate(config, BaseRecord)
+
+
+def test_instantiate_not_a_dict_message_shows_a_class() -> None:
+    config: Any = MinScalarComparator
+    with pytest.raises(
+        TypeError,
+        match=r"Expected the configuration of a BaseComparator \(a dict\), got "
+        r"<class 'minrecord.comparator.MinScalarComparator'>$",
+    ):
+        instantiate(config, BaseComparator)
+
+
+def test_instantiate_not_a_dict_message_is_cut() -> None:
+    config: Any = list(range(1000))
+    msg = "Expected the configuration of a BaseRecord (a dict), got " + repr(config)[:80]
+    with pytest.raises(TypeError, match=rf"^{re.escape(msg)}$"):
+        instantiate(config, BaseRecord)

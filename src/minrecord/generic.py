@@ -13,7 +13,7 @@ from coola.utils.introspection import get_qualified_class_name
 
 from minrecord.base import BaseRecord, EmptyRecordError
 from minrecord.config import get_max_size
-from minrecord.utils.validation import check_max_size
+from minrecord.utils.validation import check_max_size, check_name
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -42,7 +42,9 @@ class Record(BaseRecord[T]):
             the creation of the record is used.
 
     Raises:
-        ValueError: if ``max_size`` is not a positive integer.
+        TypeError: if ``name`` is not a ``str``.
+        ValueError: if ``max_size`` is not a positive integer or is
+            larger than ``sys.maxsize``.
 
     Example:
         ```pycon
@@ -65,7 +67,7 @@ class Record(BaseRecord[T]):
         elements: Iterable[tuple[float | None, T]] = (),
         max_size: int | None = None,
     ) -> None:
-        self._name = name
+        self._name = check_name(name)
         self._max_size = check_max_size(get_max_size() if max_size is None else max_size)
         self._record: deque[tuple[float | None, T]] = deque(maxlen=self._max_size)
         self.update(elements)
