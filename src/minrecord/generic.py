@@ -28,8 +28,8 @@ class Record(BaseRecord[T]):
     values added in the record. Note that this class does not allow
     to get the best value because it is not possible to define a
     generic rule to know the best object. Please see
-    ``ScalarRecord`` that can compute the best value for
-    scalars.
+    ``MinScalarRecord`` and ``MaxScalarRecord`` that can compute the
+    best value for scalars.
 
     Args:
         name: The name of the record.

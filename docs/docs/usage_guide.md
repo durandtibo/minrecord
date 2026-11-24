@@ -67,8 +67,8 @@ These properties are guaranteed by the base classes, so every record has them.
 | Round trip         | `BaseRecord.from_dict(r.to_dict()).equal(r)`, `r.clone().equal(r)`, and `r.load_dict(r2.to_dict())` makes `r` equal to `r2`, also after a JSON round trip and when `r` holds a NaN (`equal` treats NaN as equal to NaN). The clone has the same `has_improved()` and the same best pair. A clone is independent: adding values to it does not change `r`. |
 | Consistent state   | A comparable record has a best pair if and only if it has a value. `best` must be a pair `(step, value)`, and it requires `elements`: `MinScalarRecord("loss", best=(0, 1.0))` raises `ValueError`. |
 | Safe to load       | `from_dict` and the comparator dict only build objects of the expected type (a record, a comparator): a dict that names any other importable callable raises `TypeError` before it is called. `MinScalarRecord.from_dict(d)` only accepts the dict of a `MinScalarRecord`. |
-| Atomic             | An operation that raises (a comparator that fails, an invalid dict given to `load_dict` or to the manager `load_state_dict`) leaves the record, or the manager, as it was.                 |
-| Typed errors       | `EmptyRecordError` for a value asked from an empty record, `NotAComparableRecordError` for a best value asked from a record that cannot compare, `ValueError` for an invalid `max_size`, `TypeError` for a dict of the wrong type. |
+| Atomic             | `add_value`, `load_dict` and the manager `load_state_dict` leave the record, or the manager, as it was if they raise. `update` is a loop of `add_value`: the elements before the failing one are kept (use `clone().update(...)` to keep the original). |
+| Typed errors       | `EmptyRecordError` for a value asked from an empty record (`get_last_value`, `get_best_value`, `get_best_step`, `has_improved`), `NotAComparableRecordError` for a best value asked from a record that cannot compare, `ValueError` for an invalid `max_size`, `TypeError` for a dict of the wrong type. |
 | No hidden global   | The default `max_size` is read when a record is **created**. It is the only global setting (`get_max_size`, `set_max_size`, `reset_max_size`).                                             |
 | Extensible         | A new record type implements the 6 abstract members of `BaseRecord`. A new notion of "better" implements the one method `BaseComparator.is_better`. No registry is needed.               |
 
@@ -79,8 +79,11 @@ Not guaranteed:
 - **Values are stored by reference.** `add_value` does not copy the value, and `to_dict` and `clone`
   share the value objects between the copies. Store scalars or immutable objects.
 - **Order of the `step` values.** `step` is a label, it is not checked to increase.
-- **Truthiness.** `Record` defines `__len__`, so an empty record is falsy: write
+- **Truthiness.** `Record` and `RecordManager` define `__len__`, so an empty one is falsy: write
   `record.is_empty()`, not `if record:`.
+- **`load_dict` replaces the whole state.** The name and the `max_size` of the record are replaced
+  too: a record named `a` that loads the dict of a record named `b` is named `b`. Check the name
+  before if it must stay.
 
 ## Common Patterns
 
@@ -129,19 +132,17 @@ from minrecord import MinScalarRecord
 
 val_loss = MinScalarRecord("val_loss")
 patience = 5
-no_improvement_count = 0
 
 for epoch in range(num_epochs):
     # Training...
     val_loss.add_value(epoch_val_loss, step=epoch)
 
     if val_loss.has_improved():
-        no_improvement_count = 0
         save_checkpoint(model, "best_model.pt")
-    else:
-        no_improvement_count += 1
 
-    if no_improvement_count >= patience:
+    # The count is derived from the best pair, so it survives to_dict/from_dict.
+    # It needs a numeric step.
+    if epoch - val_loss.get_best_step() >= patience:
         print(f"Early stopping at epoch {epoch}")
         break
 ```

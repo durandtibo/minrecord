@@ -120,3 +120,8 @@ Loading:
   instead of `get_best_value` for a `Record`, `add_value`, `NotAComparableRecordError`, typos).
 - Replaced the PyTorch Lightning example of the [FAQ](faq.md) by one that works with Lightning 2.x.
 - The badges of the home page are the ones of the `README.md`.
+- Narrowed the Atomic property: `update` keeps the elements before a rejected one, and documented
+  it. Documented that `load_dict` replaces the whole state (name and `max_size` included), that the
+  state of a custom record must live in `vars(self)`, and that `RecordManager` is falsy when empty.
+- The early stopping pattern of the usage guide uses `get_best_step`, so the patience survives
+  `to_dict`/`from_dict`. The properties are linked from the reference of the root package.

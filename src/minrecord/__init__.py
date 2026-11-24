@@ -1,4 +1,11 @@
-r"""Root package."""
+r"""Root package.
+
+`minrecord` is a minimalist library to record values in a machine learning
+workflow. Every record keeps at most ``max_size`` recent values, keeps the best
+value apart from them, is rebuilt exactly from ``to_dict``, and only loads
+objects of the expected type. See the properties in the usage guide of the
+documentation.
+"""
 
 from __future__ import annotations
 
