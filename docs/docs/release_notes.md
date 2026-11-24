@@ -22,6 +22,10 @@ Records:
   `add_value`.
 - The `best_value` and `improved` arguments are removed. A new `best=(step, value)` argument is the
   best pair that left the recent values. `has_improved()` is derived from the values.
+- The `best` argument must be a pair `(step, value)` and requires `elements`: `best` of the wrong
+  length, or `best` without any element, raises `ValueError`. A record had an empty window and a best
+  value, and `best=(a, b, c)` was truncated. A record that is saved with `to_dict` always has
+  elements with its best pair.
 - The options `elements`, `max_size` and `best` of `Record`, `ComparableRecord`, `MaxScalarRecord`
   and `MinScalarRecord` are keyword-only.
 - `ComparableRecord.is_better` is removed. Use the comparator.
