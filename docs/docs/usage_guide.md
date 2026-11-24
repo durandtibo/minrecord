@@ -128,17 +128,11 @@ from minrecord.comparator import BaseComparator
 class F1Comparator(BaseComparator[tuple[float, float]]):
     """Maximize F1 score from precision and recall."""
 
-    def equal(self, other: object) -> bool:
-        return isinstance(other, self.__class__)
-
-    def get_initial_best_value(self) -> tuple[float, float]:
-        return (0.0, 0.0)
-
-    def is_better(self, old_value: tuple[float, float], new_value: tuple[float, float]) -> bool:
+    def is_better(self, *, new_value: tuple[float, float], old_value: tuple[float, float]) -> bool:
         def f1(p, r):
             return 2 * p * r / (p + r) if (p + r) > 0 else 0
 
-        return f1(*new_value) > f1(*old_value)
+        return f1(*new_value) >= f1(*old_value)
 
 
 record = ComparableRecord("f1_components", F1Comparator())

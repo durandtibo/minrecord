@@ -1,8 +1,17 @@
 from __future__ import annotations
 
 import json
+from typing import Any
 
-from minrecord import MaxScalarRecord, MinScalarRecord, RecordManager
+from coola.factory import OBJECT_TARGET
+
+from minrecord import (
+    BaseComparator,
+    ComparableRecord,
+    MaxScalarRecord,
+    MinScalarRecord,
+    RecordManager,
+)
 
 NUM_STEPS = 100
 
@@ -63,3 +72,43 @@ def test_clone_resume_training() -> None:
     clone.add_value(0.0, step=NUM_STEPS)
     record.add_value(0.0, step=NUM_STEPS)
     assert clone.equal(record)
+
+
+class ToleranceComparator(BaseComparator[float]):
+    r"""Define a custom comparator with an argument."""
+
+    def __init__(self, tolerance: float = 0.0) -> None:
+        self._tolerance = tolerance
+
+    def is_better(self, *, new_value: float, old_value: float) -> bool:
+        return new_value >= old_value - self._tolerance
+
+    def to_dict(self) -> dict[str, Any]:
+        return {**super().to_dict(), "tolerance": self._tolerance}
+
+
+def create_custom_manager() -> RecordManager:
+    manager = RecordManager()
+    manager.add_record(
+        ComparableRecord("score", ToleranceComparator(0.05), max_size=5), key="score"
+    )
+    for step in range(NUM_STEPS):
+        manager.get_record("score").add_value(abs(50 - step) / 100 + (step % 7) / 100, step=step)
+    return manager
+
+
+def test_state_dict_json_round_trip_custom_comparator() -> None:
+    manager = create_custom_manager()
+    new_manager = RecordManager()
+    new_manager.load_state_dict(json.loads(json.dumps(manager.state_dict())))
+    assert new_manager.state_dict() == manager.state_dict()
+
+
+def test_state_dict_json_round_trip_custom_comparator_type() -> None:
+    manager = create_custom_manager()
+    new_manager = RecordManager()
+    new_manager.load_state_dict(json.loads(json.dumps(manager.state_dict())))
+    assert new_manager.get_record("score").to_dict()["comparator"] == {
+        OBJECT_TARGET: f"{__name__}.ToleranceComparator",
+        "tolerance": 0.05,
+    }

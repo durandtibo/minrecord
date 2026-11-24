@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+import json
+from math import isnan
 from typing import TYPE_CHECKING, Any
 
 import pytest
-from coola.equality import objects_are_equal
 from coola.factory import OBJECT_TARGET
 
 from minrecord import (
@@ -17,9 +18,12 @@ from minrecord import (
     set_max_size,
 )
 from minrecord.config import reset_max_size
+from tests.unit.helpers import ToleranceComparator
 
 if TYPE_CHECKING:
     from collections.abc import Generator, Iterable
+
+NAN = float("nan")
 
 
 @pytest.fixture
@@ -133,7 +137,7 @@ def test_comparable_record_add_value_best_outlives_eviction() -> None:
 def test_comparable_record_add_value_comparator_error_leaves_record_unchanged() -> None:
     record = create_max_record(elements=[(0, 1.0)])
     value: Any = "a"
-    with pytest.raises(TypeError, match=r"not supported between instances of"):
+    with pytest.raises(TypeError, match=r"must be real number, not str"):
         record.add_value(value, step=1)
     assert record.equal(create_max_record(elements=[(0, 1.0)]))
 
@@ -141,7 +145,7 @@ def test_comparable_record_add_value_comparator_error_leaves_record_unchanged() 
 def test_comparable_record_add_value_comparator_error_keeps_improved_flag() -> None:
     record = create_max_record(elements=[(0, 1.0)])
     value: Any = "a"
-    with pytest.raises(TypeError, match=r"not supported between instances of"):
+    with pytest.raises(TypeError, match=r"must be real number, not str"):
         record.add_value(value, step=1)
     assert record.has_improved()
 
@@ -271,14 +275,6 @@ def test_comparable_record_has_improved_empty() -> None:
         create_max_record().has_improved()
 
 
-def test_comparable_record_is_better_true() -> None:
-    assert create_max_record().is_better(new_value=0.2, old_value=0.1)
-
-
-def test_comparable_record_is_better_false() -> None:
-    assert not create_max_record().is_better(new_value=0.1, old_value=0.2)
-
-
 def test_comparable_record_is_comparable() -> None:
     assert create_max_record().is_comparable()
 
@@ -302,17 +298,89 @@ def test_comparable_record_equal_false_different_comparator() -> None:
 
 
 def test_comparable_record_to_dict() -> None:
-    assert objects_are_equal(
-        create_max_record(elements=[(0, 1.0), (1, 3.0), (2, 2.0)], max_size=2).to_dict(),
-        {
-            OBJECT_TARGET: "minrecord.comparable.ComparableRecord",
-            "name": "accuracy",
-            "max_size": 2,
-            "elements": ((1, 3.0), (2, 2.0)),
-            "comparator": MaxScalarComparator(),
-            "best": (1, 3.0),
-        },
+    assert create_max_record(elements=[(0, 1.0), (1, 3.0), (2, 2.0)], max_size=2).to_dict() == {
+        OBJECT_TARGET: "minrecord.comparable.ComparableRecord",
+        "name": "accuracy",
+        "max_size": 2,
+        "elements": ((1, 3.0), (2, 2.0)),
+        "comparator": {OBJECT_TARGET: "minrecord.comparator.MaxScalarComparator"},
+        "best": (1, 3.0),
+    }
+
+
+def test_comparable_record_to_dict_json() -> None:
+    record = create_max_record(max_size=2, elements=[(0, 9.0), (1, 1.0), (2, 2.0)])
+    assert json.loads(json.dumps(record.to_dict())) == {
+        OBJECT_TARGET: "minrecord.comparable.ComparableRecord",
+        "name": "accuracy",
+        "max_size": 2,
+        "elements": [[1, 1.0], [2, 2.0]],
+        "comparator": {OBJECT_TARGET: "minrecord.comparator.MaxScalarComparator"},
+        "best": [0, 9.0],
+    }
+
+
+def test_comparable_record_from_dict_json() -> None:
+    record = create_max_record(max_size=2, elements=[(0, 9.0), (1, 1.0), (2, 2.0)])
+    assert BaseRecord.from_dict(json.loads(json.dumps(record.to_dict()))).equal(record)
+
+
+def test_comparable_record_init_comparator_dict() -> None:
+    record = ComparableRecord[float](
+        "accuracy",
+        {OBJECT_TARGET: "minrecord.comparator.MaxScalarComparator"},
+        elements=[(0, 1.0), (1, 3.0), (2, 2.0)],
     )
+    assert record.equal(create_max_record(elements=[(0, 1.0), (1, 3.0), (2, 2.0)]))
+
+
+def test_comparable_record_init_comparator_dict_does_not_modify_data() -> None:
+    comparator = {OBJECT_TARGET: "minrecord.comparator.MaxScalarComparator"}
+    ComparableRecord[float]("accuracy", comparator)
+    assert comparator == {OBJECT_TARGET: "minrecord.comparator.MaxScalarComparator"}
+
+
+def test_comparable_record_init_comparator_invalid_dict() -> None:
+    with pytest.raises(TypeError, match=r"missing 1 required positional argument: '_target_'"):
+        ComparableRecord[float]("accuracy", {})
+
+
+def test_comparable_record_custom_comparator_with_argument() -> None:
+    record = ComparableRecord[float](
+        "accuracy", ToleranceComparator(0.5), elements=[(0, 1.0), (1, 0.6), (2, 0.2)]
+    )
+    assert record.to_dict()["comparator"] == {
+        OBJECT_TARGET: "tests.unit.helpers.ToleranceComparator",
+        "tolerance": 0.5,
+    }
+
+
+def test_comparable_record_custom_comparator_with_argument_from_dict() -> None:
+    record = ComparableRecord[float](
+        "accuracy", ToleranceComparator(0.5), elements=[(0, 1.0), (1, 0.6), (2, 0.2)]
+    )
+    assert BaseRecord.from_dict(record.to_dict()).equal(record)
+
+
+def test_comparable_record_nan_first_value_replaced_by_number() -> None:
+    record = create_max_record(elements=[(0, NAN), (1, 1.0)])
+    assert record.get_best_value() == 1.0
+
+
+def test_comparable_record_nan_first_value_has_improved_after_number() -> None:
+    assert create_max_record(elements=[(0, NAN), (1, 1.0)]).has_improved()
+
+
+def test_comparable_record_nan_after_number_is_never_best() -> None:
+    assert create_max_record(elements=[(0, 1.0), (1, NAN)]).get_best_value() == 1.0
+
+
+def test_comparable_record_nan_after_number_has_not_improved() -> None:
+    assert not create_max_record(elements=[(0, 1.0), (1, NAN)]).has_improved()
+
+
+def test_comparable_record_first_nan_is_the_best_value() -> None:
+    assert isnan(create_max_record(elements=[(0, NAN)]).get_best_value())
 
 
 def test_comparable_record_to_dict_empty_best_is_none() -> None:

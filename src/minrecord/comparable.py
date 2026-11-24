@@ -6,6 +6,7 @@ __all__ = ["ComparableRecord", "MaxScalarRecord", "MinScalarRecord"]
 
 from typing import TYPE_CHECKING, Any, TypeVar
 
+from coola.factory import factory
 from coola.formatting.structure import str_indent, str_mapping
 
 from minrecord.base import EmptyRecordError
@@ -32,7 +33,8 @@ class ComparableRecord(Record[T]):
 
     Args:
         name: The name of the record.
-        comparator: The comparator to use to find the best value.
+        comparator: The comparator to use to find the best value, or
+            its dictionary (the output of ``comparator.to_dict()``).
         elements: The initial elements. Each element is a tuple with
             the step and its associated value. The elements are added
             with ``add_value``, so the best value and the improvement
@@ -69,13 +71,15 @@ class ComparableRecord(Record[T]):
     def __init__(
         self,
         name: str,
-        comparator: BaseComparator[T],
+        comparator: BaseComparator[T] | dict[str, Any],
         *,
         elements: Iterable[tuple[float | None, T]] = (),
         max_size: int | None = None,
         best: tuple[float | None, T] | None = None,
     ) -> None:
-        self._comparator = comparator
+        self._comparator: BaseComparator[T] = (
+            comparator if isinstance(comparator, BaseComparator) else factory(**comparator)
+        )
         self._best: tuple[float | None, T] | None = None if best is None else (best[0], best[1])
         self._improved = False
         super().__init__(name, elements=elements, max_size=max_size)
@@ -98,36 +102,13 @@ class ComparableRecord(Record[T]):
     def add_value(self, value: T, step: float | None = None) -> None:
         # The comparison is done first because the comparator can raise an
         # error: the record is not modified if it happens.
-        improved = self._best is None or self.is_better(old_value=self._best[1], new_value=value)
+        improved = self._best is None or self._comparator.is_better(
+            new_value=value, old_value=self._best[1]
+        )
         super().add_value(value, step)
         self._improved = improved
         if improved:
             self._best = (step, value)
-
-    def is_better(self, old_value: T, new_value: T) -> bool:
-        r"""Indicate if the new value is better than the old value.
-
-        Args:
-            old_value: The old value to compare.
-            new_value: The new value to compare.
-
-        Returns:
-            ``True`` if the new value is better than the old value,
-                otherwise ``False``.
-
-        Example:
-            ```pycon
-            >>> from minrecord import ComparableRecord
-            >>> from minrecord.comparator import MaxScalarComparator
-            >>> record = ComparableRecord("accuracy", MaxScalarComparator())
-            >>> record.is_better(new_value=1, old_value=0)
-            True
-            >>> record.is_better(new_value=0, old_value=1)
-            False
-
-            ```
-        """
-        return self._comparator.is_better(new_value=new_value, old_value=old_value)
 
     def get_best_value(self) -> T:
         if self._best is None:
@@ -145,7 +126,7 @@ class ComparableRecord(Record[T]):
         return True
 
     def to_dict(self) -> dict[str, Any]:
-        return {**super().to_dict(), "comparator": self._comparator, "best": self._best}
+        return {**super().to_dict(), "comparator": self._comparator.to_dict(), "best": self._best}
 
 
 class MaxScalarRecord(ComparableRecord[float]):
