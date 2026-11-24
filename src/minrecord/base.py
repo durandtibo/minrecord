@@ -13,7 +13,7 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
 from coola.equality.tester import EqualEqualityTester, get_default_registry
-from coola.utils.introspection import get_fully_qualified_name
+from coola.utils.introspection import get_qualified_class_name
 
 from minrecord.utils.imports import check_objectory, is_objectory_available
 
@@ -370,7 +370,7 @@ class BaseRecord(ABC, Generic[T], metaclass=AbstractFactory):
 
             ```
         """
-        return {OBJECT_TARGET: get_fully_qualified_name(self.__class__), "name": self.name}
+        return {OBJECT_TARGET: get_qualified_class_name(self.__class__), "name": self.name}
 
     @abstractmethod
     def load_state_dict(self, state_dict: dict[str, Any]) -> None:

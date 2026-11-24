@@ -6,7 +6,7 @@ __all__ = ["ComparableRecord", "MaxScalarRecord", "MinScalarRecord"]
 
 from typing import TYPE_CHECKING, Any, Self, TypeVar
 
-from coola.utils.format import str_indent, str_mapping
+from coola.formatting.structure import str_indent, str_mapping
 
 from minrecord.base import EmptyRecordError
 from minrecord.comparator import (

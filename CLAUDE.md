@@ -1,7 +1,7 @@
 # Instructions for coding agents
 
 `minrecord` is a minimalist library to record values in a machine learning workflow. It supports
-Python 3.10 and later. It depends on `coola` (1.x) and has one optional dependency, `objectory`.
+Python 3.10 and later. It depends on `coola` (2.x) and has one optional dependency, `objectory`.
 
 ## Environment
 
