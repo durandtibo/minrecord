@@ -85,6 +85,10 @@ Loading:
   comparator can be written to JSON.
 - A comparator that raises in `add_value` leaves the record unchanged.
 - `RecordManager.load_state_dict` does not change the manager if an entry is invalid.
+- `RecordManager.load_state_dict` builds each record once to validate the state (it cloned the
+  existing records before), and its merge semantics is documented: a record that the state does not
+  mention is kept.
+- `minrecord.config` has no `global` statement, and `src` has no `noqa`.
 - `has_improved()` of a record that is rebuilt (`from_dict`, `clone`) is the one of the original,
   also when its first value is NaN. A NaN equal to the best NaN is a tie.
 - A record that holds a NaN is equal to its JSON round trip.

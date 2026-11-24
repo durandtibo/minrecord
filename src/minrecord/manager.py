@@ -271,11 +271,13 @@ class RecordManager:
     def load_state_dict(self, state_dict: dict[str, Any]) -> None:
         r"""Load the state values from a dict.
 
-        The data of a key that is already in the manager is loaded in
-        the existing record (``load_dict``), so the objects that
-        other parts of the code hold are updated. The data of a new
-        key creates a new record (``BaseRecord.from_dict``). The
-        manager is not modified if one entry is invalid.
+        The state is merged into the manager. The data of a key that
+        is already in the manager is loaded in the existing record
+        (``load_dict``), so the objects that other parts of the code
+        hold are updated. The data of a new key creates a new record
+        (``BaseRecord.from_dict``). A record of the manager that the
+        state does not mention is kept. The manager is not modified if
+        one entry is invalid.
 
         Args:
             state_dict: A dict with the new state values. It has the
@@ -283,7 +285,8 @@ class RecordManager:
 
         Raises:
             TypeError: if the data of a key is the data of a record
-                of another type than the existing record.
+                of another type than the existing record, or if it is
+                not the data of a record.
 
         Example:
             ```pycon
@@ -305,19 +308,22 @@ class RecordManager:
 
             ```
         """
-        # All the entries are checked before the first change, so the
-        # manager is not modified if an entry is invalid.
-        new_records: dict[str, BaseRecord[Any]] = {}
+        # Phase 1: all the entries are built and checked before the first
+        # change, so the manager is not modified if an entry is invalid.
+        new_records = {key: BaseRecord.from_dict(data) for key, data in state_dict.items()}
+        for key, record in new_records.items():
+            if self.has_record(key) and type(self._records[key]) is not type(record):
+                msg = (
+                    f"Cannot load the data of a {type(record).__qualname__} record in a "
+                    f"{type(self._records[key]).__qualname__} record"
+                )
+                raise TypeError(msg)
+        # Phase 2: the data is valid, so the loading cannot fail.
         for key, data in state_dict.items():
             if self.has_record(key):
-                self._records[key].clone().load_dict(data)
-            else:
-                new_records[key] = BaseRecord.from_dict(data)
-        for key, data in state_dict.items():
-            if key in new_records:
-                self._records[key] = new_records[key]
-            else:
                 self._records[key].load_dict(data)
+            else:
+                self._records[key] = new_records[key]
 
     def state_dict(self) -> dict[str, Any]:
         r"""Return a dictionary containing state values of all the
