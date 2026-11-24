@@ -80,3 +80,7 @@ Configuration and utilities:
   the `examples/` directory, "batch updates").
 - Added the properties of the records to the [usage guide](usage_guide.md), and rewrote the
   sections about custom comparators and serialization.
+- Fixed the sentences of the [quickstart](quickstart.md) that contradicted the code (`get_last_value`
+  instead of `get_best_value` for a `Record`, `add_value`, `NotAComparableRecordError`, typos).
+- Replaced the PyTorch Lightning example of the [FAQ](faq.md) by one that works with Lightning 2.x.
+- The badges of the home page are the ones of the `README.md`.

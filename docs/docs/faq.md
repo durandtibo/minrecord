@@ -285,7 +285,8 @@ for epoch in range(epochs):
 
 ### Does minrecord work with PyTorch Lightning?
 
-Yes! Use records in your LightningModule:
+Yes! Use records in your LightningModule (PyTorch Lightning 2.x). Log the validation loss with
+`self.log` in `validation_step`, then read it in `on_validation_epoch_end`:
 
 ```python
 import pytorch_lightning as pl
@@ -297,12 +298,12 @@ class MyModel(pl.LightningModule):
         super().__init__()
         self.val_loss = MinScalarRecord("val_loss")
 
-    def validation_epoch_end(self, outputs):
-        avg_loss = torch.stack([x["loss"] for x in outputs]).mean()
-        self.val_loss.add_value(avg_loss.item(), step=self.current_epoch)
+    def on_validation_epoch_end(self):
+        loss = self.trainer.callback_metrics["val_loss"].item()
+        self.val_loss.add_value(loss, step=self.current_epoch)
 
         if self.val_loss.has_improved():
-            self.save_checkpoint("best_model.ckpt")
+            self.trainer.save_checkpoint("best_model.ckpt")
 ```
 
 ## Troubleshooting
