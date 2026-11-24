@@ -27,8 +27,9 @@ Record(name=loss, max_size=10, size=0)
 
 ```
 
-Usually, it is useful to keep only the last values, but it also possible to track a large number of
-values, but it can consume a lot of memory of the values to track take significant amount of memory.
+Usually, it is useful to keep only the last values. It is also possible to track a large number of
+values, but it can consume a lot of memory if the values to track take a significant amount of
+memory.
 By default, the `Record` objects only track the last 10 values, but it is possible to control the
 memory consumption by setting carefully the `max_size` argument.
 
@@ -41,7 +42,7 @@ Record(name=my_record, max_size=5, size=0)
 
 ```
 
-After creating a record, the `add_record` method can be used to add a value to the record.
+After creating a record, the `add_value` method can be used to add a value to the record.
 The following example shows how to add the value `4.2` to the record.
 
 ```pycon
@@ -67,7 +68,7 @@ Record(name=loss, max_size=10, size=1)
 ```
 
 The step can be a number or `None`. `None` means no valid step to track.
-It is possible to get the last value added by using the `get_best_value` method.
+It is possible to get the last value added by using the `get_last_value` method.
 
 ```pycon
 
@@ -82,7 +83,7 @@ Record(name=loss, max_size=10, size=2)
 
 ```
 
-Calling `get_best_value` on an empty record raises a `EmptyRecordError` exception.
+Calling `get_last_value` on an empty record raises an `EmptyRecordError` exception.
 It is possible to check if a record is empty or not by using the `is_empty` method.
 
 ```pycon
@@ -159,7 +160,7 @@ True
 
 `minrecord` also provides some comparable records i.e. records that track the best value.
 There is a generic `ComparableRecord` class where the user just needs to implement the comparator
-object that is used to find the nest value.
+object that is used to find the best value.
 There are `MaxScalarRecord` and `MinScalarRecord` that are specialized implementations
 of `ComparableRecord` for scalars (e.g. `float` or `int`).
 It is possible to know if a record is comparable by calling the `is_comparable` methods.
@@ -198,7 +199,7 @@ It is possible to use the `get_best_value` method to get the best value.
 
 ```
 
-The record tracks the best value even if the best value is not store in the record.
+The record tracks the best value even if the best value is not stored in the record.
 Below is an example where the record's maximum size is set to 3.
 
 ```pycon
@@ -256,7 +257,7 @@ True
 ```
 
 :warning: Calling `has_improved` or `get_best_value` on non-comparable record raises
-a `NotAComparableRecord` exception.
+a `NotAComparableRecordError` exception.
 
 The `elements` argument of the constructor adds the values with `add_value`, so the best value and
 `has_improved` are correct when a record is created from some elements.
