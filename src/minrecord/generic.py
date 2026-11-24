@@ -52,7 +52,7 @@ class Record(BaseRecord[T]):
     def __init__(
         self,
         name: str,
-        elements: Iterable[tuple[int | None, T]] = (),
+        elements: Iterable[tuple[float | None, T]] = (),
         max_size: int = get_max_size(),
     ) -> None:
         super().__init__()
@@ -60,6 +60,7 @@ class Record(BaseRecord[T]):
         if max_size <= 0:
             msg = f"Record size must be greater than 0 (received: {max_size})"
             raise ValueError(msg)
+        self._max_size = max_size
         self._record = deque(elements, maxlen=max_size)
 
     def __len__(self) -> int:
@@ -86,9 +87,9 @@ class Record(BaseRecord[T]):
     @property
     def max_size(self) -> int:
         r"""The maximum size of the record."""
-        return self._record.maxlen
+        return self._max_size
 
-    def add_value(self, value: T, step: int | None = None) -> None:
+    def add_value(self, value: T, step: float | None = None) -> None:
         self._record.append((step, value))
 
     def clone(self) -> Record[T]:
@@ -105,7 +106,7 @@ class Record(BaseRecord[T]):
             raise EmptyRecordError(msg)
         return self._record[-1][1]
 
-    def get_most_recent(self) -> tuple[tuple[int | None, T], ...]:
+    def get_most_recent(self) -> tuple[tuple[float | None, T], ...]:
         return tuple(self._record)
 
     def is_comparable(self) -> bool:

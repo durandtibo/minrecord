@@ -21,9 +21,6 @@
         <img alt="Documentation" src="https://github.com/durandtibo/minrecord/actions/workflows/docs-dev.yaml/badge.svg">
     </a>
     <br/>
-    <a href="https://github.com/psf/black">
-        <img  alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg">
-    </a>
     <a href="https://google.github.io/styleguide/pyguide.html#s3.8-comments-and-docstrings">
         <img  alt="Doc style: google" src="https://img.shields.io/badge/%20style-google-3666d6.svg">
     </a>
@@ -123,7 +120,7 @@ The following is the corresponding `minrecord` versions and tested dependencies.
 
 | `minrecord` | `coola`        | `objectory`              | `python`      |
 |-------------|----------------|--------------------------|---------------|
-| `main`      | `>=1.0,<2.0`   | `>=0.3,<1.0`<sup>*</sup> | `>=3.10`      |
+| `main`      | `>=1.0,<2.0`   | `>=0.3,<1.0`<sup>*</sup> | `>=3.11`      |
 | `0.3.0`     | `>=1.0,<2.0`   | `>=0.3,<1.0`<sup>*</sup> | `>=3.10`      |
 | `0.2.0`     | `>=0.10,<1.0`  | `>=0.3,<1.0`<sup>*</sup> | `>=3.10`      |
 | `0.1.0`     | `>=0.8.4,<1.0` | `>=0.2,<1.0`<sup>*</sup> | `>=3.9,<3.14` |

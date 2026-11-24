@@ -59,7 +59,7 @@ git clone git@github.com:durandtibo/minrecord.git
 cd minrecord
 ```
 
-It is recommended to create a Python 3.10+ virtual environment. This step is optional so you
+It is recommended to create a Python 3.11+ virtual environment. This step is optional so you
 can skip it. You can use `uv` to create a virtual environment:
 
 ```shell

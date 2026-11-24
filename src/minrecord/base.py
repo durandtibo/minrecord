@@ -17,10 +17,11 @@ from coola.utils.introspection import get_fully_qualified_name
 
 from minrecord.utils.imports import check_objectory, is_objectory_available
 
-if is_objectory_available():
-    from objectory import OBJECT_TARGET, AbstractFactory
-else:  # pragma: no cover
+if TYPE_CHECKING or not is_objectory_available():  # pragma: no cover
+    # The type checkers only see the fallback, so the metaclass of ``BaseRecord`` is not a union.
     from minrecord.utils.fallback.objectory import OBJECT_TARGET, AbstractFactory
+else:
+    from objectory import OBJECT_TARGET, AbstractFactory
 
 
 if TYPE_CHECKING:

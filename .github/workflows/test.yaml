@@ -26,7 +26,7 @@ jobs:
           macos-14,
           macos-15-intel,
         ]
-        python-version: [ '3.14', '3.14t', '3.13', '3.13t', '3.12', '3.11', '3.10' ]
+        python-version: [ '3.14', '3.14t', '3.13', '3.13t', '3.12', '3.11' ]
 
     steps:
       - name: Checkout
@@ -39,11 +39,11 @@ jobs:
 
       - name: Run unit tests
         run: |
-          inv unit-test --cov
+          inv test.unit --cov
 
       - name: Run integration tests
         run: |
-          inv integration-test --cov
+          inv test.integration --cov
 
 
   min:
@@ -65,7 +65,7 @@ jobs:
           macos-14,
           macos-15-intel,
         ]
-        python-version: [ '3.14', '3.14t', '3.13', '3.13t', '3.12', '3.11', '3.10' ]
+        python-version: [ '3.14', '3.14t', '3.13', '3.13t', '3.12', '3.11' ]
 
     steps:
       - name: Checkout
@@ -79,8 +79,8 @@ jobs:
 
       - name: Run unit tests
         run: |
-          inv unit-test --cov
+          inv test.unit --cov
 
       - name: Run integration tests
         run: |
-          inv integration-test --cov
+          inv test.integration --cov

@@ -133,9 +133,7 @@ class F1Comparator(BaseComparator[tuple[float, float]]):
     def get_initial_best_value(self) -> tuple[float, float]:
         return (0.0, 0.0)
 
-    def is_better(
-        self, old_value: tuple[float, float], new_value: tuple[float, float]
-    ) -> bool:
+    def is_better(self, old_value: tuple[float, float], new_value: tuple[float, float]) -> bool:
         def f1(p, r):
             return 2 * p * r / (p + r) if (p + r) > 0 else 0
 
