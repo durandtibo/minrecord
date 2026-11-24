@@ -33,8 +33,8 @@ def instantiate(config: dict[str, Any], cls: type[T]) -> T:
         The instantiated object.
 
     Raises:
-        TypeError: if ``config`` is not a configuration of ``cls``
-            (the key ``_target_`` is missing, or it names an object
+        TypeError: if ``config`` is not a ``dict``, or if it is not a
+            configuration of ``cls`` (the key ``_target_`` is missing, or it names an object
             that is not ``cls`` or a subclass of ``cls``).
         ImportError: if the object named by ``_target_`` cannot be
             imported.
@@ -51,6 +51,9 @@ def instantiate(config: dict[str, Any], cls: type[T]) -> T:
 
         ```
     """
+    if not isinstance(config, dict):
+        msg = f"Expected the configuration of a {cls.__qualname__} (a dict), got {config!r:.80}"
+        raise TypeError(msg)
     if not is_object_config(config, cls, import_target=True):
         msg = (
             f"The configuration {config.get(OBJECT_TARGET)!r} is not a configuration "

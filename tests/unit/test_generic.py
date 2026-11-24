@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import sys
 from typing import TYPE_CHECKING, Any
 
 import pytest
@@ -57,6 +58,21 @@ def test_record_init_max_size_not_positive(max_size: int) -> None:
 def test_record_init_max_size_not_an_integer(max_size: Any) -> None:
     with pytest.raises(ValueError, match=r"max_size must be a positive integer"):
         Record("loss", max_size=max_size)
+
+
+@pytest.mark.parametrize("name", [None, 3, b"x"])
+def test_record_init_name_not_a_str(name: Any) -> None:
+    with pytest.raises(TypeError, match=r"name must be a str, got"):
+        Record(name)
+
+
+def test_record_init_max_size_sys_maxsize() -> None:
+    assert Record("loss", max_size=sys.maxsize).max_size == sys.maxsize
+
+
+def test_record_init_max_size_too_large() -> None:
+    with pytest.raises(ValueError, match=r"max_size must be at most 9223372036854775807, got"):
+        Record("loss", max_size=sys.maxsize + 1)
 
 
 def test_record_add_value() -> None:

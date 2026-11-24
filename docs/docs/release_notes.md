@@ -49,6 +49,9 @@ Records:
 - `equal` of the records and of the manager treats NaN as equal to NaN, so a record that holds a NaN
   is equal to its copy after a JSON round trip.
 
+- `Record(name)` raises `TypeError` if `name` is not a `str` (`None` and `3` were accepted, and a
+  `None` name became the key `"null"` after a JSON round trip).
+
 Comparators:
 
 - `BaseComparator` has one abstract method, `is_better(*, new_value, old_value)`, which is
@@ -86,6 +89,11 @@ Loading:
 
 ### Fixes
 
+- `max_size` larger than `sys.maxsize` raises `ValueError` (it was an `OverflowError`, and
+  `set_max_size(2**63)` succeeded and made every later `Record("a")` raise).
+- A configuration that is not a dict (`BaseRecord.from_dict(None)`, `record.load_dict([])`,
+  `manager.load_state_dict({"a": None})`, `ComparableRecord("x", MinScalarComparator)`) raises
+  `TypeError` (it was `AttributeError`).
 - `set_max_size` changes the maximum size of the records created after the call. The default was
   evaluated at import.
 - `clone()` works for `MaxScalarRecord` and `MinScalarRecord`.
@@ -113,7 +121,7 @@ Loading:
 - `RecordManager.get_last_values` and `RecordManager.equal` (the managers work with
   `coola.equality.objects_are_equal`).
 - `reset_max_size` is exported at the root of the package.
-- `minrecord.utils.validation.check_max_size`.
+- `minrecord.utils.validation.check_max_size` and `check_name`.
 - `get_best_step()` returns the step of the best value of a comparable record (the latest step among
   the ties), also if the pair is not in the recent values anymore. It raises `EmptyRecordError` for an
   empty record and `NotAComparableRecordError` for a record that cannot compare. The code that

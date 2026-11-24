@@ -29,6 +29,7 @@ def check_imports() -> None:
         "minrecord.utils",
         "minrecord.utils.factory.instantiate",
         "minrecord.utils.validation.check_max_size",
+        "minrecord.utils.validation.check_name",
     ]
     for a in objects_to_import:
         module_path, name = a.rsplit(".", maxsplit=1)

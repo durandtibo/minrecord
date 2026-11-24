@@ -536,6 +536,22 @@ def test_comparable_record_init_comparator_invalid_dict() -> None:
         ComparableRecord[float]("accuracy", {})
 
 
+def test_comparable_record_init_comparator_class_raises() -> None:
+    comparator: Any = MinScalarComparator
+    with pytest.raises(
+        TypeError, match=r"Expected the configuration of a BaseComparator \(a dict\), got <class"
+    ):
+        ComparableRecord[float]("accuracy", comparator)
+
+
+def test_comparable_record_init_comparator_none_raises() -> None:
+    comparator: Any = None
+    with pytest.raises(
+        TypeError, match=r"Expected the configuration of a BaseComparator \(a dict\), got None"
+    ):
+        ComparableRecord[float]("accuracy", comparator)
+
+
 def test_comparable_record_custom_comparator_with_argument() -> None:
     record = ComparableRecord[float](
         "accuracy", ToleranceComparator(0.5), elements=[(0, 1.0), (1, 0.6), (2, 0.2)]

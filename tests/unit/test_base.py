@@ -259,3 +259,17 @@ def test_base_record_load_dict_other_type_leaves_record_unchanged() -> None:
     ):
         record.load_dict(MinScalarRecord("loss").to_dict())
     assert record.equal(Record("loss", elements=[(0, 7)]))
+
+
+@pytest.mark.parametrize("config", [None, [], "minrecord.Record"])
+def test_base_record_from_dict_not_a_dict_raises(config: Any) -> None:
+    with pytest.raises(TypeError, match=r"Expected the configuration of a BaseRecord \(a dict\)"):
+        BaseRecord.from_dict(config)
+
+
+def test_base_record_load_dict_not_a_dict_leaves_record_unchanged() -> None:
+    config: Any = []
+    record = Record("loss", elements=[(0, 7)])
+    with pytest.raises(TypeError, match=r"Expected the configuration of a BaseRecord \(a dict\)"):
+        record.load_dict(config)
+    assert record.equal(Record("loss", elements=[(0, 7)]))

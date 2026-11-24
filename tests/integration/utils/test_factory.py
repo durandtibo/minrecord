@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from typing import Any
 
 from coola.factory import OBJECT_TARGET
@@ -41,3 +42,9 @@ def test_instantiate_target_is_the_real_import() -> None:
 def test_comparable_record_comparator_dict_defined_in_a_test_module() -> None:
     record = ComparableRecord("loss", ToleranceComparator(0.5).to_dict())
     assert record.equal(ComparableRecord("loss", ToleranceComparator(0.5)))
+
+
+def test_target_in_a_stored_value_is_data_after_json_round_trip() -> None:
+    record = Record("loss", elements=[(0, {OBJECT_TARGET: "os.getcwd"})])
+    loaded = BaseRecord.from_dict(json.loads(json.dumps(record.to_dict())))
+    assert loaded.get_last_value() == {OBJECT_TARGET: "os.getcwd"}

@@ -528,3 +528,10 @@ def test_record_manager_load_state_dict_new_entry_not_added_if_other_entry_inval
             }
         )
     assert len(manager) == 0
+
+
+def test_record_manager_load_state_dict_not_a_dict_entry_leaves_manager_unchanged() -> None:
+    manager = create_manager_with_values()
+    with pytest.raises(TypeError, match=r"Expected the configuration of a BaseRecord \(a dict\)"):
+        manager.load_state_dict({"loss": None})
+    assert manager.equal(create_manager_with_values())

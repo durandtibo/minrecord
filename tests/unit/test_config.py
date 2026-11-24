@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import sys
 from typing import TYPE_CHECKING, Any
 
 import pytest
@@ -69,6 +70,13 @@ def test_set_max_size_invalid_keeps_current_value() -> None:
     set_max_size(5)
     with pytest.raises(ValueError, match=r"max_size must be a positive integer, got 0"):
         set_max_size(0)
+    assert get_max_size() == 5
+
+
+def test_set_max_size_too_large_keeps_current_value() -> None:
+    set_max_size(5)
+    with pytest.raises(ValueError, match=r"max_size must be at most 9223372036854775807, got"):
+        set_max_size(sys.maxsize + 1)
     assert get_max_size() == 5
 
 
