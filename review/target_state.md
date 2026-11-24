@@ -1,66 +1,57 @@
 # `minrecord`: target state and the changes to reach it
 
 This document describes the design that `minrecord` should have, then the changes to make to the
-current implementation (`main`, `7f311f8`) to get there. It replaces the previous version of this
-review: the eight steps of that version (#526 to #534) are merged, so the design it described (one
-snapshot, one comparator method, no `Config` singleton, no sentinel that a real value can be
-confused with) **is** the current code. What is left is the gap between that code and the properties
-that the documentation promises. The design follows the properties of `docs/docs/usage_guide.md`
-(**Properties**), the key features of `docs/docs/index.md`, the answers of `faq.md` and the rules of
-`CLAUDE.md`, and it stays aligned with `coola` (2.x), the only dependency. Its aim is a small
-package that is easy to maintain: **one record contract, one snapshot that rebuilds an object, one
-comparator method, no global state beyond `max_size`**. Breaking changes are accepted, and the
-future state is more important than the past one.
+current implementation (`main`, `f65805b`) to get there. It replaces the previous version of this
+review. The steps of that version are merged (#526 to #544): one snapshot (`to_dict`), one
+comparator method, a reflexive comparison, NaN-aware `equal`, a loader that only builds the expected
+type (`instantiate`), a consistent `best`, a two-phase `load_state_dict`, no `global` in `config.py`,
+one private scalar base and `get_best_step`. So the design that it described **is** the current
+code. What is left is small: three places where a property that the documentation promises is false
+or is only true by the discipline of the caller, and a few places where the documentation and the
+code disagree. The design follows the properties of `docs/docs/usage_guide.md` (**Properties**),
+the key features of `docs/docs/index.md`, the answers of `faq.md` and the rules of `CLAUDE.md`, and
+it stays aligned with `coola` (2.x), the only dependency. Its aim is a small package that is easy to
+maintain: **one record contract, one snapshot that rebuilds an object, one comparator method, no
+global state beyond `max_size`**. Breaking changes are accepted, and the future state is more
+important than the past one.
 
-Evidence comes from probes on `main` and from a throw-away prototype of the fixes (Python 3.14,
+Evidence comes from probes on `main` and from a throw-away prototype of the main fix (Python 3.14,
 `coola` 2.0.0a5, scripts kept outside the repository). Items marked **[verified]** were reproduced;
-**[reading]** comes from the code. Nothing in `src`, `tests` or `docs` was changed. The 477 tests,
-`ruff check` and `ty check` pass on `main`.
-
-## Constraints
-
-1. **Simple and easy to maintain.** The package is 1,572 lines, most of them docstrings and
-   doctests. The target adds no new concept: every change below either fixes a property that is
-   promised and false, or deletes code. The one new helper is 6 lines.
-2. **Major release.** Breaking changes are fine and compatibility is not a design input: no adapter,
-   no alias, no deprecation period. The release notes list the changes (`0.4.0` is unreleased, so
-   the changes join its notes). `index.md` says the API is not stable.
-3. **Downstream code is not a design input.** The dependents will be updated later. The daily names
-   (`BaseRecord`, `Record`, `MinScalarRecord`, `MaxScalarRecord`, `RecordManager`, `add_value`,
-   `get_best_value`, ...) stay because they are the natural API, not for compatibility.
-4. **One dependency.** `coola` is the only dependency and `minrecord` has no optional one. Equality,
-   formatting and object creation come from `coola` (`objects_are_equal`, `str_mapping`,
-   `is_object_config`, `factory`); nothing is re-implemented.
-5. **Fast enough by construction.** `add_value`, `get_last_value` and `get_best_value` stay O(1)
-   (`usage_guide.md`, "Computational Cost"). No change below adds a per-call cost to `add_value`.
+**[reading]** comes from the code. Nothing in `src`, `tests` or `docs` was changed, apart from this
+file. On `main`: 669 tests pass, coverage of `src/minrecord` is 100 %, `ruff check`, `ty check` and
+the doctests of the 22 Markdown files pass, and `src` has one suppression (the `pragma: no cover` of
+the `__version__` fallback).
 
 ## 1. Properties of the sub-package
 
-These are the rules of the documentation, stated once, with the four that the documentation implies
+These are the rules of the documentation, stated once, with the ones that the documentation implies
 but does not state yet (marked **new**). Every design choice below exists to make one of them true
 **by construction** (in the base classes) instead of by the discipline of each subclass. The last
-column says whether the property holds on `main`.
+column says whether the property holds on `main`; the third one names the tests that check it.
 
-| Property                | Statement                                                                                                                                                                                                                                                                                                                                                                                                                                                                | Enforced by                                  | Today         |
-| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------- | ------------- |
-| Bounded memory          | A record keeps at most `max_size` pairs `(step, value)`. The oldest pair is dropped first. Adding a value is O(1).                                                                                                                                                                                                                                                                                                                                                       | the `deque(maxlen=...)` of `Record`          | holds         |
-| Best is never lost      | The best pair `(step, value)` of a comparable record is stored apart from the window: it survives the eviction of the pair that produced it, `clone` and `to_dict`/`from_dict`.                                                                                                                                                                                                                                                                                          | `ComparableRecord._best`                     | holds         |
-| No confusable sentinel  | The absence of a best value may be represented by a sentinel, but the sentinel must never be confused with a real value: it is not a value that a record can hold or that a comparator can receive, and it is never returned by a public method. Today the sentinel is the best pair `None` (a pair is never `None`); the first value then becomes the best and counts as an improvement. A stored `inf`/`-inf` is **not** accepted, because it is a legal metric value. | `ComparableRecord.add_value`                 | holds         |
-| Ties improve            | A value equal to the best value counts as an improvement. It is useful when a metric plateaus at its optimum. This includes NaN against NaN, so the comparison is **reflexive**: `is_better(new_value=x, old_value=x)` is `True` for all `x`.                                                                                                                                                                                                                            | the comparators, the contract test (**new**) | **G1**        |
-| NaN never wins          | A NaN value is never better than a number. A NaN best value is replaced by any value (a number, or another NaN as a tie).                                                                                                                                                                                                                                                                                                                                                | the scalar comparators                       | **G1**        |
-| One snapshot            | `to_dict()` returns the arguments of the constructor, content included (window as `elements`, best as `best`). `improved` is derived from the values, never stored.                                                                                                                                                                                                                                                                                                      | `BaseRecord.from_dict/load_dict/clone/equal` | holds         |
-| Round trip is exact     | For every record `r`, also after a JSON round trip and also when it holds NaN: `from_dict(to_dict()).equal(r)`, `r.clone().equal(r)`, **the clone has the same `has_improved()` and the same best pair** (**new**).                                                                                                                                                                                                                                                      | the contract test over the record classes    | **G1, G2**    |
-| Consistent state        | A comparable record has a best pair if and only if it has a value: the sentinel (`best is None` today) exactly when `is_empty()`. No constructor argument can build an empty record that has a best value (**new**).                                                                                                                                                                                                                                                     | the constructor of `ComparableRecord`        | **G4**        |
-| Safe to load            | `from_dict` and the comparator dict only build objects of the expected type (a record, a comparator). A dict that names any other importable callable is rejected before it is called (**new**).                                                                                                                                                                                                                                                                         | `minrecord.utils.factory.instantiate`        | **G3**        |
-| Atomic                  | An operation that raises (a comparator that fails, an invalid dict given to `load_dict` or to the manager `load_state_dict`) leaves the record, or the manager, as it was.                                                                                                                                                                                                                                                                                               | `add_value` order of steps, `load_dict`      | holds         |
-| Typed errors            | `EmptyRecordError` for a value asked from an empty record, `NotAComparableRecordError` for a best value asked from a record that cannot compare, `ValueError` for an invalid `max_size` or `best`, `TypeError` for a dict of the wrong type.                                                                                                                                                                                                                             | the base class and the constructors          | partly (G3)   |
-| No hidden global        | The default `max_size` is read when a record is **created**. It is the only global setting (`get_max_size`, `set_max_size`, `reset_max_size`), and its code carries no lint suppression.                                                                                                                                                                                                                                                                                 | `Record.__init__`, `config.py`               | holds, **G7** |
-| Extensible              | A new record type implements the 6 abstract members of `BaseRecord`. A new notion of "better" implements the one method `BaseComparator.is_better`. No registry is needed.                                                                                                                                                                                                                                                                                               | the two base classes                         | holds         |
-| Consistent with `coola` | Records, comparators and managers work with `objects_are_equal`; `to_dict` works with `coola.factory.factory`; the string forms use `coola.formatting`.                                                                                                                                                                                                                                                                                                                  | the `register` calls, `to_dict`              | holds         |
-| Keyword-only options    | Every option after the identifying arguments (`name`, `comparator`) is keyword-only.                                                                                                                                                                                                                                                                                                                                                                                     | the signatures                               | holds         |
-| Minimal                 | One dependency (`coola`), no optional dependency, no I/O, no logging, no thread, no global state beyond `max_size`.                                                                                                                                                                                                                                                                                                                                                      | `pyproject.toml`                             | holds         |
+| Property                | Statement                                                                                                                                                                                                                                                                                                                                       | Enforced by (tests)                                                                                    | Today          |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ | -------------- |
+| Bounded memory          | A record keeps at most `max_size` pairs `(step, value)`. The oldest pair is dropped first. Adding a value is O(1).                                                                                                                                                                                                                              | `deque(maxlen=...)` of `Record` (`test_generic.py`, `integration/test_max_size.py`)                    | holds          |
+| Best is never lost      | The best pair `(step, value)` of a comparable record is stored apart from the window: it survives the eviction of the pair that produced it, `clone` and `to_dict`/`from_dict`.                                                                                                                                                                 | `ComparableRecord._best` (`test_contract_comparable_best_survives_from_dict`)                          | holds          |
+| No confusable sentinel  | The absence of a best value is the best pair `None` (a pair is never `None`). It is never a value that a record can hold, and `inf`/`-inf` are never stored as a stand-in.                                                                                                                                                                      | `ComparableRecord.add_value`                                                                           | holds          |
+| Ties improve            | A value equal to the best value counts as an improvement. The comparison is **reflexive**: `is_better(new_value=x, old_value=x)` is `True` for all `x`, NaN included.                                                                                                                                                                           | the comparators (`test_contract_*_comparator_is_reflexive`)                                            | holds          |
+| NaN never wins          | A NaN value is never better than a number. A NaN best value is replaced by any value (a number, or another NaN as a tie).                                                                                                                                                                                                                       | the scalar comparators (`test_comparator.py`)                                                          | holds          |
+| One snapshot            | `to_dict()` returns the arguments of the constructor, content included (window as `elements`, best as `best`). `improved` is derived from the values, never stored.                                                                                                                                                                             | `BaseRecord.from_dict/load_dict/clone/equal`                                                           | holds          |
+| Round trip is exact     | For every record `r`, also after a JSON round trip and also when it holds NaN: `from_dict(to_dict()).equal(r)`, `r.clone().equal(r)`, the clone has the same `has_improved()` and the same best pair.                                                                                                                                           | `tests/unit/test_contract.py` (20+ tests over the record classes)                                      | holds          |
+| Consistent state        | A comparable record has a best pair if and only if it has a value. `best` is a **pair** and requires `elements`.                                                                                                                                                                                                                                | the constructor of `ComparableRecord`                                                                  | partly (**N8**) |
+| Safe to load            | `from_dict` and the comparator dict only build objects of the expected type. A dict that names any other importable callable is rejected before it is called.                                                                                                                                                                                   | `minrecord.utils.factory.instantiate` (`test_factory.py`, `integration/utils/test_factory.py`)         | holds          |
+| **Fails early** (new)   | A value that the comparator cannot compare is rejected **by the `add_value` that receives it**, and never stored. A record is never left in a state where every later `add_value` raises.                                                                                                                                                       | `ComparableRecord.add_value` (the first value is compared with itself)                                  | **N1**         |
+| Atomic                  | `add_value`, `load_dict` and the manager `load_state_dict` leave the record, or the manager, as it was if they raise. `update` is a loop of `add_value`: the elements before the failing one are kept (**new**: stated, it was overstated).                                                                                                    | `add_value` order of steps, `load_dict` (`test_contract_load_dict_invalid_leaves_record_unchanged`)    | **N2** (doc)   |
+| Typed errors            | `EmptyRecordError` for a value asked from an empty record (`get_last_value`, `get_best_value`, `get_best_step`, `has_improved`), `NotAComparableRecordError` for a best value, a best step or an improvement asked from a record that cannot compare, `ValueError` for an invalid `max_size` or `best`, `TypeError` for a dict of the wrong type. | the base class and the constructors                                                                    | holds (doc: **N5**) |
+| Contract is enforced    | The methods that "must not be overridden" (`clone`, `equal`, `update`, `from_dict`, `load_dict`) are `@final`, so a type checker rejects an override (**new**).                                                                                                                                                                                 | `typing.final` (`ty`, `pyright`)                                                                        | **N4**         |
+| Readable and stable text | `repr`/`str` of a record and of a comparator are deterministic and show the arguments (no memory address) (**new**).                                                                                                                                                                                                                           | `BaseComparator.__repr__` built from `to_dict`                                                          | **N3**         |
+| No hidden global        | The default `max_size` is read when a record is **created**. It is the only global setting (`get_max_size`, `set_max_size`, `reset_max_size`), and its code carries no lint suppression.                                                                                                                                                        | `Record.__init__`, `config.py`                                                                          | holds          |
+| Extensible              | A new record type implements the 6 abstract members of `BaseRecord`, keeps its whole state in `vars(self)` (see **N6**) and accepts what its `to_dict` returns. A new notion of "better" implements the one method `BaseComparator.is_better`. No registry is needed.                                                                          | the two base classes (`UnitRecord`, `ToleranceComparator` of the contract test)                        | holds (doc: **N6**) |
+| Consistent with `coola` | Records, comparators and managers work with `objects_are_equal`; `to_dict` works with `coola.factory.factory`; the string forms use `coola.formatting`; **all** equality is NaN-aware, comparators included (**new**).                                                                                                                         | the `register` calls, `to_dict`                                                                         | partly (**N7**) |
+| Keyword-only options    | Every option after the identifying arguments (`name`, `comparator`) is keyword-only.                                                                                                                                                                                                                                                            | the signatures                                                                                          | holds          |
+| Minimal                 | One dependency (`coola`), no optional dependency, no I/O, no logging, no thread, no global state beyond `max_size`.                                                                                                                                                                                                                             | `pyproject.toml`                                                                                        | holds          |
 
-Not guaranteed, and documented as such (`usage_guide.md` has the first four):
+Not guaranteed, and documented as such (`usage_guide.md` has the first four; the fifth is new):
 
 - **Thread safety.** A record and a manager are not thread-safe. Use one record per thread or a lock.
 - **Values are stored by reference.** `add_value` does not copy the value, and `to_dict` and `clone`
@@ -69,44 +60,70 @@ Not guaranteed, and documented as such (`usage_guide.md` has the first four):
   to be a number.
 - **Truthiness.** `Record` and `RecordManager` define `__len__`, so an empty one is falsy: write
   `record.is_empty()`, not `if record:`. The usage guide names only the record; the manager is
-  added (**[verified]**: `bool(RecordManager())` is `False`).
-- **Untrusted dicts beyond the type.** `from_dict` imports the module that `_target_` names (after
-  G3 it never calls anything but a record class). A dict from an untrusted source is still not a
-  reason to import arbitrary modules; see decision D3.
+  missing (**[verified]**: `bool(RecordManager())` is `False`, **N5**).
+- **Untrusted dicts beyond the type.** `from_dict` imports the module that `_target_` names. It never
+  calls anything but a record class, but a dict from an untrusted source can still make the process
+  import a module (decision D3).
+- **`load_dict` replaces the whole state**, name and `max_size` included (**[verified]**: a `Record`
+  named `a` that loads the dict of a record named `b` is named `b`). A caller that needs the name to
+  stay checks it (**N5**).
 
-## 2. What differs today
+## 2. Constraints
 
-| #   | Finding                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | Status         |
-| --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------- |
-| G1  | **The round trip changes `has_improved()`.** `from_dict` replays the window after the seed `best`, so the last value is compared with a best that **is** the last value. That is a tie, and it only gives the original flag if `is_better(x, x)` is `True`. It is `False` for a NaN (`not isnan(new_value)`) and for any custom comparator written with `>`/`<`. `MinScalarRecord` with the single value `nan`: `has_improved()` is `True`, its clone's is `False`. 3 of the 117 sequences of up to 3 values over `{nan, 1, 2}`, with `max_size` 1 to 3, differ; the first value NaN is the case.                                                                            | **[verified]** |
-| G2  | **A record with a NaN is not equal to its own JSON round trip.** `equal` is `objects_are_equal(self.to_dict(), other.to_dict())` with the default `equal_nan=False`, and `json.loads` builds a new `nan` object, so `record.equal(BaseRecord.from_dict(json.loads(json.dumps(record.to_dict()))))` is `False` for a window that holds a NaN (a diverged loss, the case where one resumes from a checkpoint). The same holds for the managers: the checkpoint pattern of the usage guide cannot be tested with `equal`. `equal(self, other)` has no configuration (`EqualEqualityTester` calls `equal(other)`), so `objects_are_equal(a, b, equal_nan=True)` cannot reach it. | **[verified]** |
-| G3  | **`from_dict` and the comparator dict build any importable callable.** `BaseRecord.from_dict({"_target_": "collections.OrderedDict", "a": 1})` returns an `OrderedDict`, and `ComparableRecord("c", {"_target_": "collections.OrderedDict"})` stores it as the comparator. `factory` imports and calls whatever `_target_` names, with the keyword arguments of the dict. A checkpoint is a JSON/YAML file that people share, so loading one must not be a way to call an arbitrary function. In addition `cls` is ignored: `MinScalarRecord.from_dict(Record("x").to_dict())` returns a `Record`, and the return type is `BaseRecord[T]`, not the class asked.              | **[verified]** |
-| G4  | **The constructor can build an inconsistent record.** `MinScalarRecord("b", best=(0, 1.0))` has an empty window and a best value: `is_empty()` is `True`, `len` is `0`, `get_best_value()` is `1.0`, `has_improved()` raises `EmptyRecordError`, and `get_best_values` skips it. `best=("a", "b", "c")` is accepted and truncated to `("a", "b")`. The property "best is `None` iff empty" is not enforced where the record is built, only where `to_dict` is the source.                                                                                                                                                                                                    | **[verified]** |
-| G5  | **`RecordManager.load_state_dict` validates by cloning.** For a known key it runs `clone().load_dict(data)` (a `to_dict`, a constructor and a second constructor), then `load_dict(data)` again: three constructions of the record for one entry. The semantics for the keys that the manager has and the state does not have (they are kept) is not written anywhere (**[verified]**: `['a', 'z']` after loading a state with only `a`).                                                                                                                                                                                                                                    | **[verified]** |
-| G6  | **`MaxScalarRecord` and `MinScalarRecord` duplicate 25 lines** (`__init__` with the same 4 arguments and `to_dict` that deletes `comparator`), the 14-line `Args:` docstring being the rest of the duplication.                                                                                                                                                                                                                                                                                                                                                                                                                                                              | **[reading]**  |
-| G7  | **Two `noqa` in `src`.** `config.py` has `# noqa: PLW0603` twice for the `global` statement, while `CLAUDE.md` says that there is no suppression in `src` and that `noqa` is not a fix.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | **[verified]** |
-| G8  | **The quickstart contradicts the code** (it was not touched by the redesign): "get the last value added by using the `get_best_value` method"; "Calling `get_best_value` on an empty record raises `EmptyRecordError`" in the section about `Record`, which cannot get a best value (it is `get_last_value`); "the `add_record` method can be used to add a value" (it is `add_value`); "a `NotAComparableRecord` exception" (`NotAComparableRecordError`); "the nest value", "is not store". `index.md` and `README.md` repeat the overview, the badges of `index.md` are the old workflow badges.                                                                          | **[reading]**  |
-| G9  | **The framework examples of the FAQ do not run.** `validation_epoch_end` was removed from PyTorch Lightning 2.0 (`on_validation_epoch_end`), and `self.save_checkpoint` is not a `LightningModule` method (it is `trainer.save_checkpoint`). A doc that is not run cannot be trusted: these blocks are not doctests.                                                                                                                                                                                                                                                                                                                                                         | **[reading]**  |
-| G10 | **The step of the best value is not readable.** The best pair `(step, value)` is stored, but the only way to read the step is `to_dict()["best"][0]`. The code that needs "which epoch was best" (load the best checkpoint, report it) keeps its own copy, which is what the best pair was meant to remove.                                                                                                                                                                                                                                                                                                                                                                  | **[reading]**  |
+1. **Simple and easy to maintain.** The package is 1,772 lines, most of them docstrings and
+   doctests. The target adds no new concept. Every change below either makes a promised property
+   true, or deletes a branch (N1 removes one), or fixes a sentence. The net change in `src` is about
+   +12 lines of code.
+2. **Major release.** Breaking changes are fine and compatibility is not a design input: no adapter,
+   no alias, no deprecation period. The release notes list the changes (`0.4.0` is unreleased, so
+   the changes join its notes). `index.md` says that the API is not stable.
+3. **Downstream code is not a design input.** The dependents will be updated later. The daily names
+   (`BaseRecord`, `Record`, `MinScalarRecord`, `MaxScalarRecord`, `RecordManager`, `add_value`,
+   `get_best_value`, ...) stay because they are the natural API, not for compatibility.
+4. **One dependency.** `coola` is the only dependency and `minrecord` has no optional one. Equality,
+   formatting and object creation come from `coola` (`objects_are_equal`, `str_mapping`,
+   `is_object_config`, `factory`); nothing is re-implemented.
+5. **Fast enough by construction.** `add_value`, `get_last_value`, `get_best_value` and
+   `get_best_step` stay O(1) (`usage_guide.md`, "Computational Cost"). No change below adds a
+   per-call cost to `add_value` (N1 replaces a branch by a call that is made anyway for every value
+   but the first).
+
+## 3. What differs today
+
+| #   | Finding                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       | Status         |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------- |
+| N1  | **One bad first value poisons a record for good.** The first value is never compared (`improved = self._best is None or ...`), so it is stored and becomes the best pair, which is never evicted. `MinScalarRecord("x").add_value(None, step=0)` succeeds; then every `add_value(1.0)` raises `TypeError: must be real number, not NoneType`, for ever, and `get_best_value()` returns `None`. The same for `"a"`, and `10**400` raises `OverflowError` on the second value. A metric that is missing at the first epoch (a `None` from an unlogged metric) is a realistic way to hit it, and the failure is reported at the **second** call, far from the cause. The rejected value is also not atomic with the rest of the contract: the error is raised by the wrong call. | **[verified]** |
+| N2  | **`update` is not atomic and the "Atomic" property says it is.** `x.update([(1, 2.0), (2, "bad"), (3, 0.5)])` raises on the second pair and leaves the first pair in the record (`((0, 1.0), (1, 2.0))`). The property says that "an operation that raises leaves the record as it was". It is true of `add_value`, `load_dict` and `load_state_dict`, and not of `update`.                                                                                                                                                                                                                                                                                                                                  | **[verified]** |
+| N3  | **A comparator has no `repr`.** `str(MinScalarRecord("c", elements=[(0, 1.0)]))` prints `(comparator): <minrecord.comparator.MinScalarComparator object at 0x108b273e0>`: the address changes at every run, so the text cannot be used in a log diff or a doctest, and a comparator with an argument (`tolerance`) does not show it.                                                                                                                                                                                                                                                                                                                                                                          | **[verified]** |
+| N4  | **"Must not be overridden" is a sentence, not a rule.** The `BaseRecord` docstring says that `clone`, `equal`, `update`, `from_dict` and `load_dict` must not be overridden, and the property "One snapshot" depends on it. Nothing prevents it: a subclass that overrides `clone` can break the round trip silently. `typing.final` is enforced by `ty` and `pyright`, which the CI runs.                                                                                                                                                                                                                                                                                                                  | **[reading]**  |
+| N5  | **The documentation and the code disagree in five small places.** (a) the `Record` docstring says "Please see ``ScalarRecord``" (the class does not exist: `MinScalarRecord`, `MaxScalarRecord`); (b) the truthiness note of the usage guide names `Record` only, `bool(RecordManager())` is `False` too; (c) the "Typed errors" row does not name `get_best_step`; (d) `load_dict` replaces the name and `max_size` of the record and no docstring says it; (e) Pattern 3 (early stopping) keeps a `no_improvement_count` that is **not** part of the snapshot, so a resumed run restarts the patience, while `epoch - record.get_best_step()` is derived from the record and survives `to_dict`/`from_dict`. | **[verified]** |
+| N6  | **`load_dict` copies `vars(other)`.** It assumes that the whole state of a record is in its `__dict__`. A subclass with `__slots__`, or with a state outside `vars`, would be loaded partly and silently. The assumption is correct for every record of the package and is part of the contract of a custom record, but it is written nowhere.                                                                                                                                                                                                                                                                                                                                                              | **[reading]**  |
+| N7  | **`BaseComparator.equal` is not NaN-aware, the records are.** `equal` is `type(other) is type(self) and self.to_dict() == other.to_dict()`. A comparator with a NaN argument is not equal to its own copy: `ToleranceComparator(nan).equal(ToleranceComparator(nan))` is `False`, while the two records that hold them are equal (`ComparableRecord.equal` uses `objects_are_equal(..., equal_nan=True)`). Two equalities in one package, with two answers.                                                                                                                                                                                                                                                                | **[verified]** |
+| N8  | **`best` accepts anything that unpacks to two items.** `_check_pair` is `step, value = best`, so a `set` `{1, 2}` and the string `"ab"` are accepted as a pair (`"ab"` is stored as `("a", "b")` and fails later in the comparator). The documented type is `tuple[float \| None, T]`, and a JSON snapshot gives a `list`. A pair is a `tuple` or a `list` of length 2.                                                                                                                                                                                                                                                                                                                                       | **[verified]** |
+| N9  | **The constructor of `ComparableRecord` depends on an order that is not written.** `Record.__init__` replays the elements with `self.update`, which calls the **overridden** `add_value`, so `_comparator`, `_best` and `_improved` must exist before `super().__init__`. Moving a line breaks the constructor, and a new subclass has no hint about it.                                                                                                                                                                                                                                                                                                                                                       | **[reading]**  |
 
 What is already right and must not regress: the `deque(maxlen=...)` window; the best pair kept
 apart from the window; `to_dict` as the one snapshot, with `from_dict`, `load_dict` and `clone`
 written once in `BaseRecord`; 6 abstract members; the one-method `BaseComparator` with keyword-only
-arguments; the module-level `max_size` read at creation; `check_max_size`; `elements` replayed
-through `add_value`; `best` as one pair; the comparator as a dict in the snapshot; atomic
-`add_value` (the comparison runs before the append); `EmptyRecordError` and
-`NotAComparableRecordError`; the registrations in the `coola` equality registry; the contract test
-(`tests/unit/test_contract.py`, 20 tests); the JSON checkpoint integration tests; the doctests on
-every public function; no `ty` or `pyright` suppression in `src`.
+arguments and a documented reflexive contract; the module-level `max_size` read at creation;
+`check_max_size`; `elements` replayed through `add_value`; `best` as one pair that needs `elements`;
+the comparator as a dict in the snapshot; atomic `add_value` (the comparison runs before the
+append); `EmptyRecordError` and `NotAComparableRecordError`; the registrations in the `coola`
+equality registry; `instantiate` as the only loader; `get_best_step`; the shared `_ScalarRecord`
+(`_target_` of the public classes unchanged); the two-phase `load_state_dict` with its documented
+merge semantics; the contract test (`tests/unit/test_contract.py`) and the JSON checkpoint
+integration tests; the doctests on every public function and on every Markdown file; no `ty` or
+`pyright` suppression in `src`.
 
-## 3. Architecture
+## 4. Architecture
 
 The structure does not change. It is the one of the previous review, now implemented:
 
 ```text
 BaseRecord (ABC)                         minrecord/base.py
   |   abstract: name, add_value, get_last_value, get_most_recent, is_empty, to_dict
-  |   owns: update, from_dict, load_dict, clone, equal, is_comparable, get_best_value, has_improved
+  |   final:    clone, equal, update, from_dict, load_dict                    (N4)
+  |   owns:     get_best_value, get_best_step, has_improved, is_comparable (raise by default)
   |
   +-- Record                             minrecord/generic.py
   |     owns the window: deque(maxlen=max_size)
@@ -114,396 +131,311 @@ BaseRecord (ABC)                         minrecord/base.py
   |     +-- ComparableRecord             minrecord/comparable.py
   |           owns the comparator and the best pair (step, value)
   |           |
-  |           +-- MaxScalarRecord / MinScalarRecord       (comparator fixed)
+  |           +-- _ScalarRecord (private)
+  |                 +-- MaxScalarRecord / MinScalarRecord     (comparator fixed by a class attribute)
 
 BaseComparator (ABC)                     minrecord/comparator.py
   |   abstract: is_better(*, new_value, old_value)        reflexive, documented and tested
-  |   owns: to_dict, equal
+  |   owns: to_dict, equal (NaN-aware, N7), __repr__ (N3)
   +-- MaxScalarComparator / MinScalarComparator
 
 config.get_max_size / set_max_size / reset_max_size      minrecord/config.py   (one module value)
 utils.validation.check_max_size                          minrecord/utils/validation.py
-utils.factory.instantiate                                minrecord/utils/factory.py   (new, 6 lines)
+utils.factory.instantiate                                minrecord/utils/factory.py
 functional.get_best_values / get_last_values             minrecord/functional.py
 RecordManager                                            minrecord/manager.py
 ```
 
 The base class owns the invariants (reconstruction, equality, clone, loading). A subclass **only
 describes its constructor arguments**. The changes below keep that split and move the three
-remaining invariants (reflexive comparison, NaN-aware equality, safe loading) into the base classes
-and the helpers, so no subclass has to remember them.
+remaining invariants (the first value is checked, the contract methods are final, equality is
+NaN-aware everywhere) into the base classes, so no subclass has to remember them.
 
-### 3.1 The comparison is reflexive (G1)
-
-`BaseComparator.is_better` gets one more rule in its docstring and in the usage guide, upgrading
-the current "should" of the FAQ to a contract:
-
-> `is_better(new_value=x, old_value=x)` returns `True`. A value equal to the best value is an
-> improvement (a plateau), and the snapshot of a record relies on it: `from_dict` replays the last
-> value against a best that is that value.
-
-The scalar comparators satisfy it for NaN too:
+### 4.1 The first value is compared too (N1)
 
 ```python
-class MaxScalarComparator(BaseComparator[float]):
-    def is_better(self, *, new_value: float, old_value: float) -> bool:
-        return isnan(old_value) or (not isnan(new_value) and new_value >= old_value)
-        # old NaN: replaced by anything (a number, or a NaN as a tie); new NaN: never beats a number
+def add_value(self, value: T, step: float | None = None) -> None:
+    # The first value is compared with itself: a value that the comparator cannot compare is
+    # rejected here, before it is stored (see the reflexivity contract of BaseComparator).
+    old_value = value if self._best is None else self._best[1]
+    improved = self._comparator.is_better(new_value=value, old_value=old_value)
+    super().add_value(value, step)
+    self._improved = improved
+    if improved:
+        self._best = (step, value)
 ```
 
-The Min comparator is the same with `<=`. This is a one-line change of each comparator: the
-expression changes from `not isnan(new) and (isnan(old) or new >= old)` to
-`isnan(old) or (not isnan(new) and new >= old)`. The only behaviour change is NaN against NaN: it
-was "not better" and is now "better" (a tie), so a record whose first value is NaN reports
-`has_improved() is True` before and after a round trip, and a second NaN becomes the best pair (a
-NaN replaced by a NaN, with the later step). The rule "a NaN never hides a number" is unchanged.
+The branch `self._best is None or ...` disappears. The rule is the one that the package already
+documents (`is_better(new_value=x, old_value=x)` is `True`): the first value is an improvement
+because of the contract, not because of a special case, and a comparator that cannot compare a value
+with itself rejects it with its own error, before the record is modified. Prototype results are in
+section 6. What changes for a user:
 
-Why not make the round trip independent of the comparator instead (for example, store the flag, or
-omit `best` when the last value is the best)? The first needs a second field that can disagree with
-the values, the second adds a conditional to `to_dict`, and both hide a comparator that breaks the
-documented "ties improve". The contract is one sentence, the check is one parametrised test
-(section 7), and a comparator that follows the rule of the FAQ already satisfies it (decision D1).
+- `MinScalarRecord("x").add_value(None)` raises `TypeError` at the call that passes `None` (it
+  succeeded, and poisoned the record).
+- A custom comparator is called once more per record (for the first value). A comparator that is
+  strict (`>`) already breaks the documented contract; it now also reports a first value that is
+  not an improvement. The contract test rejects it (decision D1 keeps the contract).
+- The exception type is the one of the comparator (`TypeError` for `None` and `str`, `OverflowError`
+  for `10**400`). A dedicated wrapper is not added: the comparator knows the better message, and a
+  wrapper would be one more exception to document (decision D4).
 
-### 3.2 `equal` treats NaN as equal (G2)
+### 4.2 `update` and the Atomic property (N2)
 
-A record is a log of values. A NaN at the same position is the same observation, so two records
-that hold the same NaNs are equal, as `numpy.array_equal(..., equal_nan=True)` and `coola`'s own
-`equal_nan=True` express.
+The property is narrowed to what is true and tested, and `update` documents its behaviour:
+
+> `update` adds the elements one by one with `add_value`. If an element is rejected, the elements
+> before it have been added and the record is otherwise unchanged (`add_value` is atomic). Use
+> `clone().update(...)` to keep the original on failure.
+
+The alternative, an all-or-nothing `update`, needs a copy of the record before the loop or a
+validation pass with the comparator, which is O(n) per call and a second code path for every record
+type. `update` is used to resume and to replay (`elements`), where a failure aborts the construction
+anyway. Not proposed (decision D2).
+
+### 4.3 A comparator prints its arguments (N3)
 
 ```python
-# BaseRecord
+# BaseComparator
+def __repr__(self) -> str:
+    args = ", ".join(f"{k}={v!r}" for k, v in self.to_dict().items() if k != OBJECT_TARGET)
+    return f"{type(self).__qualname__}({args})"
+```
+
+`MinScalarComparator()` and `ToleranceComparator(tolerance=0.1)`. It is derived from `to_dict`, so a
+comparator that follows the contract (`to_dict` returns the arguments) has a correct `repr` with no
+code. `ComparableRecord.__str__` then prints `(comparator): MinScalarComparator()`.
+
+### 4.4 `@final` on the derived methods (N4)
+
+`clone`, `equal`, `update`, `from_dict` and `load_dict` get `@typing.final` (Python 3.11, no new
+import cost). The comparable hooks (`get_best_value`, `get_best_step`, `has_improved`,
+`is_comparable`) are **not** final: a comparable record overrides them, and the docstring says so.
+The `BaseRecord` docstring says "are `@final`" instead of "must not be overridden". No test is
+added for the decorator: the type checkers are the gate. `BaseComparator.to_dict` and `equal` are
+not final (a comparator with arguments overrides `to_dict`).
+
+### 4.5 One equality, NaN-aware (N7)
+
+```python
+# BaseComparator
 def equal(self, other: Any) -> bool:
     return type(other) is type(self) and objects_are_equal(
         self.to_dict(), other.to_dict(), equal_nan=True
     )
 ```
 
-`RecordManager.equal` gets the same argument. `ComparableRecord` needs nothing (its `to_dict` holds
-the comparator dict). The limit is stated in the docstring: `equal_nan` is fixed to `True` because
-`equal(other)` cannot receive the configuration of the caller (`EqualEqualityTester`), and a mismatch
-reported by `objects_are_equal(record_a, record_b)` shows the two records, not the path of the
-difference. A custom `BaseEqualityTester` that forwards the engine would give both, at the price of
-about 20 lines and a dependency on the `coola` engine API; not proposed (decision D2).
+The same call as `BaseRecord.equal` and `RecordManager.equal`. `ToleranceComparator(nan)` is equal to
+its copy, as the record that holds it already is. To keep "one rule, one place", the three `equal`
+methods share the sentence in their docstrings ("A NaN value is equal to a NaN value").
 
-### 3.3 Loading builds only what it expects (G3)
+### 4.6 `best` is a pair (N8)
 
 ```python
-# minrecord/utils/factory.py
-def instantiate(config: dict[str, Any], cls: type[T]) -> T:
-    if not is_object_config(config, cls, import_target=True):
-        msg = f"The configuration {config.get(OBJECT_TARGET)!r} is not a configuration of {cls.__qualname__}"
-        raise TypeError(msg)
-    return factory(**config)
+def _check_pair(best: Any) -> tuple[Any, Any]:
+    if not isinstance(best, (tuple, list)) or len(best) != 2:
+        msg = f"best must be a pair (step, value), got {best!r}"
+        raise ValueError(msg)
+    return (best[0], best[1])
 ```
 
-`is_object_config(config, cls, import_target=True)` imports the object named by `_target_` and checks
-that it is a subclass of `cls` **without calling it**. It is a public function of `coola` (no new
-code in `minrecord`), and `factory` then does the one call that is allowed. Prototype results
-**[verified]**:
+A `tuple` or a `list` of length 2, as in the `to_dict` output and in its JSON round trip. A set, a
+string or a dict raises `ValueError` with the same message as a wrong length. `_check_pair` keeps
+its own tests (one per rejected type).
 
-| Call                                                                      | Result              |
-| ------------------------------------------------------------------------- | ------------------- |
-| `instantiate({"_target_": "minrecord.MinScalarRecord", ...}, BaseRecord)` | a `MinScalarRecord` |
-| `instantiate({"_target_": "collections.OrderedDict"}, BaseRecord)`        | `TypeError`         |
-| `instantiate({"_target_": "minrecord.Record", ...}, MinScalarRecord)`     | `TypeError`         |
-| `instantiate({"name": "a"}, BaseRecord)` (no `_target_`)                  | `TypeError`         |
+### 4.7 The constructor order is written down (N9)
 
-Two call sites, both through the helper:
-
-- `BaseRecord.from_dict(cls, data)` becomes `return instantiate(data, cls)` with the return type
-  `Self`. `BaseRecord.from_dict(d)` accepts every record, `MinScalarRecord.from_dict(d)` only a
-  `MinScalarRecord` (or a subclass). `load_dict` keeps its own check (`type(other) is type(self)`,
-  stricter: a subclass is not the same type).
-- `ComparableRecord.__init__` builds a comparator dict with `instantiate(comparator, BaseComparator)`.
-
-`TypeError` is the right type: the argument has the wrong type, as `load_dict` already raises it for
-a record of another type. It is documented in the `Raises:` sections.
-
-`minrecord.utils.factory` is a public module of the sub-package `utils`, with its own tests
-(`tests/unit/utils/test_factory.py`), a page in `docs/docs/refs/` and an entry in the `nav` of
-`mkdocs.yml` (the rule of `CLAUDE.md` for a new public module; `refs/utils.md` already lists
-`validation`).
-
-### 3.4 The constructor cannot build an inconsistent record (G4)
+No code change. `ComparableRecord.__init__` gets a comment, and the contract test gets one case that
+fails if the order changes (`ComparableRecord("c", comparator, elements=[(0, 1.0)])` builds a record
+with a best pair):
 
 ```python
-def __init__(self, name, comparator, *, elements=(), max_size=None, best=None):
-    ...
-    self._best = None if best is None else _check_pair(best)   # step, value = best
-    super().__init__(name, elements=elements, max_size=max_size)
-    if self._best is not None and self.is_empty():
-        raise ValueError("best requires at least one element")
+# The state that add_value reads is set before Record.__init__, which replays the elements
+# with the overridden add_value.
 ```
 
-- `best` must be a pair: `step, value = best` raises on a wrong length (the current
-  `(best[0], best[1])` silently truncates).
-- `best` without `elements` is an error. It is never useful: a record that is resumed has at least
-  the last value in its window (`max_size >= 1`), so `to_dict` always gives a non-empty `elements`
-  with a `best`. The check is after `super().__init__` so it sees the window after the replay, and
-  it keeps `best is None` iff `is_empty()` by construction.
-- The seed is not compared with the elements (a `best` worse than the window is repaired by the
-  replay: **[verified]** `MinScalarRecord("w", elements=[(0, 1.0)], best=(None, 5.0))` has the best
-  value `1.0`). That is the documented meaning of "the best before the elements".
+The alternative (a `_replay` step that `Record.__init__` does not call) adds a second construction
+path to every subclass for no behaviour gain. Not proposed.
 
-The docstrings of `best` (`ComparableRecord`, `MinScalarRecord`, `MaxScalarRecord`) get `Raises:
-ValueError: if best is not a pair, or if best is given without elements.`
+### 4.8 The documentation says what the code does (N5, N6)
 
-### 3.5 `RecordManager.load_state_dict` without the clone (G5)
+- **Docstring of `Record`**: replace "``ScalarRecord``" by "``MinScalarRecord`` and ``MaxScalarRecord``"
+  (or by the class that exists).
+- **`load_dict`**: the docstring says that the record takes the name, `max_size` and elements of the
+  dict, and that every attribute of `vars(self)` is replaced (so the state of a custom record must
+  live in `vars`).
+- **Properties table** of `usage_guide.md`: the new rows of section 1 (Fails early, Contract is
+  enforced, Readable and stable text), the narrowed Atomic row, `get_best_step` in the Typed errors
+  row, and the manager in the truthiness note.
+- **Pattern 3 (early stopping)** uses the record, not a counter of the user:
 
-```python
-def load_state_dict(self, state_dict: dict[str, Any]) -> None:
-    new = {key: BaseRecord.from_dict(data) for key, data in state_dict.items()}   # validates all
-    for key, record in new.items():
-        if key in self._records and type(self._records[key]) is not type(record):
-            raise TypeError(...)
-    for key, data in state_dict.items():
-        if key in self._records:
-            self._records[key].load_dict(data)       # in place, cannot fail any more
-        else:
-            self._records[key] = new[key]
-```
+  ```python
+  val_loss.add_value(epoch_val_loss, step=epoch)
+  if val_loss.has_improved():
+      save_checkpoint(model, "best_model.pt")
+  if epoch - val_loss.get_best_step() >= patience:
+      break
+  ```
 
-Two constructions for a known key instead of three, no `clone`, and the validation and the
-mutation are two visible phases. The semantics is written in the docstring and in the usage guide:
-**the state is merged**: a key of the state replaces (in place) or creates a record, and a record of
-the manager that the state does not mention is kept. That is what "load the state into the objects
-that I hold" needs. A strict mode (`load_state_dict(state, *, strict=True)`, as in PyTorch) would
-raise on missing and unexpected keys; it is not needed by the documentation (decision D4).
+  The count survives `to_dict`/`from_dict`, because it is computed from the best pair. It needs a
+  numeric `step` (stated in the text). No new method (decision D5).
 
-### 3.6 No `global` statement in `config.py` (G7)
+- **Properties in the reference**: the properties table is the only one source (`usage_guide.md`).
+  `refs/root.md` and the docstring of `minrecord/__init__.py` (`Root package.`) get a short list of
+  the properties with a link to the guide, so the reference page, which is what an IDE shows, is not
+  empty.
+- **README and `index.md`** keep the same overview (already fixed by #537).
 
-```python
-DEFAULT_MAX_SIZE = 10
-_DEFAULTS: dict[str, int] = {"max_size": DEFAULT_MAX_SIZE}
+## 5. Public API after the change
 
-def get_max_size() -> int: return _DEFAULTS["max_size"]
-def set_max_size(max_size: int) -> None: _DEFAULTS["max_size"] = check_max_size(max_size)
-def reset_max_size() -> None: _DEFAULTS["max_size"] = DEFAULT_MAX_SIZE
-```
-
-A mutable module value is not a `global` statement, so there is no `noqa`. The public behaviour and
-the names do not change. (`pragma: no cover` on the `__version__` fallback of `__init__.py` stays:
-the package cannot be imported without being installed in the test environment.)
-
-### 3.7 One scalar record base (G6, optional)
-
-```python
-class _ScalarRecord(ComparableRecord[float]):
-    _comparator_type: ClassVar[type[BaseComparator[float]]]
-
-    def __init__(self, name, *, elements=(), max_size=None, best=None):
-        super().__init__(name, self._comparator_type(), elements=elements, max_size=max_size, best=best)
-
-    def to_dict(self):
-        data = super().to_dict(); del data["comparator"]; return data
-
-class MaxScalarRecord(_ScalarRecord):   # docstring with Args, as today
-    _comparator_type = MaxScalarComparator
-```
-
-About 25 lines fewer, the `_target_` of the two public classes is unchanged
-(`minrecord.comparable.MaxScalarRecord`), and a third scalar record (for example a
-`MinAbsScalarRecord`) is a docstring and one line. The cost is a private base that the docs do not
-show. It is optional: the duplication is stable and visible (decision D5).
-
-### 3.8 The best step is public (G10)
-
-```python
-# BaseRecord: default raises NotAComparableRecordError, as get_best_value does
-def get_best_step(self) -> float | None: ...
-# ComparableRecord
-def get_best_step(self) -> float | None:
-    if self._best is None: raise EmptyRecordError(...)
-    return self._best[0]
-```
-
-It is the step of the pair that produced the best value (the **latest** step among ties, because a
-tie replaces the best pair). It is one concrete method and one override of about 8 lines with their
-docstrings, and the data is already stored. It is added only if the maintainers want the checkpoint
-code to stop keeping its own copy (decision D6).
-
-### 3.9 Documentation (G8, G9)
-
-- Fix the quickstart sentences listed in G8 and run the examples as doctests (they already are,
-  except the prose).
-- Add the quickstart sections that the key features promise and the page lacks: "Serialization"
-  (`to_dict`, `from_dict`, `load_dict` with a doctest, the JSON round trip) and "Custom comparator"
-  (the 6-line comparator with the reflexivity rule). The usage guide keeps the long form.
-- Replace the Lightning example of the FAQ by one that exists (`on_validation_epoch_end`, no
-  `save_checkpoint` on the module), or remove it: the library does not depend on Lightning and the
-  generic loop of the usage guide covers it. Recommended: keep one example per framework family
-  that is a plain loop, and remove the framework-specific ones that cannot be run in the
-  documentation tests.
-- Add to `usage_guide.md` **Properties** the four new rows of section 1, the manager in the
-  truthiness note, and the merge semantics of `load_state_dict`.
-- Make `docs/docs/index.md` the single overview: `README.md` keeps the badges that `index.md` has
-  (or `index.md` includes it with `pymdownx.snippets`, which `mkdocs.yml` already enables), so the two
-  copies cannot drift.
-
-## 4. Public API after the change
-
-| Object                                       | After                                                                              | Change                                      |
-| -------------------------------------------- | ---------------------------------------------------------------------------------- | ------------------------------------------- |
-| `MaxScalarComparator`, `MinScalarComparator` | reflexive: `nan` against `nan` is better (a tie)                                   | behaviour change (NaN), fixes G1            |
-| `BaseComparator.is_better`                   | contract: `is_better(x, x)` is `True`                                              | **breaking** for a custom strict comparator |
-| `BaseRecord.equal`, `RecordManager.equal`    | NaN equal NaN                                                                      | behaviour change, fixes G2                  |
-| `BaseRecord.from_dict`                       | returns `Self`; raises `TypeError` for a dict that is not a configuration of `cls` | **breaking** (stricter), fixes G3           |
-| `ComparableRecord(..., comparator=dict)`     | the dict must be a `BaseComparator` configuration (`TypeError`)                    | **breaking** (stricter), fixes G3           |
-| `ComparableRecord(..., best=...)`            | a pair, and `elements` is required with it (`ValueError`)                          | **breaking**, fixes G4                      |
-| `MinScalarRecord`, `MaxScalarRecord`         | same signatures; the same `best` rules                                             | same as above                               |
-| `RecordManager.load_state_dict`              | two constructions per known key, the merge semantics documented                    | none (internal)                             |
-| `minrecord.utils.factory.instantiate`        | new                                                                                | additive                                    |
-| `get_best_step`                              | new (optional, D6)                                                                 | additive                                    |
-| `minrecord.config`                           | no `global`; same functions                                                        | none                                        |
-| Everything else                              | unchanged                                                                          | none                                        |
+| Object                                       | After                                                                              | Change                                          |
+| -------------------------------------------- | ---------------------------------------------------------------------------------- | ----------------------------------------------- |
+| `ComparableRecord.add_value` (all scalars)   | the first value is compared with itself; the comparator error is raised by the call | **behaviour change**, fixes N1                  |
+| `BaseComparator.__repr__`                    | `ClassName(arg=value)`, derived from `to_dict`                                     | additive, fixes N3                              |
+| `BaseComparator.equal`                       | NaN-aware                                                                          | behaviour change (a NaN argument), fixes N7     |
+| `BaseRecord.clone/equal/update/from_dict/load_dict` | `@final`                                                                    | **breaking** for a subclass that overrides one, fixes N4 |
+| `ComparableRecord(..., best=...)`            | a `tuple` or a `list` of length 2 (`ValueError` otherwise)                         | **breaking** (stricter), fixes N8               |
+| `BaseRecord.update`                          | unchanged; the partial effect is documented                                        | doc only, fixes N2                              |
+| `BaseRecord.load_dict`                       | unchanged; the replacement of the whole state is documented                        | doc only, fixes N6                              |
+| Everything else                              | unchanged                                                                          | none                                            |
 
 The serialized format does not change. A checkpoint of `0.4.0` loads, with the same `elements`,
 `best` and `comparator`.
 
-## 5. Evidence: a prototype of the fixes
+## 6. Evidence: a prototype of the main fix
 
-A prototype of the reflexive Min comparator, of `equal_nan=True` and of `instantiate` (each about 5
-lines, in a scratch directory) was run against `main` **[verified]**:
+A prototype of N1 (the `add_value` of section 4.1 in a subclass, in a scratch directory) was run
+against `main` **[verified]**:
 
-| Check                                                                                                                                  | `main`                         | With the prototype                               |
-| -------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ | ------------------------------------------------ |
-| `MinScalarRecord`, one value `nan`: `has_improved()` of the record and of its JSON clone                                               | `True`, `False`                | `True`, `True`                                   |
-| every sequence of 1 to 3 values over `{nan, 1.0, 2.0}` with `max_size` 1, 2, 3 (117 records): JSON clone has another flag or best step | 3 differ                       | 0 differ                                         |
-| `record.equal(JSON clone)` for the window `[(0, 1.0), (1, nan)]`                                                                       | `False`                        | `True`                                           |
-| `RecordManager.equal(JSON clone)` for the same window                                                                                  | `False`                        | `True`                                           |
-| `BaseRecord.from_dict({"_target_": "collections.OrderedDict"})`                                                                        | returns an `OrderedDict`       | `TypeError`                                      |
-| `MinScalarRecord.from_dict(Record("x").to_dict())`                                                                                     | returns a `Record`             | `TypeError`                                      |
-| `MinScalarRecord("b", best=(0, 1.0))`                                                                                                  | empty record with a best value | `ValueError` (by reading of 3.4, not prototyped) |
+| Check                                                                                           | `main`                                                        | With the prototype                     |
+| ----------------------------------------------------------------------------------------------- | ------------------------------------------------------------- | -------------------------------------- |
+| `MinScalarRecord`, `add_value(None)` then `add_value(1.0)` and `add_value(2.0)`                  | the first succeeds, the next two raise `TypeError`, best is `None`, size 1 | `add_value(None)` raises `TypeError`; the record stays empty |
+| `add_value("a")`                                                                                 | accepted, the next value raises                               | `TypeError`, nothing stored            |
+| `add_value(10**400)`                                                                             | accepted, the next value raises `OverflowError`               | `OverflowError`, nothing stored        |
+| first value `nan`, then `1.0`                                                                    | `nan` is the first best, `1.0` replaces it, `has_improved()` is `True` | the same                      |
+| 669 tests of `main`                                                                              | pass                                                          | the tests of the first-value path change (see section 8) |
 
-The 117 sequences also pass for the best **step** of the clone (the same pair, not only the same
-value), which is what the flag and the best pair of the snapshot need. A custom comparator written
-with `>` (strict) reproduces G1 on `main` for any first value (`has_improved()` is `True`, the
-clone's is `False`) and is rejected by the contract test of section 7 after the change.
+The probes of the other findings (all on `main`): `update` with a bad second pair leaves the first
+pair (N2); `str(record)` contains `object at 0x...` (N3); `ToleranceComparator(nan).equal(...)` is
+`False` and the two records that hold them are equal (N7); `best={1, 2}` is accepted (N8);
+`bool(RecordManager())` is `False` (N5); `Record("a").load_dict(Record("b").to_dict())` renames the
+record (N5).
 
-## 6. Changes to reach the target state
+## 7. Changes to reach the target state
 
 One branch and one pull request per step (`CLAUDE.md`, stacked when a step needs the previous one).
 Every step is independent of the others except where noted, and every step updates the docs, the
-release notes (`0.4.0`, unreleased), `tests/package_checks.py` and the tracking document it touches.
+release notes (`0.4.0`, unreleased), `tests/package_checks.py` when a public object changes, and the
+tracking document it touches (this file included).
 
-| Step | Change                                                                                                                                                                                                                                                                                         | Findings | Breaking                      |
-| ---- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ----------------------------- |
-| 1    | **Fix the docs.** The quickstart sentences, the Lightning example, one overview for `README.md` and `index.md`. Documentation only.                                                                                                                                                            | G8, G9   | no                            |
-| 2    | **Reflexive comparison and NaN-aware `equal`.** The two scalar comparators, the contract of `is_better` (docstring, FAQ, usage guide), `equal(..., equal_nan=True)` for the records and the manager, the contract tests of section 7, the property rows. Regression tests that fail on `main`. | G1, G2   | yes (NaN, strict comparators) |
-| 3    | **Safe loading.** `minrecord.utils.factory.instantiate` with tests, its reference page and `nav` entry, `from_dict` returns `Self` and checks `cls`, the comparator dict is checked; `Raises:` sections; `tests/package_checks.py`.                                                            | G3       | yes (stricter)                |
-| 4    | **Consistent constructor.** `best` is a pair and needs `elements`; docstrings; regression tests.                                                                                                                                                                                               | G4       | yes                           |
-| 5    | **Manager and config cleanups.** `load_state_dict` in two phases without `clone` and its documented merge semantics; `config.py` without `global`; drop the `noqa`.                                                                                                                            | G5, G7   | no                            |
-| 6    | **Optional.** `_ScalarRecord` (D5) and `get_best_step` (D6), each in its own PR if accepted.                                                                                                                                                                                                   | G6, G10  | no                            |
+| Step | Change                                                                                                                                                                                                                                                                                  | Findings | Breaking                          |
+| ---- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | --------------------------------- |
+| 1    | **Fix the docs.** `ScalarRecord` in the `Record` docstring, the truthiness note (manager), the Typed errors row (`get_best_step`), the narrowed Atomic row and the `update` docstring, the `load_dict` docstring, the constructor-order comment, Pattern 3 with `get_best_step`, the properties in `refs/root.md`. Documentation and comments only. | N2, N5, N6, N9 | no                          |
+| 2    | **Fail early.** The first value goes through the comparator (section 4.1), the regression tests that fail on `main` (`None`, `"a"`, `10**400` as first value leave the record empty), the contract test over the comparators with a value that cannot be compared, the property row.            | N1       | yes (behaviour)                   |
+| 3    | **Contract enforced and readable.** `@final` on the five methods, `BaseComparator.__repr__`, NaN-aware `BaseComparator.equal`, `_check_pair` for a tuple or a list of length 2, with their tests and the property rows. One PR: each is a few lines.                                         | N3, N4, N7, N8 | yes (`@final`, `best`)       |
 
-Steps 1 to 5 can be reviewed in any order; step 2 changes the observable behaviour the most and
-should be released with the notes of the NaN rule. Steps 3 and 4 are two small breaking changes of
-the constructors and are best released together with step 2 in `0.4.0`.
+Steps 1 to 3 can be reviewed in any order. Step 2 is the only change of observable behaviour for a
+user who does not subclass; it should be released with the notes of the first-value rule. Step 3 is
+small and breaks only the code that overrides a final method or passes a non-pair `best`.
 
-## 7. Tests and gates
+## 8. Tests and gates
 
 Unit tests mirror the source tree; the conventions of `CLAUDE.md` apply (one behaviour per test,
 literal expected values, a regression test for every bug that fails without the fix, no local
-imports, 100 % coverage of what changes).
+imports, 100 % coverage of what changes, a `match` on every `pytest.raises`).
 
-- **Contract test over the record classes** (`tests/unit/test_contract.py`, extend). Add NaN to the
-  samples (a window `[(0, 1.0), (1, nan)]` and a first value `nan`) so that the existing checks run
-  on them: `from_dict(to_dict())`, the **JSON round trip** and `clone()` are `equal` to the sample,
-  and
-  the clone has the same `has_improved()` and the same best pair (G1, G2). The contract test is the
-  place where a new record type is checked, so the property "the round trip is exact" is tested for
-  every type at once.
-- **Contract test over the comparators** (new, `tests/unit/test_contract.py`): for `MinScalarComparator`,
-  `MaxScalarComparator` and a comparator defined in the test, `is_better(new_value=x, old_value=x)`
-  is `True` for `x` in `{-inf, -1.0, 0.0, 1.0, inf, nan}`; a strict comparator defined in the test is
-  the negative case, asserted with a helper rather than skipped. Also `to_dict` is a dict with
-  `_target_`, and `equal` is true for two instances.
-- **Comparators**: the table of `is_better` extended with `nan` against `nan` for Min and Max
-  (literal `True`), and `nan` against a number (literal `False`), `1.0` against `nan` (`True`).
-- **`equal`**: a record with a NaN equals its JSON round trip (regression G2, fails on `main`); a
-  record with a NaN differs from one with a number at the same position; the same for the manager.
-- **`utils/factory`** (`tests/unit/utils/test_factory.py`): a record dict gives the record; a dict of
-  another type (`collections.OrderedDict`) raises `TypeError` with the target in the message; a dict
-  of a subclass for a base `cls` is accepted; a dict of a base for a subclass `cls` raises; a dict
-  without `_target_` raises; the input dict is not modified; an unimportable target raises the
-  `coola` error. An **integration** test (`tests/integration/utils/test_factory.py`, no patching)
-  loads a record and a comparator defined in a test module through `_target_` (the real import).
-- **`from_dict`**: `MinScalarRecord.from_dict(Record(...).to_dict())` raises `TypeError` (regression
-  G3); the result of `BaseRecord.from_dict` for each record class has the class of the dict.
-- **`ComparableRecord`**: `best` without `elements` raises `ValueError`; `best` with the wrong length
-  raises `ValueError`; `best` with `elements` keeps the existing replay tests (a falsy best `0.0`, a
-  best worse than the window).
-- **Manager**: `load_state_dict` with an unknown key creates, with a known key loads in place (the
-  object held by the caller is the same object), with a bad entry leaves the manager and every
-  record unchanged, with a type mismatch raises `TypeError` and leaves it unchanged; a key that the
-  state does not mention is kept (the merge, now documented and tested); `equal` with NaN.
-- **Config**: `set_max_size`, `get_max_size` and `reset_max_size` keep their tests; one test that
-  `ruff check src` has no `noqa` is not added (the linter is the gate).
-- **Integration** (`tests/integration/test_checkpoint.py`, extend, no patching): the training loop
-  with a NaN loss at step 3 (a diverged step) whose `state_dict` goes through JSON and is
-  `objects_are_equal` to the original, then resumed for 5 more steps with the same best values as
-  an uninterrupted run.
-- **Doctests**: every public function keeps a runnable example, the Markdown examples of the
-  quickstart are doctests, and the new `instantiate` has one.
-- **Gates**: `ruff check` and `ruff format`, `inv types.check --complete` with **no** `ignore`,
-  `inv test.unit`, `inv test.doctest`, coverage 100 % of `src/minrecord`, no `# pragma: no cover` for
-  a testable line, and `grep -rn "noqa\|ignore" src` empty apart from the `__version__` fallback.
-- **Not a gate**: a micro benchmark. `add_value` is unchanged (one `is_better` call and a deque
-  append, with the `isnan` order swapped), so no benchmark job is added.
+- **First value** (`tests/unit/test_comparable.py`, step 2, regression for N1, each checked to fail
+  with `git stash push src`): a first value that the comparator cannot compare (`None`, `"a"`,
+  `10**400`) raises (`TypeError`, `TypeError`, `OverflowError`, with a `match` on the message) and
+  the record is empty afterwards (`pytest.raises` followed by `assert record.is_empty()`: one
+  behaviour); the next valid value becomes the best value (the record is not poisoned); the first
+  value `nan` is an improvement; the comparator is called once for the first value with
+  `new_value == old_value` (a recording comparator, literal call list).
+- **Existing tests**: the tests that assert "the first value is the best and an improvement without
+  calling the comparator" change to the new call count; a strict comparator
+  (`StrictComparator` of the contract test) gives `has_improved() is False` for the first value, and
+  this is the negative case of the reflexivity contract, asserted with a literal.
+- **Contract test over the comparators** (`tests/unit/test_contract.py`, extend): a comparator that
+  raises on a value it cannot compare rejects it by `ComparableRecord.add_value` and leaves the
+  record empty; `repr` of each comparator of the contract test has no `0x` and starts with the class
+  name (a literal for the three package comparators: `"MinScalarComparator()"`,
+  `"MaxScalarComparator()"`, `"ToleranceComparator(tolerance=0.1)"`).
+- **`BaseComparator`** (`tests/unit/test_comparator.py`): `equal` of two comparators with a NaN
+  argument is `True` (regression N7); with different arguments `False`; with another type `False`;
+  `repr` of a comparator with and without arguments.
+- **`_check_pair`** (`tests/unit/test_comparable.py`): a `tuple` and a `list` of length 2 give the
+  tuple; a `set`, a `str`, a `dict`, a scalar and a length 1 or 3 raise `ValueError` with the
+  value in the message (parametrised).
+- **`ComparableRecord.__str__`**: the whole string is asserted against a literal, now stable
+  (`(comparator): MinScalarComparator()`).
+- **Constructor order** (N9): `ComparableRecord("c", MinScalarComparator(), elements=[(0, 1.0)])`
+  has the best value `1.0` and `has_improved()` (it fails if the state is set after
+  `super().__init__`).
+- **Integration** (`tests/integration/test_checkpoint.py`, extend, no patching): a training loop
+  whose first epoch has no metric (`None`) raises at that epoch and the loop continues with the next
+  value, then the state goes through JSON and the resumed record has the same best step; an early
+  stopping loop that uses `epoch - get_best_step()` stops at the same epoch before and after a
+  `to_dict`/`from_dict` in the middle (N5, Pattern 3).
+- **Doctests**: every public function keeps a runnable example, the Markdown examples are doctests
+  (this file has no `pycon` block, so `inv test.doctest` does not run it), and `Pattern 3` of the
+  usage guide stays a `python` block.
+- **Gates**: `ruff check` and `ruff format`, `inv types.check --complete` with **no** `ignore` (the
+  `@final` methods are checked here), `inv test.unit`, `inv test.doctest`, coverage 100 % of
+  `src/minrecord`, no `# pragma: no cover` for a testable line, and `grep -rn "noqa\|ignore" src`
+  empty apart from the `__version__` fallback.
+- **Not a gate**: a micro benchmark. `add_value` keeps one `is_better` call and a deque append (the
+  first value now has the call too).
 
-## 8. Decisions for the maintainers
+## 9. Decisions for the maintainers
 
-**D1. Make the round trip independent of the comparator?** _Recommended: no; state that
-`is_better(x, x)` is `True` and test it._ The alternatives need a second field (`improved`, which
-can disagree with the values and was removed for that reason in #531) or a conditional in
-`to_dict` (omit `best` when the last value is the best, then replay from nothing). Both work for a
-strict comparator, both add a code path to every record type, and a strict comparator already
-breaks "ties improve" (the FAQ) and makes a plateau stop early stopping. The cost of the contract
-is that a user who wrote `>` gets a wrong flag **only for the first `has_improved()` after a
-resume**, because the next `add_value` recomputes it. If maintainers prefer robustness over the
-simple contract, store `improved` in the snapshot as a read-only key that the constructor ignores.
+**D1. Keep the reflexivity contract, now that it also decides the first value?** _Recommended: yes._
+The contract already exists for the round trip (a record replays its last value against a best value
+that is that value), and the first value is the same situation: a value compared with itself. The
+alternative, `improved = True` for the first value and a comparator call whose result is ignored,
+keeps a strict comparator working for the first value only, which is the half-working state that
+the contract exists to avoid. A user who wrote `>` gets a wrong `has_improved()` for the first value
+(it was right) and for a resumed record (it was already wrong). The release notes say it.
 
-**D2. A `coola` equality tester for the records instead of `equal`?** _Recommended: no._ A
-`BaseEqualityTester` that calls `ctx.objects_are_equal(actual.to_dict(), expected.to_dict())`
-forwards `equal_nan`, `max_depth` and the path of the difference, so `objects_are_equal(r1, r2,
-equal_nan=False)` could still distinguish NaN. It needs the engine API of `coola` 2.x and one
-registration per base class; the gain is configurability that a log of values does not need. If
-`coola` offers a one-line adapter later, revisit.
+**D2. Make `update` all-or-nothing?** _Recommended: no; document it (section 4.2)._ A copy of the
+record before the loop costs O(max_size) per call and a validation pass costs a second comparator
+call per element. `update` is a replay helper, and `add_value` is atomic, which is the guarantee that
+a training loop relies on. If maintainers want it, the cheapest version is
+`staged = self.clone(); staged.update(elements); self.load_dict(staged.to_dict())` in the base class
+(three lines, O(max_size), no change for the subclasses), at the cost of a copy at each call; the
+usage guide would then say that `update` is atomic.
 
-**D3. How strict is loading?** _Recommended: type-check the target (section 3.3), and document that
-the module named by `_target_` is imported._ The stricter option is an allow-list of prefixes
-(`allowed_prefixes=("minrecord",)`), which `coola` supports, but it blocks the custom records and
-comparators that the library is designed to extend. A user who loads dicts from an untrusted source
-passes the allow-list themselves (`factory(**data, _allowed_prefixes_=...)`, or `from_dict` after
-checking `_target_`). If the maintainers want it built in, add a keyword-only `allowed_prefixes` to
-`from_dict` (default `None`), which is additive.
+**D3. How strict is loading?** _Recommended: type-check the target (done, `instantiate`), and
+document that the module named by `_target_` is imported (done)._ The stricter option is an
+allow-list of prefixes (`allowed_prefixes=("minrecord",)`), which `coola` supports, but it blocks the
+custom records and comparators that the library is designed to extend. A user who loads dicts from
+an untrusted source checks `_target_` before calling `from_dict`. If the maintainers want it built
+in, add a keyword-only `allowed_prefixes` to `from_dict` (default `None`), which is additive.
 
-**D4. `load_state_dict(strict=...)`?** _Recommended: no._ The merge (keep the unknown records, update
-the known ones in place, create the new ones) matches how the manager is used (records created on
-first use by `get_record`). A strict mode doubles the tests for a case that no document asks for.
+**D4. Wrap the comparator error of the first value in a dedicated exception?** _Recommended: no._
+`TypeError` and `OverflowError` come from the comparator with the message of the value, and the
+record is unchanged. A `RecordValueError` would be a new class to document and to catch for the same
+information, and `ComparableRecord.add_value` would need a `try`/`except` on the hot path.
 
-**D5. Introduce the private `_ScalarRecord`?** _Recommended: yes, if a third scalar record is
-likely; otherwise leave it._ The duplication is 25 lines and stable. The base removes it and makes
-the three classes the same shape, at the price of one private class that mkdocstrings does not
-show and an inherited `__init__` signature in the reference.
+**D5. Add a `steps_since_best` helper for early stopping?** _Recommended: no._ `step` is a label,
+not a number, and the record does not own the current step; `epoch - record.get_best_step()` is one
+subtraction and needs the caller's step. Pattern 3 shows it. Revisit if users ask for a record-owned
+counter.
 
-**D6. Add `get_best_step()`?** _Recommended: yes._ The step is already stored with the best value
-and the only public way to read it is a key of `to_dict()`. The method is additive and the code that
-saves "the best epoch" stops keeping its own copy. If the maintainers want the smallest API, leave
-the best pair private and document `to_dict()["best"]` as the way.
-
-**D7. Keep `get_record` creating a missing record?** _Recommended: keep (unchanged decision)._ It is
+**D6. Keep `get_record` creating a missing record?** _Recommended: keep (unchanged decision)._ It is
 documented in the FAQ and tested; the cost is that a typo creates a silent empty `Record`, which the
 FAQ troubleshooting already covers. A strict manager would be `get_record` raising `KeyError` and a
 `get_or_create`.
 
-## 9. Not covered
+**D7. `load_dict` keeps the name of the record?** _Recommended: no; the dict is the whole state and
+the name is part of it (section 1, "Not guaranteed")._ Rejecting a dict with another name would make
+the manager state, where the key can differ from the name (`add_record(record, key)`), harder to
+load. The documentation says it.
+
+## 10. Not covered
 
 - **Other record kinds.** A record of the whole history (no `max_size`), a windowed mean, a record
-  of vectors: each is a possible `BaseRecord` subclass (6 members), and nothing in the
-  documentation asks for them.
-- **Early-stopping helper.** The patience counter of Pattern 3 of the usage guide is 5 lines of the
-  user's code. A `steps_since_best` needs the current step, which the record does not own. Revisit
-  with `get_best_step` if users ask.
+  of vectors: each is a possible `BaseRecord` subclass (6 members), and nothing in the documentation
+  asks for them.
 - **Thread safety and multi-process aggregation.** The FAQ answer ("one record per process, gather
   after") stays the answer.
 - **A `step` that is checked to increase or to be a number.** `step` stays a label.
@@ -512,22 +444,33 @@ FAQ troubleshooting already covers. A strict manager would be `get_record` raisi
   document asks for it.
 - **Renaming modules** (`generic.py` for `Record`) or moving the scalar records: the `_target_` of
   every saved checkpoint (`minrecord.comparable.MaxScalarRecord`) would change for no gain.
+- **A strict `load_state_dict(strict=...)`**: the merge (unknown records kept, known ones loaded in
+  place, new ones created) matches how the manager is used, and no document asks for the strict mode.
+- **A `coola` equality tester that forwards `equal_nan`** instead of the fixed `equal_nan=True`: a
+  log of values does not need the configuration, and it needs the engine API of `coola` 2.x.
 - **The repository tooling** (workflows, `invoke` tasks, `.make`), which follows `coola`.
 
-## Appendix: what the previous review delivered, and what this one adds
+## Appendix: what the previous review delivered
 
-| Previous step (PR)                                | State on `main` | Residual in this review                                   |
-| ------------------------------------------------- | --------------- | --------------------------------------------------------- |
-| 1. Docs that promise missing code (#526)          | merged          | the quickstart and the FAQ examples (G8, G9)              |
-| 2. `max_size` read at creation (#527)             | merged          | none                                                      |
-| 3. `clone` of the scalar records (#528)           | merged          | none                                                      |
-| 4. Dead code, `Config` singleton (#529)           | merged          | the two `noqa` of `global` (G7)                           |
-| 5. One snapshot, `best`, `elements` replay (#531) | merged          | the exactness of the round trip (G1, G2), `best` (G3, G4) |
-| 6. One comparator method, NaN (#532)              | merged          | NaN against NaN is not a tie (G1)                         |
-| 7. Manager and functional (#533)                  | merged          | `load_state_dict` by clone (G5)                           |
-| 8. Documentation and release notes (#534)         | merged          | the properties table lacks four rows (section 1)          |
+| Previous step (PR)                                    | State on `main` | Residual in this review                              |
+| ----------------------------------------------------- | --------------- | ---------------------------------------------------- |
+| Docs that promise missing code (#526)                 | merged          | none                                                 |
+| `max_size` read at creation (#527)                    | merged          | none                                                 |
+| `clone` of the scalar records (#528)                  | merged          | none                                                 |
+| Dead code, `Config` singleton (#529)                  | merged          | none                                                 |
+| One snapshot, `best`, `elements` replay (#531)        | merged          | `load_dict` assumes `vars` (N6, doc)                 |
+| One comparator method, NaN (#532)                     | merged          | none                                                 |
+| Manager and functional (#533)                         | merged          | the truthiness note of the manager (N5)              |
+| Documentation and release notes (#534)                | merged          | the properties table lacks three rows (section 1)    |
+| Quickstart, FAQ and badges (#537)                     | merged          | `ScalarRecord` in the `Record` docstring (N5)        |
+| Reflexive comparison, NaN-aware `equal` (#538)        | merged          | `BaseComparator.equal` is not NaN-aware (N7)         |
+| `instantiate`, safe loading (#540)                    | merged          | none                                                 |
+| `best` is a pair and needs `elements` (#541)          | merged          | a `set` or a `str` is accepted as a pair (N8)        |
+| Two-phase `load_state_dict`, no `global` (#542)       | merged          | none                                                 |
+| Shared `_ScalarRecord` (#543)                         | merged          | none                                                 |
+| `get_best_step` (#544)                                | merged          | Pattern 3 does not use it (N5)                       |
 
-Expected result of this review: a package of the same size (about 25 lines fewer with D5, 6 lines
-for the helper), with **no property of section 1 that is false**, no `noqa` in `src`, a loader that
-only builds records and comparators, and a round trip that is exact for the values that appear in
-real training logs (NaN included).
+Expected result of this review: a package of the same size (about 12 more lines of code, a few more
+tests), with **no property of section 1 that is false**, a record that cannot be left in a state
+where every `add_value` raises, a contract that the type checker enforces, a `repr` that can be
+logged and compared, and a documentation whose every sentence is true of the code.
