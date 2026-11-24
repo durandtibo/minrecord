@@ -58,6 +58,9 @@ class ComparableRecord(Record[T]):
     when the pair ``(step, value)`` that produced it leaves the recent
     values. The first value added to the record is the best value. A
     value that is equal to the best value counts as an improvement.
+    The first value is compared with itself, so a value that the
+    comparator cannot compare is rejected by ``add_value`` and the
+    record stays empty.
 
     Args:
         name: The name of the record.
@@ -143,10 +146,11 @@ class ComparableRecord(Record[T]):
 
     def add_value(self, value: T, step: float | None = None) -> None:
         # The comparison is done first because the comparator can raise an
-        # error: the record is not modified if it happens.
-        improved = self._best is None or self._comparator.is_better(
-            new_value=value, old_value=self._best[1]
-        )
+        # error: the record is not modified if it happens. The first value is
+        # compared with itself (the comparison is reflexive), so a value that
+        # the comparator cannot compare is rejected here, before it is stored.
+        old_value = value if self._best is None else self._best[1]
+        improved = self._comparator.is_better(new_value=value, old_value=old_value)
         super().add_value(value, step)
         self._improved = improved
         if improved:
