@@ -376,6 +376,13 @@ class BaseRecord(ABC, Generic[T]):
     def update(self, elements: Iterable[tuple[float | None, T]]) -> None:
         r"""Update the record by adding the elements.
 
+        The elements are added one by one with ``add_value``. If an
+        element is rejected (for example a value that the comparator
+        cannot compare), the elements before it have been added and the
+        record is otherwise unchanged, because ``add_value`` is atomic.
+        Use ``record.clone().update(elements)`` to keep the original
+        record if it fails.
+
         Args:
             elements: The elements to add to the record.  Each tuple
                 has the following structure ``(step, value)``.
@@ -443,6 +450,12 @@ class BaseRecord(ABC, Generic[T]):
         The new record is built first from the dictionary (with
         ``BaseRecord.from_dict``), so the record is not modified if the
         dictionary is invalid.
+
+        The dictionary is the whole state of the record: the record
+        takes its name, its ``max_size`` and its elements, and every
+        attribute of ``vars(self)`` is replaced. Thus the state of a
+        custom record must live in ``vars(self)`` (no ``__slots__``).
+        A caller that needs the name to stay the same checks it before.
 
         Args:
             data: The dictionary to load. It is expected to have the

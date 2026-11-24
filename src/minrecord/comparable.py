@@ -112,6 +112,8 @@ class ComparableRecord(Record[T]):
         max_size: int | None = None,
         best: tuple[float | None, T] | None = None,
     ) -> None:
+        # The state that add_value reads is set before Record.__init__, which
+        # replays the elements with the overridden add_value.
         self._comparator: BaseComparator[T] = (
             comparator
             if isinstance(comparator, BaseComparator)
