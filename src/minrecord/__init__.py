@@ -55,8 +55,26 @@ from minrecord.functional import get_best_values, get_last_values
 from minrecord.generic import Record
 from minrecord.manager import RecordManager
 
-try:
-    __version__ = version(__name__)
-except PackageNotFoundError:  # pragma: no cover
-    # Package is not installed, fallback if needed
-    __version__ = "0.0.0"
+
+def _get_version() -> str:
+    r"""Get the version of the installed package.
+
+    Returns:
+        The version of the installed ``minrecord`` package, or
+            ``"0.0.0"`` if the package is not installed.
+
+    Example:
+        ```pycon
+        >>> from minrecord import _get_version
+        >>> isinstance(_get_version(), str)
+        True
+
+        ```
+    """
+    try:
+        return version("minrecord")
+    except PackageNotFoundError:
+        return "0.0.0"
+
+
+__version__ = _get_version()

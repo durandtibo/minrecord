@@ -99,7 +99,10 @@ class BaseRecord(ABC, Generic[T]):
         Args:
             value: The value to add to the record.
             step: The step value to record. ``None`` means there is no
-                step to track.
+                step to track. The type of a step is ``float | None``:
+                it is not checked at run time, so a label works but a
+                type checker rejects it, and ``get_best_step`` (early
+                stopping) needs a number.
 
         Example:
             ```pycon

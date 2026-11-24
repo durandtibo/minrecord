@@ -92,6 +92,9 @@ Manager and functions:
 - A configuration that is not a dict raises `TypeError` (it was `AttributeError`).
 - `has_improved()` of a rebuilt record (`from_dict`, `clone`) is the one of the original, also when
   its first value is NaN.
+- The documentation says what `step` is (`float | None`, not checked at run time) and the memory
+  figures of the FAQ are the measured ones. `minrecord.__version__` is read by a tested function, so
+  `src` has no `pragma: no cover`.
 
 ### New
 

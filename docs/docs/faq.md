@@ -254,10 +254,10 @@ if record.is_comparable():
 
 There's no hard limit. Each record has minimal overhead. With max_size=10:
 
-- Memory per record: about 1 KB when empty, and about 3 KB for a `MinScalarRecord` that holds 10
+- Memory per record: about 1 KB when empty, and about 2 KB for a `MinScalarRecord` that holds 10
   `(step, float)` pairs (measured with `tracemalloc` on Python 3.14; it depends on the Python
   version and on the values)
-- 1000 records with 10 scalars each: about 3 MB
+- 1000 records with 10 scalars each: about 2 MB
 
 ### Is minrecord thread-safe?
 
