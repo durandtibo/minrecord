@@ -23,6 +23,7 @@ def check_imports() -> None:
     objects_to_import += [
         "minrecord.utils",
         "minrecord.utils.factory.instantiate",
+        "minrecord.utils.equality.SnapshotEqualityTester",
         "minrecord.utils.validation.check_key",
         "minrecord.utils.validation.check_max_size",
         "minrecord.utils.validation.check_name",
@@ -50,8 +51,8 @@ def check_comparable_record() -> None:
     assert record.get_best_value() == 1.0
     assert record.get_best_step() == 0
     assert record.get_most_recent() == ((1, 5.0), (2, 6.0))
-    assert record.clone().equal(record)
-    assert BaseRecord.from_dict(record.to_dict()).equal(record)
+    assert objects_are_equal(record.clone(), record)
+    assert objects_are_equal(BaseRecord.from_dict(record.to_dict()), record)
     assert type(MinScalarRecord.from_dict(record.to_dict())) is MinScalarRecord
     assert MinScalarComparator().is_better(new_value=float("nan"), old_value=1.0) is False
 
@@ -62,7 +63,7 @@ def check_manager() -> None:
     manager.add_record(Record("custom"))
     new_manager = RecordManager()
     new_manager.load_state_dict(manager.state_dict())
-    assert new_manager.equal(manager)
+    assert objects_are_equal(new_manager, manager)
     assert new_manager.get_best_values() == {"loss": 0.5}
     assert RecordManager(default_factory=MinScalarRecord).get_record("acc").name == "acc"
 

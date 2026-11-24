@@ -24,8 +24,9 @@ RecordManager: {key: BaseRecord}
 ```
 
 Every record is rebuilt from one **snapshot**: `to_dict()` returns the arguments of the constructor
-(and the full name of the class under `_target_`), content included. `from_dict`, `clone`, `equal`
-and `load_dict` are all defined from this snapshot.
+(and the full name of the class under `_target_`), content included. `from_dict`, `clone` and
+`load_dict` are all defined from this snapshot, and so is the equality: two records are equal if
+they have the same type and equal snapshots, as `coola` compares them.
 
 ## Guarantees
 
@@ -38,14 +39,14 @@ These guarantees come from the base classes, so every record has them.
 | No sentinel             | An empty comparable record has no best pair (`None`). `inf` and `-inf` are never used as a stand-in.                                                                                                                                    |
 | Ties improve            | A value equal to the best value counts as an improvement. The comparison is reflexive: `is_better(new_value=x, old_value=x)` is `True` for all `x`, NaN included.                                                                       |
 | NaN never wins          | A NaN is never better than a number. A NaN best value is replaced by any value (a number, or another NaN as a tie).                                                                                                                     |
-| Exact round trip        | For every record `r`, also after a JSON round trip and when it holds NaN: `BaseRecord.from_dict(r.to_dict()).equal(r)` and `r.clone().equal(r)`. The clone has the same `has_improved()` and the same best pair, and it is independent. |
+| Exact round trip        | For every record `r`, also after a JSON round trip and when it holds NaN: `objects_are_equal(BaseRecord.from_dict(r.to_dict()), r, equal_nan=True)` and `objects_are_equal(r.clone(), r, equal_nan=True)`. The clone has the same `has_improved()` and the same best pair, and it is independent. |
 | Consistent state        | A comparable record has a best pair if and only if it has a value.                                                                                                                                                                      |
 | Safe loading            | `from_dict`, `load_dict`, `load_state_dict` and the comparator dict only build objects of the expected type, and anything that is not a dict is a `TypeError`.                                                                          |
 | Fails early             | An input that cannot work is rejected by the call that receives it and is never stored: a value that the comparator cannot compare, an invalid `max_size`, a `name` or a manager key that is not a `str`, a record that is not a record, an element that is not a pair `(step, value)`, an unknown manager key.                        |
 | Atomic                  | `add_value`, `load_dict` and `RecordManager.load_state_dict` leave the record, or the manager, unchanged if they raise. `update` is a loop of `add_value`: the elements before the failing one are kept.                                |
 | Typed errors            | `EmptyRecordError`, `NotAComparableRecordError`, `ValueError` (`max_size`, `best`, an element that is not a pair), `TypeError` (`name`, a key, a record, a dict or comparator of the wrong type), `KeyError` (unknown manager key).                                                       |
 | Readable text           | `repr` and `str` of records and comparators are deterministic and show the arguments (no memory address).                                                                                                                               |
-| Consistent with `coola` | Records, comparators and managers work with `objects_are_equal`, and `to_dict` works with `coola.factory.factory`.                                                                                                                      |
+| Consistent with `coola` | The comparison of records, comparators and managers is the comparison of `coola`: `objects_are_equal` and `objects_are_allclose` honour `equal_nan` and the tolerance, and `assert_objects_equal` reports the path of the first difference. `to_dict` works with `coola.factory.factory`.                                                                                                                      |
 | Minimal                 | One dependency (`coola`), no optional dependency, no I/O, no logging, no thread, and no global state beyond the default `max_size`.                                                                                                     |
 
 ## Design choices and trade-offs
@@ -80,14 +81,13 @@ its optimum keeps improving, and a checkpoint is saved at each step of the plate
 `to_dict()` is exactly the arguments of the constructor. There is no separate configuration and
 state, and no registry: the class is found from `_target_`.
 
-- **Benefit**: `clone`, `equal`, `from_dict` and `load_dict` are final methods of the base class, so
+- **Benefit**: `clone`, `update`, `from_dict` and `load_dict` are final methods of the base class, so
   a custom record only implements six members and gets them right. `improved` is derived from the
   values and never stored, so a snapshot cannot be inconsistent.
-- **Cost**: `equal` is the equality of the snapshots, so it needs the values to be comparable by
-  `coola`, and a NaN is equal to a NaN even with `objects_are_equal(..., equal_nan=False)`. This is
-  the one deliberate difference with `coola`: it lets a record that holds a NaN be equal to its JSON
-  round trip. The state of a custom record must live in `vars(self)` (no `__slots__`), because
-  `load_dict` replaces it.
+- **Cost**: the equality is the equality of the snapshots, so it needs the values to be comparable
+  by `coola`, and a record that holds a NaN is equal to its copy only with
+  `objects_are_equal(..., equal_nan=True)`, as for every other object. The state of a custom record
+  must live in `vars(self)` (no `__slots__`), because `load_dict` replaces it.
 
 ### The first value is compared with itself
 
@@ -131,7 +131,7 @@ the key and returns the record.
   record that nobody reads. The factory also chooses the type, so on-demand records can have a best
   value (`RecordManager(default_factory=MinScalarRecord)`).
 - **Cost**: one more line of setup when you want on-demand records. The factory is not part of the
-  state: `state_dict`, `equal` and `load_state_dict` do not use it.
+  state: `state_dict` and `load_state_dict` do not use it, and it is not compared.
 
 ### `load_state_dict` merges
 
@@ -169,6 +169,8 @@ not affect the existing records.
   share the value objects with the original. Store scalars or immutable objects.
 - **Order of the steps.** `step` is a label: it is not checked to increase, nor to be a number.
   Early stopping with `get_best_step` needs a numeric step.
+- **`==` and `hash`.** A record, a comparator and a manager have no `__eq__`, so `==` is the identity:
+  `MinScalarRecord("a") == MinScalarRecord("a")` is `False`. Use `coola.equality.objects_are_equal`.
 - **Truthiness.** `Record` and `RecordManager` define `__len__`, so an empty one is falsy: write
   `record.is_empty()`, not `if record:`.
 - **`copy.copy(record)` is not a clone.** A shallow copy shares the recent values, so `add_value` on

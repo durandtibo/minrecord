@@ -12,10 +12,11 @@ from abc import ABC, abstractmethod
 from math import isnan
 from typing import Any, Generic, TypeVar
 
-from coola.equality import objects_are_equal
-from coola.equality.tester import EqualEqualityTester, get_default_registry
+from coola.equality.tester import get_default_registry
 from coola.factory import OBJECT_TARGET
 from coola.utils.introspection import get_qualified_class_name
+
+from minrecord.utils.equality import SnapshotEqualityTester
 
 T = TypeVar("T")
 
@@ -98,36 +99,6 @@ class BaseComparator(ABC, Generic[T]):
         """
         return {OBJECT_TARGET: get_qualified_class_name(type(self))}
 
-    def equal(self, other: Any) -> bool:
-        r"""Indicate if two comparators are equal or not.
-
-        Two comparators are equal if they have the same type and the
-        same ``to_dict`` output: the equality of a comparator is the
-        equality of its snapshot. A NaN value is equal to a NaN value,
-        also when ``objects_are_equal`` is called with
-        ``equal_nan=False``.
-
-        Args:
-            other: The other object to compare with.
-
-        Returns:
-            ``True`` if the comparators are equal, ``False`` otherwise.
-
-        Example:
-            ```pycon
-            >>> from minrecord import MinScalarComparator, MaxScalarComparator
-            >>> comparator = MinScalarComparator()
-            >>> comparator.equal(MinScalarComparator())
-            True
-            >>> comparator.equal(MaxScalarComparator())
-            False
-
-            ```
-        """
-        return type(other) is type(self) and objects_are_equal(
-            self.to_dict(), other.to_dict(), equal_nan=True
-        )
-
 
 class MaxScalarComparator(BaseComparator[float]):
     r"""Implement a max comparator for scalar value.
@@ -183,4 +154,4 @@ class MinScalarComparator(BaseComparator[float]):
         return isnan(old_value) or (not isnan(new_value) and new_value <= old_value)
 
 
-get_default_registry().register(BaseComparator, EqualEqualityTester(), exist_ok=True)
+get_default_registry().register(BaseComparator, SnapshotEqualityTester("to_dict"), exist_ok=True)

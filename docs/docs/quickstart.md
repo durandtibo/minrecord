@@ -159,17 +159,19 @@ Record(name=loss, max_size=10, size=0)
 
 ```
 
-It is possible to check if two `Record` objects are equal by calling the `equal` method.
+Two records are compared with `coola.equality.objects_are_equal`. They are equal if they have the same
+type and the same snapshot (`to_dict`).
 
 ```pycon
 
+>>> from coola.equality import objects_are_equal
 >>> from minrecord import Record
 >>> record1 = Record("loss")
 >>> record2 = Record("loss", elements=[(0, 42), (None, 45), (2, 46)])
 >>> record3 = Record("loss", elements=[(0, 42), (None, 45), (2, 46)])
->>> record1.equal(record2)
+>>> objects_are_equal(record1, record2)
 False
->>> record3.equal(record2)
+>>> objects_are_equal(record3, record2)
 True
 
 ```
@@ -314,11 +316,12 @@ recent values.
 ```pycon
 
 >>> import json
+>>> from coola.equality import objects_are_equal
 >>> from minrecord import BaseRecord, MinScalarRecord
 >>> record = MinScalarRecord("loss", max_size=2, elements=[(0, 1.0), (1, 5.0), (2, 6.0)])
 >>> data = json.loads(json.dumps(record.to_dict()))
 >>> new_record = BaseRecord.from_dict(data)
->>> new_record.equal(record)
+>>> objects_are_equal(new_record, record)
 True
 >>> new_record.get_best_value()
 1.0
@@ -441,11 +444,12 @@ computations are available for any mapping of records with the functions `get_be
 
 ```pycon
 
+>>> from coola.equality import objects_are_equal
 >>> from minrecord import RecordManager, MinScalarRecord
 >>> manager = RecordManager({"loss": MinScalarRecord("loss", elements=[(0, 1.5)])})
 >>> new_manager = RecordManager()
 >>> new_manager.load_state_dict(manager.state_dict())
->>> new_manager.equal(manager)
+>>> objects_are_equal(new_manager, manager)
 True
 
 ```

@@ -7,12 +7,12 @@ __all__ = ["RecordManager"]
 import copy
 from typing import TYPE_CHECKING, Any
 
-from coola.equality import objects_are_equal
-from coola.equality.tester import EqualEqualityTester, get_default_registry
+from coola.equality.tester import get_default_registry
 from coola.formatting.structure import repr_indent, repr_mapping, str_indent, str_mapping
 
 from minrecord.base import BaseRecord
 from minrecord.functional import get_best_values, get_last_values
+from minrecord.utils.equality import SnapshotEqualityTester
 from minrecord.utils.validation import check_key
 
 if TYPE_CHECKING:
@@ -68,7 +68,7 @@ class RecordManager:
             key that is not registered. It is called with the key and
             must return a record. If ``None``, ``get_record`` raises
             ``KeyError`` for an unknown key. The factory is not part
-            of the state of the manager (``state_dict``, ``equal``).
+            of the state of the manager (``state_dict``).
 
     Raises:
         TypeError: if a value of ``records`` is not a ``BaseRecord``
@@ -161,38 +161,6 @@ class RecordManager:
             )
             raise RuntimeError(msg)
         self._records[key] = record
-
-    def equal(self, other: Any) -> bool:
-        r"""Indicate if two managers are equal or not.
-
-        Two managers are equal if they have the same type and the same
-        records (same keys and equal ``to_dict`` output): the equality
-        of a manager is the equality of its ``state_dict``. A NaN value
-        is equal to a NaN value, also when ``objects_are_equal`` is
-        called with ``equal_nan=False``, as for ``BaseRecord.equal``.
-        The ``default_factory`` is not compared.
-
-        Args:
-            other: The object to compare.
-
-        Returns:
-            ``True`` if the managers are equal, ``False`` otherwise.
-
-        Example:
-            ```pycon
-            >>> from minrecord import RecordManager, MinScalarRecord
-            >>> manager1 = RecordManager({"loss": MinScalarRecord("loss")})
-            >>> manager2 = RecordManager({"loss": MinScalarRecord("loss")})
-            >>> manager1.equal(manager2)
-            True
-            >>> manager1.equal(RecordManager())
-            False
-
-            ```
-        """
-        if type(other) is not type(self):
-            return False
-        return objects_are_equal(self.state_dict(), other.state_dict(), equal_nan=True)
 
     def get_best_values(self, *, prefix: str = "", suffix: str = "") -> dict[str, Any]:
         r"""Get the best value of each record.
@@ -446,4 +414,4 @@ class RecordManager:
         return {key: hist.to_dict() for key, hist in self._records.items()}
 
 
-get_default_registry().register(RecordManager, EqualEqualityTester(), exist_ok=True)
+get_default_registry().register(RecordManager, SnapshotEqualityTester("state_dict"), exist_ok=True)
