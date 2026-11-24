@@ -21,6 +21,13 @@ if TYPE_CHECKING:
 class RecordManager:
     r"""Implement a simple record manager.
 
+    The manager stores records by key (by default, the name of the
+    record) and gives the operations that work on all of them: the best
+    values, the last values, and saving and loading the whole group. It
+    can hold different types of records (``Record``, ``MinScalarRecord``,
+    custom records, ...). A manager is not thread-safe, and an empty
+    manager is falsy because it defines ``__len__``.
+
     This class proposes an approach to manage a group of records, but it
     is possible to use other approaches. If this class does not fit your
     needs, feel free to use another approach.
@@ -262,7 +269,10 @@ class RecordManager:
         r"""Get all the records.
 
         Returns:
-            The records with their associated keys.
+            The records with their associated keys. It is a shallow
+                copy: adding a record to the returned dict does not
+                add it to the manager, but the records are the same
+                objects. This method never creates a record.
 
         Example:
             ```pycon
@@ -277,13 +287,15 @@ class RecordManager:
         return copy.copy(self._records)
 
     def has_record(self, key: str) -> bool:
-        r"""Indicate if the engine has a record for the given key.
+        r"""Indicate if the manager has a record for the given key.
 
         Args:
             key: The key of the record to check.
 
         Returns:
-            ``True`` if the record exists, ``False`` otherwise
+            ``True`` if a record is registered for the key, ``False``
+                otherwise. This method never creates a record, also if
+                the manager has a ``default_factory``.
 
         Example:
             ```pycon
@@ -367,15 +379,23 @@ class RecordManager:
         r"""Return a dictionary containing state values of all the
         records.
 
+        The dictionary maps each key to the output of ``to_dict`` of
+        its record, so it can be written to JSON if the values can. It
+        is the input of ``load_state_dict``. The ``default_factory`` is
+        not part of the state.
+
         Returns:
             The dictionary containing state values of all the records.
 
         Example:
             ```pycon
-            >>> from minrecord import RecordManager
+            >>> from minrecord import RecordManager, MinScalarRecord
             >>> manager = RecordManager()
             >>> manager.state_dict()
             {}
+            >>> manager.add_record(MinScalarRecord("loss", elements=[(0, 1.5)]))
+            >>> manager.state_dict()
+            {'loss': {'_target_': 'minrecord.comparable.MinScalarRecord', 'name': 'loss', 'max_size': 10, 'elements': ((0, 1.5),), 'best': (0, 1.5)}}
 
             ```
         """

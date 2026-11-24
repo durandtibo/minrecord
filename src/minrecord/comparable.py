@@ -81,9 +81,10 @@ class ComparableRecord(Record[T]):
             ``None`` means there is no value yet.
 
     Raises:
-        TypeError: if ``comparator`` is a dictionary that is not the
-            dictionary of a comparator (``_target_`` is missing, or it
-            is not a ``BaseComparator``).
+        TypeError: if ``name`` is not a ``str``, or if ``comparator``
+            is a dictionary that is not the dictionary of a comparator
+            (``_target_`` is missing, or it is not a
+            ``BaseComparator``).
         ValueError: if ``max_size`` is not a positive integer, if
             ``best`` is not a pair ``(step, value)``, or if ``best``
             is given without ``elements``.
@@ -197,6 +198,7 @@ class _ScalarRecord(ComparableRecord[float]):
             are added. See ``ComparableRecord``.
 
     Raises:
+        TypeError: if ``name`` is not a ``str``.
         ValueError: if ``max_size`` is not a positive integer, if
             ``best`` is not a pair ``(step, value)``, or if ``best``
             is given without ``elements``.
@@ -234,7 +236,8 @@ class MaxScalarRecord(_ScalarRecord):
     record.
 
     This record uses the ``MaxScalarComparator`` to find the
-    best value of the record.
+    best value of the record: the largest value, a NaN never being
+    better than a number.
 
     Args:
         name: The name of the record.
@@ -251,6 +254,7 @@ class MaxScalarRecord(_ScalarRecord):
             means there is no value yet.
 
     Raises:
+        TypeError: if ``name`` is not a ``str``.
         ValueError: if ``max_size`` is not a positive integer, if
             ``best`` is not a pair ``(step, value)``, or if ``best``
             is given without ``elements``.
@@ -281,7 +285,8 @@ class MinScalarRecord(_ScalarRecord):
     record.
 
     This record uses the ``MinScalarComparator`` to find the
-    best value of the record.
+    best value of the record: the smallest value, a NaN never being
+    better than a number.
 
     Args:
         name: The name of the record.
@@ -298,6 +303,7 @@ class MinScalarRecord(_ScalarRecord):
             means there is no value yet.
 
     Raises:
+        TypeError: if ``name`` is not a ``str``.
         ValueError: if ``max_size`` is not a positive integer, if
             ``best`` is not a pair ``(step, value)``, or if ``best``
             is given without ``elements``.

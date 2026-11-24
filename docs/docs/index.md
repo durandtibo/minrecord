@@ -35,10 +35,11 @@
 ## Overview
 
 `minrecord` is a minimalist Python library to record values in a ML workflow.
-In particular, it provides functionalities to track the best value, or the most recent values by
-storing a limiting number of values.
-It is possible to customize the library e.g. it is possible to define a new logic to track the best
-value.
+A record stores the most recent values (a bounded number of `(step, value)` pairs) and, for a
+comparable record, the best value, which is kept even after it leaves the recent values.
+A record manager groups several records, and every record can be saved to and restored from a
+dictionary. The logic that defines the best value is customizable with a comparator.
+`minrecord` only depends on `coola`.
 
 ### Key Features
 
@@ -47,8 +48,10 @@ value.
 - **✅ Improvement Detection**: Easily check if your model is still improving
 - **🎯 Flexible Comparators**: Define custom logic to determine what "better" means
 - **🗂️ Record Manager**: Organize and manage multiple metrics efficiently
-- **💾 Serialization**: Save and load record states for checkpointing
-- **🚀 Minimal Dependencies**: Lightweight with only essential dependencies
+- **💾 Serialization**: Save and load record states (`to_dict`, `from_dict`) for checkpointing
+- **🚀 Minimal Dependencies**: Lightweight, with `coola` as the only dependency
+- **🛡️ Strict by Design**: Invalid inputs are rejected when they are received, and a failed call leaves
+  the record unchanged
 
 Below is an example to show how to track the best scalar value when the best value is the maximum
 value and when the best value is the minimum value.
@@ -74,6 +77,7 @@ value and when the best value is the minimum value.
 - **[Get Started](get_started.md)**: Installation instructions
 - **[Quickstart](quickstart.md)**: Quick overview of the main features
 - **[Usage Guide](usage_guide.md)**: Detailed patterns and best practices
+- **[Design](design.md)**: Guarantees, design choices and their trade-offs
 - **[FAQ](faq.md)**: Frequently asked questions and troubleshooting
 - **[Release notes](release_notes.md)**: Changes and breaking changes
 - **[API Reference](refs/root.md)**: Detailed API documentation

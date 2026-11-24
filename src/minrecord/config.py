@@ -16,11 +16,12 @@ def get_max_size() -> int:
     r"""Get the current default maximum size of values to track in each
     record.
 
+    The default is 10. It is read when a record is created, and it can
+    be changed with ``set_max_size``.
+
     Returns:
         The current default maximum size of values to track in each
             record.
-
-    This value can be changed by using ``set_max_size``.
 
     Example:
         ```pycon
@@ -45,7 +46,8 @@ def set_max_size(max_size: int) -> None:
             each record. Must be a positive integer.
 
     Raises:
-        ValueError: If ``max_size`` is not a positive integer.
+        ValueError: If ``max_size`` is not a positive integer, or if it
+            is larger than ``sys.maxsize``. The default is not changed.
 
     Example:
         ```pycon
@@ -63,7 +65,7 @@ def set_max_size(max_size: int) -> None:
 
 
 def reset_max_size() -> None:
-    r"""Reset the default maximum size to its initial value.
+    r"""Reset the default maximum size to its initial value (10).
 
     Example:
         ```pycon

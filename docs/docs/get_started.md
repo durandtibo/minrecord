@@ -55,13 +55,12 @@ configurations. Then, you should install the required package to use `minrecord`
 command:
 
 ```shell
-inv install
+inv env.install
 ```
 
-This command will install all the required packages. You can also use this command to update the
-required packages. This command will check if there is a more recent package available and will
-install it. Finally, you can test the installation with the following command:
+This command installs all the required packages (and `inv env.update` updates them). Finally, you
+can test the installation with the following command:
 
 ```shell
-inv unit-test --cov
+inv test.unit --cov
 ```

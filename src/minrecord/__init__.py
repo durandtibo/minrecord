@@ -3,8 +3,21 @@ r"""Root package.
 `minrecord` is a minimalist library to record values in a machine learning
 workflow. Every record keeps at most ``max_size`` recent values, keeps the best
 value apart from them, is rebuilt exactly from ``to_dict``, and only loads
-objects of the expected type. See the properties in the usage guide of the
-documentation.
+objects of the expected type. See the guarantees and the design choices in the
+design page of the documentation.
+
+The public objects are:
+
+- records: ``Record`` (recent values), ``ComparableRecord``,
+  ``MinScalarRecord`` and ``MaxScalarRecord`` (recent values and best value),
+  and the base class ``BaseRecord``;
+- comparators: ``BaseComparator``, ``MinScalarComparator`` and
+  ``MaxScalarComparator``, which define what a better value is;
+- ``RecordManager``, ``get_best_values`` and ``get_last_values`` to work on a
+  group of records;
+- ``get_max_size``, ``set_max_size`` and ``reset_max_size`` for the default
+  ``max_size``;
+- ``EmptyRecordError`` and ``NotAComparableRecordError``.
 """
 
 from __future__ import annotations

@@ -27,6 +27,7 @@ nav:
   - User Guide:
       - quickstart.md
       - usage_guide.md
+      - design.md
       - faq.md
       - release_notes.md
   - Reference:

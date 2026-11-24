@@ -27,17 +27,17 @@ T = TypeVar("T")
 class BaseRecord(ABC, Generic[T]):
     r"""Define the base class to implement a record.
 
-    The record tracks the value added as well as the step
-    when the value is added. The goal of this class is to track the
-    recent record because the loggers (e.g. MLFlow or Tensorboard)
+    A record tracks the values added to it as well as the step when
+    each value was added. The goal of this class is to keep the recent
+    values in memory because the loggers (e.g. MLFlow or Tensorboard)
     do not allow to get the last value or the best value. The record
-    keeps in memory a recent record of pairs (step, value)
-    where step is the index of the step when the value was added. The
-    length of the recent record depends on the concrete
-    implementation.
+    keeps in memory a recent history of pairs ``(step, value)`` where
+    ``step`` is the index of the step when the value was added (or
+    ``None``). The length of the recent history depends on the
+    concrete implementation.
 
-    To implement your own record, you will need to define the
-    following members:
+    To implement your own record, you need to define the following
+    members:
 
         - ``name``
         - ``add_value``
@@ -48,8 +48,9 @@ class BaseRecord(ABC, Generic[T]):
 
     The other methods are derived from them. ``clone``, ``equal``,
     ``update``, ``from_dict`` and ``load_dict`` are ``@final``, so a
-    type checker rejects an override. A comparable record overrides ``is_comparable``, ``get_best_value``,
-    ``get_best_step`` and ``has_improved``.
+    type checker rejects an override. A comparable record also
+    overrides ``is_comparable``, ``get_best_value``, ``get_best_step``
+    and ``has_improved``.
 
     The contract of a record is:
 
@@ -58,14 +59,17 @@ class BaseRecord(ABC, Generic[T]):
             full name of the class with the key ``_target_``. Thus
             ``BaseRecord.from_dict(record.to_dict()).equal(record)``.
         2. The constructor accepts what ``to_dict`` returns, validates
-            its arguments and raises before any object exists.
+            its arguments and raises before any object exists. The
+            whole state of the record lives in ``vars(self)`` (no
+            ``__slots__``), because ``load_dict`` replaces it.
         3. ``get_best_value``, ``get_best_step`` and ``has_improved`` raise
             ``NotAComparableRecordError`` if the record is not
             comparable, and ``EmptyRecordError`` if the record is
             comparable and empty.
 
     The values are stored by reference: ``to_dict`` and ``clone`` share
-    the value objects with the original record.
+    the value objects with the original record. A record is not
+    thread-safe.
 
     Example:
         ```pycon
@@ -264,7 +268,7 @@ class BaseRecord(ABC, Generic[T]):
         Raises:
             NotAComparableRecordError: if it is not a comparable
                 record.
-            EmptyRecordError: if the record is empty
+            EmptyRecordError: if the record is empty.
 
         Example:
             ```pycon
@@ -301,7 +305,7 @@ class BaseRecord(ABC, Generic[T]):
         Raises:
             NotAComparableRecordError: if it is not a comparable
                 record.
-            EmptyRecordError: if the record is empty
+            EmptyRecordError: if the record is empty.
 
         Example:
             ```pycon
@@ -336,7 +340,7 @@ class BaseRecord(ABC, Generic[T]):
         Raises:
             NotAComparableRecordError: if it is not a comparable
                 record.
-            EmptyRecordError: if the record is empty
+            EmptyRecordError: if the record is empty.
 
         Example:
             ```pycon
@@ -359,8 +363,8 @@ class BaseRecord(ABC, Generic[T]):
         r"""Indicate if it is possible to compare the values in the
         record.
 
-        Note that it is possible to compute the best value only for
-        records that are comparable.
+        The best value, the best step and the improvement flag are
+        available only for the records that are comparable.
 
         Returns:
             ``True`` if it is possible to compare the values in
@@ -495,12 +499,13 @@ class BaseRecord(ABC, Generic[T]):
 
 
 class EmptyRecordError(Exception):
-    r"""Raise an error if the record is empty."""
+    r"""Raise an error if a value is asked from an empty record."""
 
 
 class NotAComparableRecordError(Exception):
-    r"""Raise an error if it is not possible to compare the values in
-    the record."""
+    r"""Raise an error if the best value, the best step or the
+    improvement flag is asked from a record that cannot compare its
+    values (e.g. ``Record``)."""
 
 
 get_default_registry().register(BaseRecord, EqualEqualityTester(), exist_ok=True)

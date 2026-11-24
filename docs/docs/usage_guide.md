@@ -31,7 +31,8 @@ with comparison logic:
 
 ### Memory Management
 
-By default, records keep only the last 10 values. This is configurable:
+By default, records keep only the last 10 values. This is configurable, per record or for the records
+created afterwards (`reset_max_size()` restores the default):
 
 ```python
 from minrecord import Record, get_max_size, set_max_size
@@ -39,7 +40,7 @@ from minrecord import Record, get_max_size, set_max_size
 # Check default
 print(get_max_size())  # 10
 
-# Change globally for new records
+# Change the default of the records created after this call
 set_max_size(20)
 
 # Or set per record
@@ -52,51 +53,21 @@ record = Record("my_metric", max_size=50)
 - Best values are tracked separately and never lost
 - Recent values are usually sufficient for monitoring
 
-## Properties
+`max_size` is fixed when the record is created. To change it, create a new record and add the
+values of the old one (`new.update(old.get_most_recent())`).
 
-These properties are guaranteed by the base classes, so every record has them.
+## Guarantees and Limits
 
-| Property                      | Statement                                                                                                                                                                                                                                                                                                                                    |
-| ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Bounded memory                | A record keeps at most `max_size` pairs `(step, value)`, with `1 <= max_size <= sys.maxsize`. The oldest pair is dropped first. Adding a value is O(1).                                                                                                                                                                                      |
-| Best is never lost            | The best pair `(step, value)` of a comparable record is stored apart from the window: it survives the eviction of the pair that produced it, `clone` and `to_dict`/`from_dict`.                                                                                                                                                              |
-| No confusable sentinel        | The absence of a best value is the best pair `None`. It is never a value that a record can hold, and `inf`/`-inf` are never stored as a stand-in.                                                                                                                                                                                            |
-| Ties improve                  | A value equal to the best value counts as an improvement. The comparison is **reflexive**: `is_better(new_value=x, old_value=x)` is `True` for all `x`, NaN included.                                                                                                                                                                        |
-| NaN never wins                | A NaN value is never better than a number. A NaN best value is replaced by any value (a number, or another NaN as a tie).                                                                                                                                                                                                                    |
-| One snapshot                  | `to_dict()` returns the arguments of the constructor, content included (window as `elements`, best as `best`). `improved` is derived from the values, never stored.                                                                                                                                                                          |
-| Round trip is exact           | For every record `r`, also after a JSON round trip and when it holds NaN: `from_dict(to_dict()).equal(r)`, `r.clone().equal(r)`, the clone has the same `has_improved()` and the same best pair. A clone is independent.                                                                                                                     |
-| Consistent state              | A comparable record has a best pair if and only if it has a value. `best` is a pair (a `tuple` or a `list` of length 2) and requires `elements`.                                                                                                                                                                                             |
-| Safe to load                  | `from_dict`, `load_dict`, `load_state_dict` and the comparator dict only build objects of the expected type, and anything that is not a dict is a `TypeError`. A `_target_` inside a stored value is data: it is never instantiated.                                                                                                         |
-| Fails early                   | An input that cannot work is rejected **by the call that receives it** and never stored: a value that the comparator cannot compare, a `max_size` that a deque cannot hold, a `name` that is not a `str`, a manager key that nobody registered. The package never creates a record that the caller did not ask for.                          |
-| Atomic                        | `add_value`, `load_dict` and the manager `load_state_dict` leave the record, or the manager, as it was if they raise. `update` is a loop of `add_value`: the elements before the failing one are kept.                                                                                                                                       |
-| Typed errors                  | `EmptyRecordError` for a value asked from an empty record, `NotAComparableRecordError` for a best value, a best step or an improvement asked from a record that cannot compare, `ValueError` for an invalid `max_size` or `best`, `TypeError` for a `name`, a dict or a comparator of the wrong type, `KeyError` for an unknown manager key. |
-| Contract is enforced          | The methods that must not be overridden (`clone`, `equal`, `update`, `from_dict`, `load_dict`) are `@final`.                                                                                                                                                                                                                                 |
-| Readable and stable text      | `repr`/`str` of a record and of a comparator are deterministic and show the arguments (no memory address).                                                                                                                                                                                                                                   |
-| No hidden global              | The default `max_size` is read when a record is **created**. It is the only global setting (`get_max_size`, `set_max_size`, `reset_max_size`) and it only accepts values that a record can use.                                                                                                                                              |
-| Equality is snapshot equality | `equal` is the equality of the `to_dict` output of two records (same type) and of the `state_dict` of two managers. A NaN is equal to a NaN, also for `objects_are_equal(..., equal_nan=False)`: this is the one deliberate difference with `coola`.                                                                                         |
-| Extensible                    | A new record type implements the 6 abstract members of `BaseRecord`, keeps its whole state in `vars(self)` and accepts what its `to_dict` returns. A new notion of "better" implements the one method `BaseComparator.is_better`. No registry is needed.                                                                                     |
-| Consistent with `coola`       | Records, comparators and managers work with `objects_are_equal`; `to_dict` works with `coola.factory.factory`; the string forms use `coola.formatting`.                                                                                                                                                                                      |
-| Keyword-only options          | Every option after the identifying arguments (`name`, `comparator`, `records`) is keyword-only.                                                                                                                                                                                                                                              |
-| Minimal                       | One dependency (`coola`), no optional dependency, no I/O, no logging, no thread, no global state beyond `max_size`.                                                                                                                                                                                                                          |
+Every record keeps at most `max_size` values, keeps the best pair apart from them, is rebuilt exactly
+from `to_dict`, and rejects invalid inputs in the call that receives them. The
+[design page](design.md) lists the guarantees, explains the design choices with their trade-offs, and
+describes what is not guaranteed (thread safety, values stored by reference, `copy.copy`, ...).
 
-Not guaranteed:
+Three points are worth knowing before you start:
 
-- **Thread safety.** A record and a manager are not thread-safe. Use one record per thread or a
-  lock.
-- **Values are stored by reference.** `add_value` does not copy the value, and `to_dict` and `clone`
-  share the value objects between the copies. Store scalars or immutable objects.
-- **Order of the `step` values.** `step` is a label: it is not checked to increase, nor to be a
-  number. Early stopping with `get_best_step` needs a numeric step.
-- **Truthiness.** `Record` and `RecordManager` define `__len__`, so an empty one is falsy: write
-  `record.is_empty()`, not `if record:`.
-- **`load_dict` replaces the whole state.** The name and the `max_size` of the record are replaced
-  too: a record named `a` that loads the dict of a record named `b` is named `b`. Check the name
-  before if it must stay.
-- **Untrusted dicts beyond the type.** `from_dict` imports the module that `_target_` names. It
-  never calls anything but a record class, but a dict from an untrusted source can still make the
-  process import a module.
-- **`copy.copy(record)` is not a clone.** A shallow copy shares the window, so `add_value` on the
-  copy changes the original. `clone()` and `copy.deepcopy` are independent: use `clone()`.
+- **A value that equals the best value is an improvement.** `has_improved()` is `True` on a plateau.
+- **A NaN is never better than a number.** It can only be the best value if it is the first one.
+- **An empty record is falsy.** Write `record.is_empty()`, not `if record:`.
 
 ## Common Patterns
 
@@ -128,15 +99,23 @@ manager.add_record(MinScalarRecord("val/loss"))
 manager.add_record(MaxScalarRecord("train/accuracy"))
 manager.add_record(MaxScalarRecord("val/accuracy"))
 
+# get_record raises KeyError for a key that is not registered. To create the
+# records on demand, pass a factory: RecordManager(default_factory=MinScalarRecord)
+
 # Add values to each record
 manager.get_record("train/loss").add_value(train_loss, step=epoch)
 manager.get_record("val/loss").add_value(val_loss, step=epoch)
 manager.get_record("train/accuracy").add_value(train_acc, step=epoch)
 manager.get_record("val/accuracy").add_value(val_acc, step=epoch)
 
-# Get best values for logging
-best_values = manager.get_best_values()
+# Get the best values and the last values for logging
+best_values = manager.get_best_values(prefix="best/")
+last_values = manager.get_last_values(prefix="last/")
 ```
+
+`get_best_values` skips the empty records and the records that are not comparable, and
+`get_last_values` skips the empty records. The same functions exist for any mapping of records:
+`minrecord.get_best_values(records)` and `minrecord.get_last_values(records)`.
 
 ### Pattern 3: Early Stopping
 
@@ -208,8 +187,10 @@ so the record can be saved and loaded: `{**super().to_dict(), "tolerance": self.
 
 1. **Set appropriate max_size**: Balance between memory and information needs
 2. **Use RecordManager** for multiple metrics to keep code organized
-3. **Reuse records** across training runs by loading/saving state
-4. **Avoid storing large objects**: Records are meant for scalars or small objects
+3. **Resume a run** by saving `manager.state_dict()` (or `record.to_dict()`) in your checkpoint and
+   loading it back
+4. **Avoid storing large objects**: Records store the values by reference and are meant for scalars
+   or small objects
 
 ## Integration with ML Frameworks
 
@@ -322,7 +303,8 @@ invalid (the entries are built and checked first, then loaded). Two
 managers can be compared with `manager1.equal(manager2)` or `coola.equality.objects_are_equal`.
 
 The dict is not compatible with the one of the versions before 0.4.0 (`{"config": ..., "state": ...}`),
-see the [release notes](release_notes.md).
+see the [release notes](release_notes.md). The [design page](design.md) explains the trade-offs of
+`from_dict`, `load_dict` and `load_state_dict`.
 
 ## Debugging Tips
 
@@ -356,6 +338,7 @@ assert record1.equal(record2)
 ## See Also
 
 - [Quickstart Guide](quickstart.md) for basic usage
+- [Design](design.md) for the guarantees and the design choices
 - [Release notes](release_notes.md) for the breaking changes
 - [FAQ](faq.md) for common questions and troubleshooting
 - API Reference:
@@ -363,6 +346,8 @@ assert record1.equal(record2)
   - [minrecord.base](refs/base.md) - Base classes and exceptions
   - [minrecord.comparable](refs/comparable.md) - Comparable record implementations
   - [minrecord.comparator](refs/comparator.md) - Comparator classes
+  - [minrecord.config](refs/config.md) - Default `max_size`
   - [minrecord.functional](refs/functional.md) - Utility functions
   - [minrecord.generic](refs/generic.md) - Generic record implementation
   - [minrecord.manager](refs/manager.md) - Record manager
+  - [minrecord.utils](refs/utils.md) - Validation and factory helpers

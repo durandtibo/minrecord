@@ -34,8 +34,9 @@ def instantiate(config: dict[str, Any], cls: type[T]) -> T:
 
     Raises:
         TypeError: if ``config`` is not a ``dict``, or if it is not a
-            configuration of ``cls`` (the key ``_target_`` is missing, or it names an object
-            that is not ``cls`` or a subclass of ``cls``).
+            configuration of ``cls`` (the key ``_target_`` is missing,
+            or it names an object that is not ``cls`` or a subclass of
+            ``cls``).
         ImportError: if the object named by ``_target_`` cannot be
             imported.
 
