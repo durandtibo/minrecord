@@ -134,8 +134,7 @@ def test_record_get_most_recent_empty() -> None:
 
 def test_record_get_most_recent_add_max_size() -> None:
     record = Record("loss", max_size=3)
-    for i in range(10):
-        record.add_value(i)
+    record.update([(None, i) for i in range(10)])
     assert record.get_most_recent() == ((None, 7), (None, 8), (None, 9))
 
 

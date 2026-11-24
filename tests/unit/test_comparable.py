@@ -213,11 +213,15 @@ def test_comparable_record_add_value_worse_value_has_not_improved() -> None:
     assert not record.has_improved()
 
 
-def test_comparable_record_add_value_best_outlives_eviction() -> None:
+def test_comparable_record_add_value_best_outlives_eviction_window() -> None:
     record = create_max_record(max_size=2)
-    for step, value in enumerate([9.0, 1.0, 2.0, 3.0]):
-        record.add_value(value, step=step)
+    record.update(list(enumerate([9.0, 1.0, 2.0, 3.0])))
     assert record.get_most_recent() == ((2, 2.0), (3, 3.0))
+
+
+def test_comparable_record_add_value_best_outlives_eviction_best() -> None:
+    record = create_max_record(max_size=2)
+    record.update(list(enumerate([9.0, 1.0, 2.0, 3.0])))
     assert record.to_dict()["best"] == (0, 9.0)
 
 
@@ -249,16 +253,19 @@ def test_comparable_record_init_elements_has_improved_true() -> None:
     assert create_max_record(elements=[(0, 1.0), (1, 3.0)]).has_improved()
 
 
-def test_comparable_record_init_elements_longer_than_max_size() -> None:
+def test_comparable_record_init_elements_longer_than_max_size_window() -> None:
     record = create_max_record(max_size=2, elements=[(0, 9.0), (1, 1.0), (2, 2.0)])
     assert record.get_most_recent() == ((1, 1.0), (2, 2.0))
+
+
+def test_comparable_record_init_elements_longer_than_max_size_best() -> None:
+    record = create_max_record(max_size=2, elements=[(0, 9.0), (1, 1.0), (2, 2.0)])
     assert record.get_best_value() == 9.0
 
 
 def test_comparable_record_init_elements_same_state_as_add_value() -> None:
     record = create_max_record(max_size=3)
-    for step, value in enumerate([4.0, 7.0, 7.0, 1.0, 5.0]):
-        record.add_value(value, step=step)
+    record.update(list(enumerate([4.0, 7.0, 7.0, 1.0, 5.0])))
     assert record.equal(
         create_max_record(max_size=3, elements=list(enumerate([4.0, 7.0, 7.0, 1.0, 5.0])))
     )

@@ -245,44 +245,51 @@ def test_record_manager_load_state_dict_empty() -> None:
     assert len(manager) == 0
 
 
-def test_record_manager_load_state_dict_with_existing_record() -> None:
-    manager = RecordManager()
-    manager.add_record(MinScalarRecord("loss"))
-    manager.get_record("loss").add_value(2, step=0)
-    manager.load_state_dict(
-        {
-            "loss": {
-                OBJECT_TARGET: "minrecord.comparable.MinScalarRecord",
-                "name": "loss",
-                "max_size": 10,
-                "elements": ((0, 10), (1, 9), (2, 8), (3, 7), (4, 6)),
-                "best": (4, 6),
-            }
-        }
-    )
-    record = manager.get_record("loss")
-    assert isinstance(record, MinScalarRecord)
-    assert record.get_last_value() == 6
-    assert record.get_best_value() == 6
+LOSS_STATE = {
+    "loss": {
+        OBJECT_TARGET: "minrecord.comparable.MinScalarRecord",
+        "name": "loss",
+        "max_size": 10,
+        "elements": ((0, 10), (1, 9), (2, 8), (3, 7), (4, 6)),
+        "best": (4, 6),
+    }
+}
 
 
-def test_record_manager_load_state_dict_without_record() -> None:
+def create_manager_with_loss() -> RecordManager:
+    manager = RecordManager({"loss": MinScalarRecord("loss", elements=[(0, 2)])})
+    manager.load_state_dict(LOSS_STATE)
+    return manager
+
+
+def test_record_manager_load_state_dict_with_existing_record_last_value() -> None:
+    assert create_manager_with_loss().get_record("loss").get_last_value() == 6
+
+
+def test_record_manager_load_state_dict_with_existing_record_best_value() -> None:
+    assert create_manager_with_loss().get_record("loss").get_best_value() == 6
+
+
+def test_record_manager_load_state_dict_with_existing_record_type() -> None:
+    assert type(create_manager_with_loss().get_record("loss")) is MinScalarRecord
+
+
+def test_record_manager_load_state_dict_without_record_last_value() -> None:
     manager = RecordManager()
-    manager.load_state_dict(
-        {
-            "loss": {
-                OBJECT_TARGET: "minrecord.comparable.MinScalarRecord",
-                "name": "loss",
-                "max_size": 10,
-                "elements": ((0, 10), (1, 9), (2, 8), (3, 7), (4, 6)),
-                "best": (4, 6),
-            }
-        },
-    )
-    record = manager.get_record("loss")
-    assert isinstance(record, MinScalarRecord)
-    assert record.get_last_value() == 6
-    assert record.get_best_value() == 6
+    manager.load_state_dict(LOSS_STATE)
+    assert manager.get_record("loss").get_last_value() == 6
+
+
+def test_record_manager_load_state_dict_without_record_best_value() -> None:
+    manager = RecordManager()
+    manager.load_state_dict(LOSS_STATE)
+    assert manager.get_record("loss").get_best_value() == 6
+
+
+def test_record_manager_load_state_dict_without_record_type() -> None:
+    manager = RecordManager()
+    manager.load_state_dict(LOSS_STATE)
+    assert type(manager.get_record("loss")) is MinScalarRecord
 
 
 def test_record_manager_state_dict_empty() -> None:

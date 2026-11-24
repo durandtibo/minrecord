@@ -345,7 +345,7 @@ One branch and one pull request per step (`CLAUDE.md`). The steps are independen
 | 3    | **Documentation.** Snapshot equality (docstrings, property row, one test for `equal_nan=False`), the `load_state_dict` sentence, the `BaseRecord` half sentence, the FAQ memory figures, the properties table of `usage_guide.md` replaced by the one of section 1, the `copy.copy` note.                                         | F5, F6, F7 | no                    |
 | 4    | **Tests and package checks.** `package_checks.py` on `minrecord.__all__` plus a manager round trip; the 8 tests split or parametrised.                                                                                                                                                                                            | F8         | no                    |
 
-Status: step 1 is done in #552, step 2 in #553 (stacked on #552).
+Status: step 1 is done in #552, step 2 in #553 and step 3 in #554 (stacked on #552), step 4 in the next pull request (stacked on #554).
 
 Steps 1 and 2 change what a caller observes, and nothing else does; they should be released with
 the notes of the new checks. Steps 3 and 4 change no behaviour. Step 4 can be done first to get the
