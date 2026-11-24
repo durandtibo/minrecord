@@ -193,7 +193,7 @@ for epoch in range(epochs):
 
 ```python
 import wandb
-from minrecord import RecordManager, get_last_values
+from minrecord import RecordManager
 
 manager = RecordManager()
 # ... add records ...
@@ -208,7 +208,7 @@ for epoch in range(epochs):
     wandb.log(
         {
             "epoch": epoch,
-            **get_last_values(manager.get_records(), prefix="current/"),
+            **manager.get_last_values(prefix="current/"),
             **manager.get_best_values(prefix="best/"),
         }
     )
@@ -241,6 +241,11 @@ manager_state = manager.state_dict()
 new_manager = RecordManager()
 new_manager.load_state_dict(manager_state)
 ```
+
+The state of a manager is a dict of records dicts, so it can be written to JSON. `load_state_dict` loads
+the data of a known key in the existing record (the objects that you hold are updated), creates the
+records of the new keys, and does not change the manager if one entry is invalid. Two managers can
+be compared with `manager1.equal(manager2)` or `coola.equality.objects_are_equal`.
 
 ## Debugging Tips
 

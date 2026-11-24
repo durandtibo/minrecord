@@ -5,13 +5,18 @@ from __future__ import annotations
 __all__ = ["RecordManager"]
 
 import copy
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
+from coola.equality import objects_are_equal
+from coola.equality.tester import EqualEqualityTester, get_default_registry
 from coola.formatting.structure import repr_indent, repr_mapping, str_indent, str_mapping
 
 from minrecord.base import BaseRecord
-from minrecord.functional import get_best_values
+from minrecord.functional import get_best_values, get_last_values
 from minrecord.generic import Record
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping
 
 
 class RecordManager:
@@ -22,7 +27,9 @@ class RecordManager:
     needs, feel free to use another approach.
 
     Args:
-        records: The initial records to add to the manager.
+        records: The initial records to add to the manager. The
+            mapping is copied, so adding a record to the manager does
+            not change it.
 
     Example:
         ```pycon
@@ -37,8 +44,8 @@ class RecordManager:
         ```
     """
 
-    def __init__(self, records: dict[str, BaseRecord[Any]] | None = None) -> None:
-        self._records = records or {}
+    def __init__(self, records: Mapping[str, BaseRecord[Any]] | None = None) -> None:
+        self._records = dict(records or {})
 
     def __len__(self) -> int:
         return len(self._records)
@@ -56,7 +63,7 @@ class RecordManager:
         return f"{self.__class__.__qualname__}()"
 
     def add_record(
-        self, record: BaseRecord[Any], key: str | None = None, exist_ok: bool = False
+        self, record: BaseRecord[Any], key: str | None = None, *, exist_ok: bool = False
     ) -> None:
         r"""Add a record to the manager.
 
@@ -101,26 +108,47 @@ class RecordManager:
             raise RuntimeError(msg)
         self._records[key] = record
 
-    def get_best_values(self, prefix: str = "", suffix: str = "") -> dict[str, Any]:
-        r"""Get the best value of each metric.
+    def equal(self, other: Any) -> bool:
+        r"""Indicate if two managers are equal or not.
 
-        This method ignores the metrics with empty record and the
-        non-comparable record.
+        Two managers are equal if they have the same type and the same
+        records (same keys and equal records).
 
         Args:
-            prefix: The prefix used to create the dict of best values.
-                The goal of this prefix is to generate a name which is
-                different from the metric name to avoid confusion.
-                By default, the returned dict uses the same name as the
-                metric.
-            suffix: The suffix used to create the dict of best values.
-                The goal of this suffix is to generate a name which is
-                different from the metric name to avoid confusion.
-                By default, the returned dict uses the same name as the
-                metric.
+            other: The object to compare.
 
         Returns:
-            The dict with the best value of each metric.
+            ``True`` if the managers are equal, ``False`` otherwise.
+
+        Example:
+            ```pycon
+            >>> from minrecord import RecordManager, MinScalarRecord
+            >>> manager1 = RecordManager({"loss": MinScalarRecord("loss")})
+            >>> manager2 = RecordManager({"loss": MinScalarRecord("loss")})
+            >>> manager1.equal(manager2)
+            True
+            >>> manager1.equal(RecordManager())
+            False
+
+            ```
+        """
+        if type(other) is not type(self):
+            return False
+        return objects_are_equal(self.state_dict(), other.state_dict())
+
+    def get_best_values(self, *, prefix: str = "", suffix: str = "") -> dict[str, Any]:
+        r"""Get the best value of each record.
+
+        This method ignores the empty and non-comparable records.
+        See ``minrecord.get_best_values`` for the description of the
+        arguments.
+
+        Args:
+            prefix: The prefix used to create the keys of the dict.
+            suffix: The suffix used to create the keys of the dict.
+
+        Returns:
+            The dict with the best value of each record.
 
         Example:
             ```pycon
@@ -138,6 +166,38 @@ class RecordManager:
             ```
         """
         return get_best_values(self._records, prefix=prefix, suffix=suffix)
+
+    def get_last_values(self, *, prefix: str = "", suffix: str = "") -> dict[str, Any]:
+        r"""Get the last value of each record.
+
+        This method ignores the empty records. See
+        ``minrecord.get_last_values`` for the description of the
+        arguments.
+
+        Args:
+            prefix: The prefix used to create the keys of the dict.
+            suffix: The suffix used to create the keys of the dict.
+
+        Returns:
+            The dict with the last value of each record.
+
+        Example:
+            ```pycon
+            >>> from minrecord import RecordManager, MaxScalarRecord
+            >>> manager = RecordManager()
+            >>> manager.add_record(MaxScalarRecord("accuracy"))
+            >>> manager.get_record("accuracy").add_value(42.0)
+            >>> manager.get_record("accuracy").add_value(40.0)
+            >>> manager.get_last_values()
+            {'accuracy': 40.0}
+            >>> manager.get_last_values(prefix="last/")
+            {'last/accuracy': 40.0}
+            >>> manager.get_last_values(suffix="/last")
+            {'accuracy/last': 40.0}
+
+            ```
+        """
+        return get_last_values(self._records, prefix=prefix, suffix=suffix)
 
     def get_record(self, key: str) -> BaseRecord[Any]:
         r"""Get the record associated to a key.
@@ -210,8 +270,19 @@ class RecordManager:
     def load_state_dict(self, state_dict: dict[str, Any]) -> None:
         r"""Load the state values from a dict.
 
+        The data of a key that is already in the manager is loaded in
+        the existing record (``load_dict``), so the objects that
+        other parts of the code hold are updated. The data of a new
+        key creates a new record (``BaseRecord.from_dict``). The
+        manager is not modified if one entry is invalid.
+
         Args:
-            state_dict: A dict with the new state values.
+            state_dict: A dict with the new state values. It has the
+                structure of the output of ``state_dict``.
+
+        Raises:
+            TypeError: if the data of a key is the data of a record
+                of another type than the existing record.
 
         Example:
             ```pycon
@@ -233,11 +304,19 @@ class RecordManager:
 
             ```
         """
+        # All the entries are checked before the first change, so the
+        # manager is not modified if an entry is invalid.
+        new_records: dict[str, BaseRecord[Any]] = {}
         for key, data in state_dict.items():
             if self.has_record(key):
-                self._records[key].load_dict(data)
+                self._records[key].clone().load_dict(data)
             else:
-                self._records[key] = BaseRecord.from_dict(data)
+                new_records[key] = BaseRecord.from_dict(data)
+        for key, data in state_dict.items():
+            if key in new_records:
+                self._records[key] = new_records[key]
+            else:
+                self._records[key].load_dict(data)
 
     def state_dict(self) -> dict[str, Any]:
         r"""Return a dictionary containing state values of all the
@@ -256,3 +335,6 @@ class RecordManager:
             ```
         """
         return {key: hist.to_dict() for key, hist in self._records.items()}
+
+
+get_default_registry().register(RecordManager, EqualEqualityTester(), exist_ok=True)

@@ -1,9 +1,14 @@
 from __future__ import annotations
 
+from types import MappingProxyType
+from typing import Any
+
 import pytest
+from coola.equality import objects_are_equal
+from coola.equality.tester import get_default_registry
 from coola.factory import OBJECT_TARGET
 
-from minrecord import MaxScalarRecord, MinScalarRecord, Record, RecordManager
+from minrecord import BaseRecord, MaxScalarRecord, MinScalarRecord, Record, RecordManager
 
 NAMES = ("NAME", "my_record")
 
@@ -212,3 +217,249 @@ def test_record_manager_state_dict_2_record() -> None:
     record2 = MaxScalarRecord("accuracy")
     manager.add_record(record2)
     assert manager.state_dict() == {"loss": record1.to_dict(), "accuracy": record2.to_dict()}
+
+
+#########################################
+#     Tests for RecordManager input     #
+#########################################
+
+
+def test_record_manager_init_copies_input_non_empty() -> None:
+    records = {"loss": MinScalarRecord("loss")}
+    manager = RecordManager(records)
+    manager.add_record(MaxScalarRecord("accuracy"))
+    assert list(records) == ["loss"]
+
+
+def test_record_manager_init_copies_input_empty() -> None:
+    records: dict[str, BaseRecord[Any]] = {}
+    manager = RecordManager(records)
+    manager.add_record(MaxScalarRecord("accuracy"))
+    assert records == {}
+
+
+def test_record_manager_init_keeps_record_objects() -> None:
+    record = MinScalarRecord("loss")
+    assert RecordManager({"loss": record}).get_record("loss") is record
+
+
+def test_record_manager_init_mapping() -> None:
+    record = MinScalarRecord("loss")
+    assert RecordManager(MappingProxyType({"loss": record})).get_records() == {"loss": record}
+
+
+def test_record_manager_add_record_exist_ok_keyword_only() -> None:
+    manager = RecordManager()
+    add_record: Any = manager.add_record
+    with pytest.raises(TypeError, match=r"takes from 2 to 3 positional arguments but 4 were given"):
+        add_record(Record("loss"), "loss", True)
+
+
+def test_record_manager_add_record_exist_ok() -> None:
+    manager = RecordManager()
+    manager.add_record(Record("loss"))
+    new_record = MinScalarRecord("loss")
+    manager.add_record(new_record, exist_ok=True)
+    assert manager.get_record("loss") is new_record
+
+
+def test_record_manager_add_record_duplicate_key_keeps_record() -> None:
+    manager = RecordManager()
+    record = Record("loss")
+    manager.add_record(record)
+    with pytest.raises(RuntimeError, match=r"is already registered for the key loss"):
+        manager.add_record(MinScalarRecord("loss"))
+    assert manager.get_record("loss") is record
+
+
+#####################################
+#     Tests for get_last_values     #
+#####################################
+
+
+def create_manager_with_values() -> RecordManager:
+    manager = RecordManager()
+    manager.add_record(MinScalarRecord("loss"))
+    manager.add_record(MaxScalarRecord("accuracy"))
+    manager.add_record(Record("epoch"))
+    manager.add_record(MaxScalarRecord("f1"))
+    manager.get_record("loss").update([(0, 1.9), (1, 1.2)])
+    manager.get_record("accuracy").update([(0, 42), (1, 35)])
+    manager.get_record("epoch").update([(0, 0), (1, 1)])
+    return manager
+
+
+def test_record_manager_get_last_values() -> None:
+    assert create_manager_with_values().get_last_values() == {
+        "loss": 1.2,
+        "accuracy": 35,
+        "epoch": 1,
+    }
+
+
+def test_record_manager_get_last_values_empty() -> None:
+    assert RecordManager().get_last_values() == {}
+
+
+def test_record_manager_get_last_values_skips_empty_records() -> None:
+    assert "f1" not in create_manager_with_values().get_last_values()
+
+
+def test_record_manager_get_last_values_prefix() -> None:
+    assert create_manager_with_values().get_last_values(prefix="last/") == {
+        "last/loss": 1.2,
+        "last/accuracy": 35,
+        "last/epoch": 1,
+    }
+
+
+def test_record_manager_get_last_values_suffix() -> None:
+    assert create_manager_with_values().get_last_values(suffix="/last") == {
+        "loss/last": 1.2,
+        "accuracy/last": 35,
+        "epoch/last": 1,
+    }
+
+
+def test_record_manager_get_last_values_positional_prefix() -> None:
+    get_last_values: Any = create_manager_with_values().get_last_values
+    with pytest.raises(TypeError, match=r"takes 1 positional argument but 2 were given"):
+        get_last_values("last/")
+
+
+def test_record_manager_get_best_values_positional_prefix() -> None:
+    get_best_values: Any = create_manager_with_values().get_best_values
+    with pytest.raises(TypeError, match=r"takes 1 positional argument but 2 were given"):
+        get_best_values("best/")
+
+
+def test_record_manager_get_best_values_prefix_suffix() -> None:
+    assert create_manager_with_values().get_best_values(prefix="best/", suffix="/v") == {
+        "best/loss/v": 1.2,
+        "best/accuracy/v": 42,
+    }
+
+
+#########################################
+#     Tests for RecordManager.equal     #
+#########################################
+
+
+def test_record_manager_equal_true() -> None:
+    assert create_manager_with_values().equal(create_manager_with_values())
+
+
+def test_record_manager_equal_true_empty() -> None:
+    assert RecordManager().equal(RecordManager())
+
+
+def test_record_manager_equal_false_different_values() -> None:
+    manager = create_manager_with_values()
+    manager.get_record("loss").add_value(0.5)
+    assert not manager.equal(create_manager_with_values())
+
+
+def test_record_manager_equal_false_different_keys() -> None:
+    manager = create_manager_with_values()
+    manager.get_record("new_record")
+    assert not manager.equal(create_manager_with_values())
+
+
+def test_record_manager_equal_false_different_record_types() -> None:
+    assert not RecordManager({"loss": MinScalarRecord("loss")}).equal(
+        RecordManager({"loss": Record("loss")})
+    )
+
+
+def test_record_manager_equal_false_different_types() -> None:
+    assert not RecordManager().equal({})
+
+
+def test_record_manager_objects_are_equal_true() -> None:
+    assert objects_are_equal(create_manager_with_values(), create_manager_with_values())
+
+
+def test_record_manager_objects_are_equal_false() -> None:
+    assert not objects_are_equal(create_manager_with_values(), RecordManager())
+
+
+def test_record_manager_equality_tester_registry_has_equality_tester() -> None:
+    assert get_default_registry().has_equality_tester(RecordManager)
+
+
+###################################################
+#     Tests for RecordManager.load_state_dict     #
+###################################################
+
+
+def test_record_manager_state_dict_round_trip() -> None:
+    manager = RecordManager()
+    manager.load_state_dict(create_manager_with_values().state_dict())
+    assert manager.equal(create_manager_with_values())
+
+
+def test_record_manager_load_state_dict_known_key_keeps_record_object() -> None:
+    manager = create_manager_with_values()
+    record = manager.get_record("loss")
+    manager.load_state_dict({"loss": MinScalarRecord("loss", elements=[(0, 0.1)]).to_dict()})
+    assert manager.get_record("loss") is record
+
+
+def test_record_manager_load_state_dict_known_key_loads_data() -> None:
+    manager = create_manager_with_values()
+    manager.load_state_dict({"loss": MinScalarRecord("loss", elements=[(0, 0.1)]).to_dict()})
+    assert manager.get_record("loss").get_last_value() == 0.1
+
+
+def test_record_manager_load_state_dict_unknown_key_creates_record() -> None:
+    manager = RecordManager()
+    manager.load_state_dict({"loss": MinScalarRecord("loss", elements=[(0, 0.1)]).to_dict()})
+    assert manager.get_record("loss").equal(MinScalarRecord("loss", elements=[(0, 0.1)]))
+
+
+def test_record_manager_load_state_dict_keeps_other_records() -> None:
+    manager = create_manager_with_values()
+    manager.load_state_dict({"new": Record("new").to_dict()})
+    assert manager.has_record("accuracy")
+
+
+def test_record_manager_load_state_dict_does_not_modify_state() -> None:
+    state = create_manager_with_values().state_dict()
+    expected = create_manager_with_values().state_dict()
+    RecordManager().load_state_dict(state)
+    assert objects_are_equal(state, expected)
+
+
+def test_record_manager_load_state_dict_invalid_new_entry_leaves_manager_unchanged() -> None:
+    manager = create_manager_with_values()
+    invalid = Record("bad").to_dict()
+    invalid["max_size"] = 0
+    with pytest.raises(ValueError, match=r"max_size must be a positive integer, got 0"):
+        manager.load_state_dict(
+            {"loss": MinScalarRecord("loss", elements=[(0, 0.1)]).to_dict(), "bad": invalid}
+        )
+    assert manager.equal(create_manager_with_values())
+
+
+def test_record_manager_load_state_dict_other_type_leaves_manager_unchanged() -> None:
+    manager = create_manager_with_values()
+    with pytest.raises(TypeError, match=r"Cannot load the data of a"):
+        manager.load_state_dict(
+            {
+                "loss": MinScalarRecord("loss", elements=[(0, 0.1)]).to_dict(),
+                "accuracy": MinScalarRecord("accuracy").to_dict(),
+            }
+        )
+    assert manager.equal(create_manager_with_values())
+
+
+def test_record_manager_load_state_dict_new_entry_not_added_if_other_entry_invalid() -> None:
+    manager = RecordManager()
+    with pytest.raises(ValueError, match=r"max_size must be a positive integer, got 0"):
+        manager.load_state_dict(
+            {
+                "loss": MinScalarRecord("loss").to_dict(),
+                "bad": {OBJECT_TARGET: "minrecord.Record", "name": "bad", "max_size": 0},
+            }
+        )
+    assert len(manager) == 0

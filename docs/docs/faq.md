@@ -154,7 +154,7 @@ If your comparator has some arguments, override `to_dict()` so the record can be
 RecordManager provides:
 
 - **Organized storage**: All records in one place
-- **Convenience methods**: `get_best_values()`
+- **Convenience methods**: `get_best_values()`, `get_last_values()`
 - **State management**: Save/load all records together
 
 ### Does RecordManager create records automatically?
@@ -263,7 +263,7 @@ for epoch in range(epochs):
 
 ```python
 import wandb
-from minrecord import RecordManager, get_last_values
+from minrecord import RecordManager
 
 wandb.init(project="my-project")
 manager = RecordManager()
@@ -277,7 +277,7 @@ for epoch in range(epochs):
     wandb.log(
         {
             "epoch": epoch,
-            **get_last_values(manager.get_records(), prefix="train/"),
+            **manager.get_last_values(prefix="train/"),
             **manager.get_best_values(prefix="best/"),
         }
     )
@@ -330,9 +330,7 @@ record = MinScalarRecord("loss", elements=elements)
 Use `get_last_values()` for all records:
 
 ```python
-from minrecord import get_last_values
-
-last_values = get_last_values(manager.get_records())  # All non-empty records
+last_values = manager.get_last_values()  # All non-empty records
 best_values = manager.get_best_values()  # Only comparable records
 ```
 

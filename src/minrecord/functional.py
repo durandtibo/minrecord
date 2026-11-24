@@ -4,17 +4,16 @@ from __future__ import annotations
 
 __all__ = ["get_best_values", "get_last_values"]
 
-import contextlib
 from typing import TYPE_CHECKING, Any
-
-from minrecord.base import BaseRecord, EmptyRecordError
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
 
+    from minrecord.base import BaseRecord
+
 
 def get_best_values(
-    records: Mapping[str, BaseRecord[Any]], prefix: str = "", suffix: str = ""
+    records: Mapping[str, BaseRecord[Any]], *, prefix: str = "", suffix: str = ""
 ) -> dict[str, Any]:
     r"""Get the best value of each record.
 
@@ -54,16 +53,15 @@ def get_best_values(
 
         ```
     """
-    values = {}
+    values: dict[str, Any] = {}
     for key, record in records.items():
-        if record.is_comparable():
-            with contextlib.suppress(EmptyRecordError):
-                values[f"{prefix}{key}{suffix}"] = record.get_best_value()
+        if record.is_comparable() and not record.is_empty():
+            values[f"{prefix}{key}{suffix}"] = record.get_best_value()
     return values
 
 
 def get_last_values(
-    records: Mapping[str, BaseRecord[Any]], prefix: str = "", suffix: str = ""
+    records: Mapping[str, BaseRecord[Any]], *, prefix: str = "", suffix: str = ""
 ) -> dict[str, Any]:
     r"""Get the last value of each record.
 
@@ -103,8 +101,8 @@ def get_last_values(
 
         ```
     """
-    values = {}
+    values: dict[str, Any] = {}
     for key, record in records.items():
-        with contextlib.suppress(EmptyRecordError):
+        if not record.is_empty():
             values[f"{prefix}{key}{suffix}"] = record.get_last_value()
     return values
