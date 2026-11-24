@@ -5,7 +5,7 @@ import logging
 
 from coola.equality import objects_are_equal
 
-from minrecord import BaseRecord, MinScalarRecord, Record
+from minrecord import BaseRecord, MinScalarComparator, MinScalarRecord, Record
 
 logger: logging.Logger = logging.getLogger(__name__)
 
@@ -13,7 +13,10 @@ logger: logging.Logger = logging.getLogger(__name__)
 def check_imports() -> None:
     logger.info("Checking imports...")
     objects_to_import = [
+        "minrecord.BaseComparator",
         "minrecord.BaseRecord",
+        "minrecord.MaxScalarComparator",
+        "minrecord.MinScalarComparator",
         "minrecord.Record",
         "minrecord.MaxScalarRecord",
         "minrecord.MinScalarRecord",
@@ -49,6 +52,7 @@ def check_comparable_record() -> None:
     assert record.get_most_recent() == ((1, 5.0), (2, 6.0))
     assert record.clone().equal(record)
     assert BaseRecord.from_dict(record.to_dict()).equal(record)
+    assert MinScalarComparator().is_better(new_value=float("nan"), old_value=1.0) is False
 
 
 def main() -> None:

@@ -108,6 +108,21 @@ record.add_value(1.4)
 record.has_improved()  # False (1.4 > 1.3)
 ```
 
+### What happens with NaN values?
+
+A NaN value is never better than another value, so it never becomes the best value when a number
+exists. A NaN best value is replaced by the first number. The first value of a record is always the
+best value, even if it is NaN.
+
+```python
+record = MinScalarRecord("loss")
+record.add_value(float("nan"))
+record.add_value(1.5)
+record.get_best_value()  # 1.5
+record.add_value(float("nan"))
+record.get_best_value()  # 1.5
+```
+
 ### Why does has_improved() return True for equal values?
 
 By design, equal values are considered improvements. This is useful when a metric plateaus at the
@@ -115,23 +130,22 @@ optimal value.
 
 ### Can I create custom comparators?
 
-Yes! Implement `BaseComparator`:
+Yes! Implement `BaseComparator`, it has only one abstract method. The first value of a record is
+always the best value, so a comparator does not need an initial value. A new value that is equal to
+the old value should be better, so a plateau counts as an improvement:
 
 ```python
 from minrecord.comparator import BaseComparator
 
 
 class MyComparator(BaseComparator[float]):
-    def equal(self, other: object) -> bool:
-        return isinstance(other, self.__class__)
-
-    def get_initial_best_value(self) -> float:
-        return 0.0  # Starting point
-
-    def is_better(self, old_value: float, new_value: float) -> bool:
+    def is_better(self, *, new_value: float, old_value: float) -> bool:
         # Define your comparison logic
-        return new_value > old_value
+        return new_value >= old_value
 ```
+
+If your comparator has some arguments, override `to_dict()` so the record can be saved and loaded
+(`{**super().to_dict(), "tolerance": self._tolerance}`).
 
 ## RecordManager Questions
 

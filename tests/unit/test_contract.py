@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from typing import Any
 
 import pytest
@@ -13,6 +14,7 @@ from minrecord import (
     MinScalarRecord,
     Record,
 )
+from tests.unit.helpers import ToleranceComparator
 
 
 class UnitRecord(Record[float]):
@@ -46,12 +48,14 @@ def create_record(cls: str) -> BaseRecord[Any]:
         return UnitRecord("loss", unit="ms", elements=ELEMENTS, max_size=3)
     if cls == "ComparableRecord":
         return ComparableRecord("loss", MaxScalarComparator(), elements=ELEMENTS, max_size=3)
+    if cls == "ToleranceRecord":
+        return ComparableRecord("loss", ToleranceComparator(0.5), elements=ELEMENTS, max_size=3)
     if cls == "MaxScalarRecord":
         return MaxScalarRecord("loss", elements=ELEMENTS, max_size=3)
     return MinScalarRecord("loss", elements=ELEMENTS, max_size=3)
 
 
-COMPARABLE_RECORDS = ["ComparableRecord", "MaxScalarRecord", "MinScalarRecord"]
+COMPARABLE_RECORDS = ["ComparableRecord", "ToleranceRecord", "MaxScalarRecord", "MinScalarRecord"]
 RECORDS = ["Record", "UnitRecord", *COMPARABLE_RECORDS]
 
 
@@ -119,6 +123,14 @@ def test_contract_to_dict_contains_the_recent_values(record: BaseRecord[Any]) ->
     assert record.to_dict()["elements"] == ((2, 1.0), (3, 7.0), (4, 3.0))
 
 
+def test_contract_to_dict_is_json_serializable(record: BaseRecord[Any]) -> None:
+    assert isinstance(json.dumps(record.to_dict()), str)
+
+
+def test_contract_json_round_trip_is_equal(record: BaseRecord[Any]) -> None:
+    assert BaseRecord.from_dict(json.loads(json.dumps(record.to_dict()))).equal(record)
+
+
 def test_contract_to_dict_does_not_change_record(record: BaseRecord[Any]) -> None:
     before = record.get_most_recent()
     record.to_dict()
@@ -154,6 +166,7 @@ def test_contract_load_dict_invalid_leaves_record_unchanged(record: BaseRecord[A
         ("Record", "UnitRecord"),
         ("UnitRecord", "Record"),
         ("ComparableRecord", "Record"),
+        ("ToleranceRecord", "Record"),
         ("MaxScalarRecord", "MinScalarRecord"),
         ("MinScalarRecord", "MaxScalarRecord"),
     ],
