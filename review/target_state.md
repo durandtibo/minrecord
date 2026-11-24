@@ -334,6 +334,8 @@ tracking document it touches (this file included).
 | 2    | **Fail early.** The first value goes through the comparator (section 4.1), the regression tests that fail on `main` (`None`, `"a"`, `10**400` as first value leave the record empty), the contract test over the comparators with a value that cannot be compared, the property row.            | N1       | yes (behaviour)                   |
 | 3    | **Contract enforced and readable.** `@final` on the five methods, `BaseComparator.__repr__`, NaN-aware `BaseComparator.equal`, `_check_pair` for a tuple or a list of length 2, with their tests and the property rows. One PR: each is a few lines.                                         | N3, N4, N7, N8 | yes (`@final`, `best`)       |
 
+Status: step 1 is in #547, step 2 in #548 and step 3 in #549 (stacked PRs, not merged yet).
+
 Steps 1 to 3 can be reviewed in any order. Step 2 is the only change of observable behaviour for a
 user who does not subclass; it should be released with the notes of the first-value rule. Step 3 is
 small and breaks only the code that overrides a final method or passes a non-pair `best`.

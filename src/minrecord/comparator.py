@@ -12,6 +12,7 @@ from abc import ABC, abstractmethod
 from math import isnan
 from typing import Any, Generic, TypeVar
 
+from coola.equality import objects_are_equal
 from coola.equality.tester import EqualEqualityTester, get_default_registry
 from coola.factory import OBJECT_TARGET
 from coola.utils.introspection import get_qualified_class_name
@@ -71,6 +72,10 @@ class BaseComparator(ABC, Generic[T]):
             ```
         """
 
+    def __repr__(self) -> str:
+        args = ", ".join(f"{k}={v!r}" for k, v in self.to_dict().items() if k != OBJECT_TARGET)
+        return f"{type(self).__qualname__}({args})"
+
     def to_dict(self) -> dict[str, Any]:
         r"""Export the comparator to a dictionary.
 
@@ -97,7 +102,7 @@ class BaseComparator(ABC, Generic[T]):
         r"""Indicate if two comparators are equal or not.
 
         Two comparators are equal if they have the same type and the
-        same ``to_dict`` output.
+        same ``to_dict`` output. A NaN value is equal to a NaN value.
 
         Args:
             other: The other object to compare with.
@@ -116,7 +121,9 @@ class BaseComparator(ABC, Generic[T]):
 
             ```
         """
-        return type(other) is type(self) and self.to_dict() == other.to_dict()
+        return type(other) is type(self) and objects_are_equal(
+            self.to_dict(), other.to_dict(), equal_nan=True
+        )
 
 
 class MaxScalarComparator(BaseComparator[float]):
