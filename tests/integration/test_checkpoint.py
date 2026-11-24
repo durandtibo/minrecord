@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from typing import Any
 
+from coola.equality import objects_are_equal
 from coola.factory import OBJECT_TARGET
 
 from minrecord import (
@@ -32,6 +33,13 @@ def test_state_dict_json_round_trip() -> None:
     new_manager = RecordManager()
     new_manager.load_state_dict(json.loads(json.dumps(manager.state_dict())))
     assert new_manager.state_dict() == manager.state_dict()
+
+
+def test_state_dict_json_round_trip_objects_are_equal() -> None:
+    manager = create_manager()
+    new_manager = RecordManager()
+    new_manager.load_state_dict(json.loads(json.dumps(manager.state_dict())))
+    assert objects_are_equal(new_manager, manager)
 
 
 def test_state_dict_json_round_trip_best_values() -> None:
@@ -112,3 +120,10 @@ def test_state_dict_json_round_trip_custom_comparator_type() -> None:
         OBJECT_TARGET: f"{__name__}.ToleranceComparator",
         "tolerance": 0.05,
     }
+
+
+def test_state_dict_json_round_trip_custom_comparator_objects_are_equal() -> None:
+    manager = create_custom_manager()
+    new_manager = RecordManager()
+    new_manager.load_state_dict(json.loads(json.dumps(manager.state_dict())))
+    assert objects_are_equal(new_manager, manager)

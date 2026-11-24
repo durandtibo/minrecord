@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any
+
 import pytest
 
 from minrecord import (
@@ -43,6 +45,23 @@ def test_get_best_values_suffix(records: dict[str, BaseRecord]) -> None:
     assert get_best_values(records, suffix="/best") == {"loss/best": 1.2, "accuracy/best": 42}
 
 
+def test_get_best_values_positional_prefix(records: dict[str, BaseRecord]) -> None:
+    get_best_values_function: Any = get_best_values
+    with pytest.raises(TypeError, match=r"takes 1 positional argument but 2 were given"):
+        get_best_values_function(records, "best/")
+
+
+def test_get_best_values_prefix_suffix(records: dict[str, BaseRecord]) -> None:
+    assert get_best_values(records, prefix="a/", suffix="/b") == {
+        "a/loss/b": 1.2,
+        "a/accuracy/b": 42,
+    }
+
+
+def test_get_best_values_skips_empty_and_not_comparable(records: dict[str, BaseRecord]) -> None:
+    assert set(get_best_values(records)) == {"loss", "accuracy"}
+
+
 def test_get_best_values_empty() -> None:
     assert get_best_values({}) == {}
 
@@ -70,6 +89,24 @@ def test_get_last_values_suffix(records: dict[str, BaseRecord]) -> None:
         "accuracy/last": 35,
         "epoch/last": 1,
     }
+
+
+def test_get_last_values_positional_prefix(records: dict[str, BaseRecord]) -> None:
+    get_last_values_function: Any = get_last_values
+    with pytest.raises(TypeError, match=r"takes 1 positional argument but 2 were given"):
+        get_last_values_function(records, "last/")
+
+
+def test_get_last_values_prefix_suffix(records: dict[str, BaseRecord]) -> None:
+    assert get_last_values(records, prefix="a/", suffix="/b") == {
+        "a/loss/b": 1.2,
+        "a/accuracy/b": 35,
+        "a/epoch/b": 1,
+    }
+
+
+def test_get_last_values_skips_empty_records(records: dict[str, BaseRecord]) -> None:
+    assert "f1" not in get_last_values(records)
 
 
 def test_get_last_values_empty() -> None:
