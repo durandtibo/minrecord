@@ -8,7 +8,8 @@ from minrecord.utils.validation import check_max_size
 
 DEFAULT_MAX_SIZE = 10
 
-_MAX_SIZE = DEFAULT_MAX_SIZE
+# A mutable module value: it is changed in place, so no ``global`` statement is needed.
+_DEFAULTS: dict[str, int] = {"max_size": DEFAULT_MAX_SIZE}
 
 
 def get_max_size() -> int:
@@ -29,7 +30,7 @@ def get_max_size() -> int:
 
         ```
     """
-    return _MAX_SIZE
+    return _DEFAULTS["max_size"]
 
 
 def set_max_size(max_size: int) -> None:
@@ -58,8 +59,7 @@ def set_max_size(max_size: int) -> None:
 
         ```
     """
-    global _MAX_SIZE  # noqa: PLW0603
-    _MAX_SIZE = check_max_size(max_size)
+    _DEFAULTS["max_size"] = check_max_size(max_size)
 
 
 def reset_max_size() -> None:
@@ -77,5 +77,4 @@ def reset_max_size() -> None:
 
         ```
     """
-    global _MAX_SIZE  # noqa: PLW0603
-    _MAX_SIZE = DEFAULT_MAX_SIZE
+    _DEFAULTS["max_size"] = DEFAULT_MAX_SIZE

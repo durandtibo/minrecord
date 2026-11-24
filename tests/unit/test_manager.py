@@ -444,6 +444,50 @@ def test_record_manager_load_state_dict_keeps_other_records() -> None:
     assert manager.has_record("accuracy")
 
 
+def test_record_manager_load_state_dict_keeps_other_records_unchanged() -> None:
+    manager = create_manager_with_values()
+    expected = manager.get_record("accuracy").clone()
+    manager.load_state_dict({"new": Record("new").to_dict()})
+    assert manager.get_record("accuracy").equal(expected)
+
+
+def test_record_manager_load_state_dict_merge_keys() -> None:
+    manager = create_manager_with_values()
+    manager.load_state_dict({"new": Record("new").to_dict()})
+    assert list(manager.get_records()) == ["loss", "accuracy", "epoch", "f1", "new"]
+
+
+def test_record_manager_load_state_dict_known_key_same_object_after_error() -> None:
+    manager = create_manager_with_values()
+    record = manager.get_record("loss")
+    with pytest.raises(TypeError, match=r"Cannot load the data of a"):
+        manager.load_state_dict({"loss": Record("loss").to_dict()})
+    assert manager.get_record("loss") is record
+
+
+def test_record_manager_load_state_dict_other_callable_raises() -> None:
+    manager = create_manager_with_values()
+    with pytest.raises(TypeError, match=r"The configuration 'collections.OrderedDict' is not"):
+        manager.load_state_dict({"new": {OBJECT_TARGET: "collections.OrderedDict"}})
+    assert manager.equal(create_manager_with_values())
+
+
+def test_record_manager_load_state_dict_message_has_the_two_types() -> None:
+    manager = create_manager_with_values()
+    with pytest.raises(
+        TypeError, match=r"Cannot load the data of a Record record in a MinScalarRecord record"
+    ):
+        manager.load_state_dict({"loss": Record("loss").to_dict()})
+
+
+def test_record_manager_load_state_dict_known_key_with_nan() -> None:
+    manager = create_manager_with_values()
+    manager.load_state_dict(
+        {"loss": MinScalarRecord("loss", elements=[(0, 1.0), (1, NAN)]).to_dict()}
+    )
+    assert manager.get_record("loss").equal(MinScalarRecord("loss", elements=[(0, 1.0), (1, NAN)]))
+
+
 def test_record_manager_load_state_dict_does_not_modify_state() -> None:
     state = create_manager_with_values().state_dict()
     expected = create_manager_with_values().state_dict()

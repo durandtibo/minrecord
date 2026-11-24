@@ -301,8 +301,10 @@ new_manager.load_state_dict(manager_state)
 ```
 
 The state of a manager is a dict of records dicts, so it can be written to JSON. `load_state_dict`
-loads the data of a known key in the existing record (the objects that you hold are updated),
-creates the records of the new keys, and does not change the manager if one entry is invalid. Two
+merges the state into the manager: the data of a known key is loaded in the existing record (the
+objects that you hold are updated), the records of the new keys are created, and a record of the
+manager that the state does not mention is kept. It does not change the manager if one entry is
+invalid (the entries are built and checked first, then loaded). Two
 managers can be compared with `manager1.equal(manager2)` or `coola.equality.objects_are_equal`.
 
 The dict is not compatible with the one of the versions before 0.4.0 (`{"config": ..., "state": ...}`),
