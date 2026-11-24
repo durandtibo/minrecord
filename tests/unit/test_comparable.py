@@ -542,3 +542,124 @@ def test_min_scalar_record_init_max_size_default_not_changed_for_existing_record
 def test_min_scalar_record_init_max_size_explicit_overrides_default() -> None:
     set_max_size(3)
     assert MinScalarRecord("loss", max_size=7).max_size == 7
+
+
+#################################################
+#     Tests for clone of the scalar records     #
+#################################################
+
+
+def test_max_scalar_record_clone_equal() -> None:
+    record = MaxScalarRecord("loss")
+    record.add_value(1.0, step=0)
+    record.add_value(3.0, step=1)
+    assert record.clone().equal(record)
+
+
+def test_max_scalar_record_clone_type() -> None:
+    assert type(MaxScalarRecord("loss").clone()) is MaxScalarRecord
+
+
+def test_max_scalar_record_clone_is_new_object() -> None:
+    record = MaxScalarRecord("loss")
+    assert record.clone() is not record
+
+
+def test_max_scalar_record_clone_best_value() -> None:
+    record = MaxScalarRecord("loss")
+    record.add_value(1.0, step=0)
+    record.add_value(3.0, step=1)
+    assert record.clone().get_best_value() == 3.0
+
+
+def test_max_scalar_record_clone_has_improved() -> None:
+    record = MaxScalarRecord("loss")
+    record.add_value(1.0, step=0)
+    record.add_value(3.0, step=1)
+    assert record.clone().has_improved() is True
+
+
+def test_max_scalar_record_clone_max_size() -> None:
+    assert MaxScalarRecord("loss", max_size=3).clone().max_size == 3
+
+
+def test_max_scalar_record_clone_best_value_outside_window() -> None:
+    record = MaxScalarRecord("loss", max_size=1)
+    record.add_value(1.0)
+    record.add_value(3.0)
+    assert record.clone().get_best_value() == 3.0
+
+
+def test_max_scalar_record_clone_zero_best_value() -> None:
+    record = MaxScalarRecord("loss")
+    record.add_value(0.0)
+    assert record.clone().get_best_value() == 0.0
+
+
+def test_max_scalar_record_clone_is_independent() -> None:
+    record = MaxScalarRecord("loss")
+    record.add_value(1.0, step=0)
+    record.clone().add_value(5.0)
+    assert record.get_most_recent() == ((0, 1.0),)
+
+
+def test_max_scalar_record_clone_empty() -> None:
+    assert MaxScalarRecord("loss").clone().is_empty()
+
+
+def test_min_scalar_record_clone_equal() -> None:
+    record = MinScalarRecord("loss")
+    record.add_value(3.0, step=0)
+    record.add_value(1.0, step=1)
+    assert record.clone().equal(record)
+
+
+def test_min_scalar_record_clone_type() -> None:
+    assert type(MinScalarRecord("loss").clone()) is MinScalarRecord
+
+
+def test_min_scalar_record_clone_is_new_object() -> None:
+    record = MinScalarRecord("loss")
+    assert record.clone() is not record
+
+
+def test_min_scalar_record_clone_best_value() -> None:
+    record = MinScalarRecord("loss")
+    record.add_value(3.0, step=0)
+    record.add_value(1.0, step=1)
+    assert record.clone().get_best_value() == 1.0
+
+
+def test_min_scalar_record_clone_has_improved() -> None:
+    record = MinScalarRecord("loss")
+    record.add_value(3.0, step=0)
+    record.add_value(1.0, step=1)
+    assert record.clone().has_improved() is True
+
+
+def test_min_scalar_record_clone_max_size() -> None:
+    assert MinScalarRecord("loss", max_size=3).clone().max_size == 3
+
+
+def test_min_scalar_record_clone_best_value_outside_window() -> None:
+    record = MinScalarRecord("loss", max_size=1)
+    record.add_value(3.0)
+    record.add_value(1.0)
+    assert record.clone().get_best_value() == 1.0
+
+
+def test_min_scalar_record_clone_zero_best_value() -> None:
+    record = MinScalarRecord("loss")
+    record.add_value(0.0)
+    assert record.clone().get_best_value() == 0.0
+
+
+def test_min_scalar_record_clone_is_independent() -> None:
+    record = MinScalarRecord("loss")
+    record.add_value(3.0, step=0)
+    record.clone().add_value(0.5)
+    assert record.get_most_recent() == ((0, 3.0),)
+
+
+def test_min_scalar_record_clone_empty() -> None:
+    assert MinScalarRecord("loss").clone().is_empty()
