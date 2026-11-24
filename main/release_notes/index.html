@@ -1202,8 +1202,14 @@ compatibility layer.</p>
 <li><code>BaseComparator</code> has a <code>repr</code> built from <code>to_dict</code> (<code>ToleranceComparator(tolerance=0.1)</code>), so
   <code>str(record)</code> no longer contains a memory address.</li>
 <li><code>equal</code> requires the same type.</li>
-<li><code>equal</code> of the records and of the manager treats NaN as equal to NaN, so a record that holds a NaN
-  is equal to its copy after a JSON round trip.</li>
+<li>
+<p><code>equal</code> of the records and of the manager treats NaN as equal to NaN, so a record that holds a NaN
+  is equal to its copy after a JSON round trip.</p>
+</li>
+<li>
+<p><code>Record(name)</code> raises <code>TypeError</code> if <code>name</code> is not a <code>str</code> (<code>None</code> and <code>3</code> were accepted, and a
+  <code>None</code> name became the key <code>"null"</code> after a JSON round trip).</p>
+</li>
 </ul>
 <p>Comparators:</p>
 <ul>
@@ -1242,6 +1248,11 @@ compatibility layer.</p>
 </ul>
 <h3 id="fixes">Fixes<a class="headerlink" href="#fixes" title="Permanent link">&para;</a></h3>
 <ul>
+<li><code>max_size</code> larger than <code>sys.maxsize</code> raises <code>ValueError</code> (it was an <code>OverflowError</code>, and
+  <code>set_max_size(2**63)</code> succeeded and made every later <code>Record("a")</code> raise).</li>
+<li>A configuration that is not a dict (<code>BaseRecord.from_dict(None)</code>, <code>record.load_dict([])</code>,
+  <code>manager.load_state_dict({"a": None})</code>, <code>ComparableRecord("x", MinScalarComparator)</code>) raises
+  <code>TypeError</code> (it was <code>AttributeError</code>).</li>
 <li><code>set_max_size</code> changes the maximum size of the records created after the call. The default was
   evaluated at import.</li>
 <li><code>clone()</code> works for <code>MaxScalarRecord</code> and <code>MinScalarRecord</code>.</li>
@@ -1269,7 +1280,7 @@ compatibility layer.</p>
 <li><code>RecordManager.get_last_values</code> and <code>RecordManager.equal</code> (the managers work with
   <code>coola.equality.objects_are_equal</code>).</li>
 <li><code>reset_max_size</code> is exported at the root of the package.</li>
-<li><code>minrecord.utils.validation.check_max_size</code>.</li>
+<li><code>minrecord.utils.validation.check_max_size</code> and <code>check_name</code>.</li>
 <li><code>get_best_step()</code> returns the step of the best value of a comparable record (the latest step among
   the ties), also if the pair is not in the recent values anymore. It raises <code>EmptyRecordError</code> for an
   empty record and <code>NotAComparableRecordError</code> for a record that cannot compare. The code that

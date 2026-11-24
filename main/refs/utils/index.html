@@ -1003,6 +1003,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#minrecord.utils.validation.check_name" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        check_name
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1131,6 +1142,17 @@
     <span class="md-ellipsis">
       
         check_max_size
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.utils.validation.check_name" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        check_name
       
     </span>
   </a>
@@ -1351,8 +1373,8 @@ output of <code>to_dict</code>. It is not modified.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>if <code>config</code> is not a configuration of <code>cls</code>
-(the key <code>_target_</code> is missing, or it names an object
+                <p>if <code>config</code> is not a <code>dict</code>, or if it is not a
+configuration of <code>cls</code> (the key <code>_target_</code> is missing, or it names an object
 that is not <code>cls</code> or a subclass of <code>cls</code>).</p>
               </div>
             </td>
@@ -1467,7 +1489,9 @@ imported.</p>
             <td>
               <div class="doc-md-description">
                 <p>The maximum size to check. It must be a positive
-integer (a <code>bool</code> is not accepted).</p>
+integer (a <code>bool</code> is not accepted) that is at most
+<code>sys.maxsize</code>, the largest size that a <code>deque</code> can
+hold.</p>
               </div>
             </td>
             <td>
@@ -1516,7 +1540,8 @@ integer (a <code>bool</code> is not accepted).</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If <code>max_size</code> is not a positive integer.</p>
+                <p>If <code>max_size</code> is not a positive integer, or if
+it is larger than <code>sys.maxsize</code>.</p>
               </div>
             </td>
           </tr>
@@ -1529,6 +1554,112 @@ integer (a <code>bool</code> is not accepted).</p>
   <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">minrecord.utils.validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">check_max_size</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">check_max_size</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
 <span class="go">5</span>
+</code></pre></div>
+</details>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="minrecord.utils.validation.check_name" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">minrecord.utils.validation.check_name</span>
+
+
+<a href="#minrecord.utils.validation.check_name" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">check_name</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="n"><span title="typing.Any">Any</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="str">str</span></span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Check that the name of a record is valid.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>name</code>
+            </td>
+            <td>
+                  <code><span title="typing.Any">Any</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The name to check. It must be a <code>str</code>. An empty string
+is valid.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The name.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="TypeError">TypeError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If <code>name</code> is not a <code>str</code>.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<details class="example" open>
+  <summary>Example</summary>
+  <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">minrecord.utils.validation</span><span class="w"> </span><span class="kn">import</span> <span class="n">check_name</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">check_name</span><span class="p">(</span><span class="s2">"loss"</span><span class="p">)</span>
+<span class="go">'loss'</span>
 </code></pre></div>
 </details>
 

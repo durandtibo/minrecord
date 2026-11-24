@@ -1659,7 +1659,7 @@ with comparison logic:</p>
 <tbody>
 <tr>
 <td>Bounded memory</td>
-<td>A record keeps at most <code>max_size</code> pairs <code>(step, value)</code>. The oldest pair is dropped first. Adding a value is O(1).</td>
+<td>A record keeps at most <code>max_size</code> pairs <code>(step, value)</code>, with <code>1 &lt;= max_size &lt;= sys.maxsize</code>. The oldest pair is dropped first. Adding a value is O(1).</td>
 </tr>
 <tr>
 <td>Best is never lost</td>
@@ -1691,11 +1691,11 @@ with comparison logic:</p>
 </tr>
 <tr>
 <td>Safe to load</td>
-<td><code>from_dict</code> and the comparator dict only build objects of the expected type (a record, a comparator): a dict that names any other importable callable raises <code>TypeError</code> before it is called. <code>MinScalarRecord.from_dict(d)</code> only accepts the dict of a <code>MinScalarRecord</code>.</td>
+<td><code>from_dict</code> and the comparator dict only build objects of the expected type (a record, a comparator): a dict that names any other importable callable raises <code>TypeError</code> before it is called, and so does anything that is not a dict. <code>MinScalarRecord.from_dict(d)</code> only accepts the dict of a <code>MinScalarRecord</code>.</td>
 </tr>
 <tr>
 <td>Fails early</td>
-<td>A value that the comparator cannot compare (<code>None</code>, a string, ...) is rejected by the <code>add_value</code> that receives it, and never stored: the first value is compared with itself. A record is never left in a state where every later <code>add_value</code> raises.</td>
+<td>A value that the comparator cannot compare (<code>None</code>, a string, ...) is rejected by the <code>add_value</code> that receives it, and never stored: the first value is compared with itself. A record is never left in a state where every later <code>add_value</code> raises. A <code>max_size</code> that a deque cannot hold and a <code>name</code> that is not a <code>str</code> are rejected by the call that receives them.</td>
 </tr>
 <tr>
 <td>Atomic</td>
@@ -1703,11 +1703,11 @@ with comparison logic:</p>
 </tr>
 <tr>
 <td>Typed errors</td>
-<td><code>EmptyRecordError</code> for a value asked from an empty record (<code>get_last_value</code>, <code>get_best_value</code>, <code>get_best_step</code>, <code>has_improved</code>), <code>NotAComparableRecordError</code> for a best value asked from a record that cannot compare, <code>ValueError</code> for an invalid <code>max_size</code>, <code>TypeError</code> for a dict of the wrong type.</td>
+<td><code>EmptyRecordError</code> for a value asked from an empty record (<code>get_last_value</code>, <code>get_best_value</code>, <code>get_best_step</code>, <code>has_improved</code>), <code>NotAComparableRecordError</code> for a best value asked from a record that cannot compare, <code>ValueError</code> for an invalid <code>max_size</code>, <code>TypeError</code> for a <code>name</code> that is not a <code>str</code> and for a dict or a comparator of the wrong type.</td>
 </tr>
 <tr>
 <td>No hidden global</td>
-<td>The default <code>max_size</code> is read when a record is <strong>created</strong>. It is the only global setting (<code>get_max_size</code>, <code>set_max_size</code>, <code>reset_max_size</code>).</td>
+<td>The default <code>max_size</code> is read when a record is <strong>created</strong>. It is the only global setting (<code>get_max_size</code>, <code>set_max_size</code>, <code>reset_max_size</code>), and it only accepts values that a record can use.</td>
 </tr>
 <tr>
 <td>Contract is enforced</td>
