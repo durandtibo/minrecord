@@ -2259,10 +2259,10 @@ numeric <code>step</code>.</p>
 <h3 id="how-many-records-can-i-have">How many records can I have?<a class="headerlink" href="#how-many-records-can-i-have" title="Permanent link">&para;</a></h3>
 <p>There's no hard limit. Each record has minimal overhead. With max_size=10:</p>
 <ul>
-<li>Memory per record: about 1 KB when empty, and about 3 KB for a <code>MinScalarRecord</code> that holds 10
+<li>Memory per record: about 1 KB when empty, and about 2 KB for a <code>MinScalarRecord</code> that holds 10
   <code>(step, float)</code> pairs (measured with <code>tracemalloc</code> on Python 3.14; it depends on the Python
   version and on the values)</li>
-<li>1000 records with 10 scalars each: about 3 MB</li>
+<li>1000 records with 10 scalars each: about 2 MB</li>
 </ul>
 <h3 id="is-minrecord-thread-safe">Is minrecord thread-safe?<a class="headerlink" href="#is-minrecord-thread-safe" title="Permanent link">&para;</a></h3>
 <p>No, records and managers are not thread-safe. If using multiple threads:</p>

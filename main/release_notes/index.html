@@ -1311,6 +1311,9 @@ compatibility layer. The <a href="../design/">design page</a> explains the curre
 <li>A configuration that is not a dict raises <code>TypeError</code> (it was <code>AttributeError</code>).</li>
 <li><code>has_improved()</code> of a rebuilt record (<code>from_dict</code>, <code>clone</code>) is the one of the original, also when
   its first value is NaN.</li>
+<li>The documentation says what <code>step</code> is (<code>float | None</code>, not checked at run time) and the memory
+  figures of the FAQ are the measured ones. <code>minrecord.__version__</code> is read by a tested function, so
+  <code>src</code> has no <code>pragma: no cover</code>.</li>
 </ul>
 <h3 id="new">New<a class="headerlink" href="#new" title="Permanent link">&para;</a></h3>
 <ul>

@@ -2506,7 +2506,10 @@ thread-safe.</p>
             <td>
               <div class="doc-md-description">
                 <p>The step value to record. <code>None</code> means there is no
-step to track.</p>
+step to track. The type of a step is <code>float | None</code>:
+it is not checked at run time, so a label works but a
+type checker rejects it, and <code>get_best_step</code> (early
+stopping) needs a number.</p>
               </div>
             </td>
             <td>

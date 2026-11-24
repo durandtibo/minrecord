@@ -1581,8 +1581,9 @@ not affect the existing records.</p>
   a lock.</li>
 <li><strong>Values are stored by reference.</strong> <code>add_value</code> does not copy the value, and <code>to_dict</code> and <code>clone</code>
   share the value objects with the original. Store scalars or immutable objects.</li>
-<li><strong>Order of the steps.</strong> <code>step</code> is a label: it is not checked to increase, nor to be a number.
-  Early stopping with <code>get_best_step</code> needs a numeric step.</li>
+<li><strong>The <code>step</code>.</strong> Its type is <code>float | None</code>, so a type checker rejects a label such as <code>"epoch1"</code>,
+  but nothing checks it at run time: it is not checked to increase, nor to be a number. Early
+  stopping with <code>get_best_step</code> needs a numeric step.</li>
 <li><strong><code>==</code> and <code>hash</code>.</strong> A record, a comparator and a manager have no <code>__eq__</code>, so <code>==</code> is the identity:
   <code>MinScalarRecord("a") == MinScalarRecord("a")</code> is <code>False</code>. Use <code>coola.equality.objects_are_equal</code>.</li>
 <li><strong>Truthiness.</strong> <code>Record</code> and <code>RecordManager</code> define <code>__len__</code>, so an empty one is falsy: write
