@@ -631,6 +631,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#properties" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Properties
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#common-patterns" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -876,6 +887,34 @@
     
   
     Frequently Asked Questions (FAQ)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../release_notes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Release notes
   
 
     
@@ -1311,6 +1350,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#properties" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Properties
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#common-patterns" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1597,6 +1647,72 @@ with comparison logic:</p>
 <li>Best values are tracked separately and never lost</li>
 <li>Recent values are usually sufficient for monitoring</li>
 </ul>
+<h2 id="properties">Properties<a class="headerlink" href="#properties" title="Permanent link">&para;</a></h2>
+<p>These properties are guaranteed by the base classes, so every record has them.</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Statement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Bounded memory</td>
+<td>A record keeps at most <code>max_size</code> pairs <code>(step, value)</code>. The oldest pair is dropped first. Adding a value is O(1).</td>
+</tr>
+<tr>
+<td>Best is never lost</td>
+<td>The best pair <code>(step, value)</code> of a comparable record is stored apart from the recent values: it survives the eviction of the pair that produced it, <code>clone</code> and <code>to_dict</code>/<code>from_dict</code>.</td>
+</tr>
+<tr>
+<td>No sentinel</td>
+<td>The best pair is <code>None</code> until a value is added. The first value is then the best value and an improvement. No <code>inf</code> or <code>-inf</code> is stored or returned.</td>
+</tr>
+<tr>
+<td>Ties improve</td>
+<td>A value equal to the best value counts as an improvement. It is useful when a metric plateaus at its optimum.</td>
+</tr>
+<tr>
+<td>NaN never wins</td>
+<td>A NaN value is never better than another value. A NaN best value is replaced by the first number.</td>
+</tr>
+<tr>
+<td>One snapshot</td>
+<td><code>to_dict()</code> returns the arguments of the constructor, content included (the recent values as <code>elements</code>, the best pair as <code>best</code>). <code>improved</code> is derived from the values, it is not stored.</td>
+</tr>
+<tr>
+<td>Round trip</td>
+<td><code>BaseRecord.from_dict(r.to_dict()).equal(r)</code>, <code>r.clone().equal(r)</code>, and <code>r.load_dict(r2.to_dict())</code> makes <code>r</code> equal to <code>r2</code>. A clone is independent: adding values to it does not change <code>r</code>.</td>
+</tr>
+<tr>
+<td>Atomic</td>
+<td>An operation that raises (a comparator that fails, an invalid dict given to <code>load_dict</code> or to the manager <code>load_state_dict</code>) leaves the record, or the manager, as it was.</td>
+</tr>
+<tr>
+<td>Typed errors</td>
+<td><code>EmptyRecordError</code> for a value asked from an empty record, <code>NotAComparableRecordError</code> for a best value asked from a record that cannot compare, <code>ValueError</code> for an invalid <code>max_size</code>.</td>
+</tr>
+<tr>
+<td>No hidden global</td>
+<td>The default <code>max_size</code> is read when a record is <strong>created</strong>. It is the only global setting (<code>get_max_size</code>, <code>set_max_size</code>, <code>reset_max_size</code>).</td>
+</tr>
+<tr>
+<td>Extensible</td>
+<td>A new record type implements the 6 abstract members of <code>BaseRecord</code>. A new notion of "better" implements the one method <code>BaseComparator.is_better</code>. No registry is needed.</td>
+</tr>
+</tbody>
+</table>
+<p>Not guaranteed:</p>
+<ul>
+<li><strong>Thread safety.</strong> A record and a manager are not thread-safe. Use one record per thread or a
+  lock.</li>
+<li><strong>Values are stored by reference.</strong> <code>add_value</code> does not copy the value, and <code>to_dict</code> and <code>clone</code>
+  share the value objects between the copies. Store scalars or immutable objects.</li>
+<li><strong>Order of the <code>step</code> values.</strong> <code>step</code> is a label, it is not checked to increase.</li>
+<li><strong>Truthiness.</strong> <code>Record</code> defines <code>__len__</code>, so an empty record is falsy: write
+  <code>record.is_empty()</code>, not <code>if record:</code>.</li>
+</ul>
 <h2 id="common-patterns">Common Patterns<a class="headerlink" href="#common-patterns" title="Permanent link">&para;</a></h2>
 <h3 id="pattern-1-basic-training-loop">Pattern 1: Basic Training Loop<a class="headerlink" href="#pattern-1-basic-training-loop" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">minrecord</span><span class="w"> </span><span class="kn">import</span> <span class="n">MinScalarRecord</span><span class="p">,</span> <span class="n">MaxScalarRecord</span>
@@ -1670,6 +1786,9 @@ with comparison logic:</p>
 <span class="n">record</span> <span class="o">=</span> <span class="n">ComparableRecord</span><span class="p">(</span><span class="s2">"f1_components"</span><span class="p">,</span> <span class="n">F1Comparator</span><span class="p">())</span>
 <span class="n">record</span><span class="o">.</span><span class="n">add_value</span><span class="p">((</span><span class="n">precision</span><span class="p">,</span> <span class="n">recall</span><span class="p">))</span>
 </code></pre></div>
+<p>A comparator only implements <code>is_better</code>. The first value of a record is the best value, so the
+comparator does not need an initial value. If the comparator has some arguments, override <code>to_dict</code>
+so the record can be saved and loaded: <code>{**super().to_dict(), "tolerance": self._tolerance}</code>.</p>
 <h2 id="performance-considerations">Performance Considerations<a class="headerlink" href="#performance-considerations" title="Permanent link">&para;</a></h2>
 <h3 id="memory-usage">Memory Usage<a class="headerlink" href="#memory-usage" title="Permanent link">&para;</a></h3>
 <ul>
@@ -1717,7 +1836,7 @@ with comparison logic:</p>
 </code></pre></div>
 <h3 id="logging-integration">Logging Integration<a class="headerlink" href="#logging-integration" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">wandb</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">minrecord</span><span class="w"> </span><span class="kn">import</span> <span class="n">RecordManager</span><span class="p">,</span> <span class="n">get_last_values</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">minrecord</span><span class="w"> </span><span class="kn">import</span> <span class="n">RecordManager</span>
 
 <span class="n">manager</span> <span class="o">=</span> <span class="n">RecordManager</span><span class="p">()</span>
 <span class="c1"># ... add records ...</span>
@@ -1732,25 +1851,35 @@ with comparison logic:</p>
     <span class="n">wandb</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
         <span class="p">{</span>
             <span class="s2">"epoch"</span><span class="p">:</span> <span class="n">epoch</span><span class="p">,</span>
-            <span class="o">**</span><span class="n">get_last_values</span><span class="p">(</span><span class="n">manager</span><span class="o">.</span><span class="n">get_records</span><span class="p">(),</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">"current/"</span><span class="p">),</span>
+            <span class="o">**</span><span class="n">manager</span><span class="o">.</span><span class="n">get_last_values</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">"current/"</span><span class="p">),</span>
             <span class="o">**</span><span class="n">manager</span><span class="o">.</span><span class="n">get_best_values</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">"best/"</span><span class="p">),</span>
         <span class="p">}</span>
     <span class="p">)</span>
 </code></pre></div>
 <h2 id="state-management">State Management<a class="headerlink" href="#state-management" title="Permanent link">&para;</a></h2>
-<p>Records support serialization for checkpointing:</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Save state</span>
-<span class="n">state</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
-<span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="s2">"record_state.pt"</span><span class="p">)</span>
-
-<span class="c1"># Load state in a new record</span>
-<span class="n">state</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">"record_state.pt"</span><span class="p">)</span>
-<span class="n">record</span> <span class="o">=</span> <span class="n">BaseRecord</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
-
-<span class="c1"># Or load state in place (the record is not changed if the state is invalid)</span>
-<span class="n">record</span><span class="o">.</span><span class="n">load_dict</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+<p>A record is saved with <code>to_dict()</code>: it is one flat dict with the arguments of the constructor (the
+full name of the class, the name, <code>max_size</code>, the recent values as <code>elements</code> and, for a comparable
+record, the <code>comparator</code> and the best pair as <code>best</code>). The dict can be written to JSON, if the
+values are numbers or strings.</p>
+<div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">minrecord</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseRecord</span><span class="p">,</span> <span class="n">MinScalarRecord</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span> <span class="o">=</span> <span class="n">MinScalarRecord</span><span class="p">(</span><span class="s2">"loss"</span><span class="p">,</span> <span class="n">max_size</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">update</span><span class="p">([(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mf">6.0</span><span class="p">)])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+<span class="go">{'_target_': 'minrecord.comparable.MinScalarRecord', 'name': 'loss', 'max_size': 2, 'elements': ((1, 5.0), (2, 6.0)), 'best': (0, 1.0)}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new_record</span> <span class="o">=</span> <span class="n">BaseRecord</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">to_dict</span><span class="p">())))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new_record</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new_record</span><span class="o">.</span><span class="n">get_best_value</span><span class="p">()</span>
+<span class="go">1.0</span>
 </code></pre></div>
-<p>For RecordManager:</p>
+<p><code>from_dict</code> creates a new record, with the validation of the constructor. <code>load_dict</code> loads the
+dict in an existing record, in place, for the objects that other parts of your code hold. It builds
+the new record first, so the record is not changed if the dict is invalid or if it is the dict of a
+record of another type:</p>
+<div class="highlight"><pre><span></span><code><span class="n">record</span><span class="o">.</span><span class="n">load_dict</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+</code></pre></div>
+<p>For <code>RecordManager</code>:</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Save entire manager</span>
 <span class="n">manager_state</span> <span class="o">=</span> <span class="n">manager</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()</span>
 
@@ -1758,6 +1887,12 @@ with comparison logic:</p>
 <span class="n">new_manager</span> <span class="o">=</span> <span class="n">RecordManager</span><span class="p">()</span>
 <span class="n">new_manager</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">manager_state</span><span class="p">)</span>
 </code></pre></div>
+<p>The state of a manager is a dict of records dicts, so it can be written to JSON. <code>load_state_dict</code>
+loads the data of a known key in the existing record (the objects that you hold are updated),
+creates the records of the new keys, and does not change the manager if one entry is invalid. Two
+managers can be compared with <code>manager1.equal(manager2)</code> or <code>coola.equality.objects_are_equal</code>.</p>
+<p>The dict is not compatible with the one of the versions before 0.4.0 (<code>{"config": ..., "state": ...}</code>),
+see the <a href="../release_notes/">release notes</a>.</p>
 <h2 id="debugging-tips">Debugging Tips<a class="headerlink" href="#debugging-tips" title="Permanent link">&para;</a></h2>
 <h3 id="check-if-metrics-are-improving">Check if metrics are improving<a class="headerlink" href="#check-if-metrics-are-improving" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="n">record</span> <span class="o">=</span> <span class="n">MinScalarRecord</span><span class="p">(</span><span class="s2">"loss"</span><span class="p">)</span>
@@ -1779,6 +1914,7 @@ with comparison logic:</p>
 <h2 id="see-also">See Also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
 <ul>
 <li><a href="../quickstart/">Quickstart Guide</a> for basic usage</li>
+<li><a href="../release_notes/">Release notes</a> for the breaking changes</li>
 <li><a href="../faq/">FAQ</a> for common questions and troubleshooting</li>
 <li>API Reference:</li>
 <li><a href="../refs/root/">minrecord</a> - Main package</li>

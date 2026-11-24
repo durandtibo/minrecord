@@ -14,7 +14,7 @@
         <link rel="prev" href="../usage_guide/">
       
       
-        <link rel="next" href="../refs/root/">
+        <link rel="next" href="../release_notes/">
       
       
         
@@ -1100,6 +1100,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../release_notes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Release notes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -2087,7 +2115,7 @@ the old value should be better, so a plateau counts as an improvement:</p>
 <p>RecordManager provides:</p>
 <ul>
 <li><strong>Organized storage</strong>: All records in one place</li>
-<li><strong>Convenience methods</strong>: <code>get_best_values()</code></li>
+<li><strong>Convenience methods</strong>: <code>get_best_values()</code>, <code>get_last_values()</code></li>
 <li><strong>State management</strong>: Save/load all records together</li>
 </ul>
 <h3 id="does-recordmanager-create-records-automatically">Does RecordManager create records automatically?<a class="headerlink" href="#does-recordmanager-create-records-automatically" title="Permanent link">&para;</a></h3>
@@ -2166,7 +2194,7 @@ the old value should be better, so a plateau counts as an improvement:</p>
 </code></pre></div>
 <h3 id="how-do-i-integrate-with-weights-biases-wandb">How do I integrate with Weights &amp; Biases (wandb)?<a class="headerlink" href="#how-do-i-integrate-with-weights-biases-wandb" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">wandb</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">minrecord</span><span class="w"> </span><span class="kn">import</span> <span class="n">RecordManager</span><span class="p">,</span> <span class="n">get_last_values</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">minrecord</span><span class="w"> </span><span class="kn">import</span> <span class="n">RecordManager</span>
 
 <span class="n">wandb</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">project</span><span class="o">=</span><span class="s2">"my-project"</span><span class="p">)</span>
 <span class="n">manager</span> <span class="o">=</span> <span class="n">RecordManager</span><span class="p">()</span>
@@ -2180,7 +2208,7 @@ the old value should be better, so a plateau counts as an improvement:</p>
     <span class="n">wandb</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
         <span class="p">{</span>
             <span class="s2">"epoch"</span><span class="p">:</span> <span class="n">epoch</span><span class="p">,</span>
-            <span class="o">**</span><span class="n">get_last_values</span><span class="p">(</span><span class="n">manager</span><span class="o">.</span><span class="n">get_records</span><span class="p">(),</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">"train/"</span><span class="p">),</span>
+            <span class="o">**</span><span class="n">manager</span><span class="o">.</span><span class="n">get_last_values</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">"train/"</span><span class="p">),</span>
             <span class="o">**</span><span class="n">manager</span><span class="o">.</span><span class="n">get_best_values</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">"best/"</span><span class="p">),</span>
         <span class="p">}</span>
     <span class="p">)</span>
@@ -2220,9 +2248,7 @@ create the record from its values:</p>
 <li>Comparable records</li>
 </ul>
 <p>Use <code>get_last_values()</code> for all records:</p>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">minrecord</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_last_values</span>
-
-<span class="n">last_values</span> <span class="o">=</span> <span class="n">get_last_values</span><span class="p">(</span><span class="n">manager</span><span class="o">.</span><span class="n">get_records</span><span class="p">())</span>  <span class="c1"># All non-empty records</span>
+<div class="highlight"><pre><span></span><code><span class="n">last_values</span> <span class="o">=</span> <span class="n">manager</span><span class="o">.</span><span class="n">get_last_values</span><span class="p">()</span>  <span class="c1"># All non-empty records</span>
 <span class="n">best_values</span> <span class="o">=</span> <span class="n">manager</span><span class="o">.</span><span class="n">get_best_values</span><span class="p">()</span>  <span class="c1"># Only comparable records</span>
 </code></pre></div>
 <h3 id="record-not-found-errors">Record not found errors<a class="headerlink" href="#record-not-found-errors" title="Permanent link">&para;</a></h3>

@@ -567,6 +567,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../release_notes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Release notes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -927,10 +955,32 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#minrecord.manager.RecordManager.equal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        equal
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#minrecord.manager.RecordManager.get_best_values" class="md-nav__link">
     <span class="md-ellipsis">
       
         get_best_values
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.manager.RecordManager.get_last_values" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_last_values
       
     </span>
   </a>
@@ -1135,10 +1185,32 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#minrecord.manager.RecordManager.equal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        equal
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#minrecord.manager.RecordManager.get_best_values" class="md-nav__link">
     <span class="md-ellipsis">
       
         get_best_values
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.manager.RecordManager.get_last_values" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_last_values
       
     </span>
   </a>
@@ -1303,11 +1375,13 @@ needs, feel free to use another approach.</p>
                 <code>records</code>
             </td>
             <td>
-                  <code><span title="dict">dict</span>[<span title="str">str</span>, <a class="autorefs autorefs-internal" title="minrecord.base.BaseRecord" href="../base/#minrecord.base.BaseRecord">BaseRecord</a>[<span title="typing.Any">Any</span>]] | None</code>
+                  <code><span title="collections.abc.Mapping">Mapping</span>[<span title="str">str</span>, <a class="autorefs autorefs-internal" title="minrecord.base.BaseRecord" href="../base/#minrecord.base.BaseRecord">BaseRecord</a>[<span title="typing.Any">Any</span>]] | None</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The initial records to add to the manager.</p>
+                <p>The initial records to add to the manager. The
+mapping is copied, so adding a record to the manager does
+not change it.</p>
               </div>
             </td>
             <td>
@@ -1361,6 +1435,7 @@ needs, feel free to use another approach.</p>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">add_record</span><span class="p">(</span>
     <span class="n">record</span><span class="p">:</span> <span class="n"><a class="autorefs autorefs-internal" title="minrecord.base.BaseRecord" href="../base/#minrecord.base.BaseRecord">BaseRecord</a></span><span class="p">[</span><span class="n"><span title="typing.Any">Any</span></span><span class="p">],</span>
     <span class="n">key</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
     <span class="n">exist_ok</span><span class="p">:</span> <span class="n"><span title="bool">bool</span></span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
 </code></pre></div>
@@ -1485,21 +1560,110 @@ key and <code>exist_ok=False</code>.</p>
 <div class="doc doc-object doc-function">
 
 
+<h4 id="minrecord.manager.RecordManager.equal" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">minrecord.manager.RecordManager.equal</span>
+
+
+<a href="#minrecord.manager.RecordManager.equal" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">equal</span><span class="p">(</span><span class="n">other</span><span class="p">:</span> <span class="n"><span title="typing.Any">Any</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="bool">bool</span></span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Indicate if two managers are equal or not.</p>
+<p>Two managers are equal if they have the same type and the same
+records (same keys and equal records).</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>other</code>
+            </td>
+            <td>
+                  <code><span title="typing.Any">Any</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The object to compare.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><code>True</code> if the managers are equal, <code>False</code> otherwise.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<details class="example" open>
+  <summary>Example</summary>
+  <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">minrecord</span><span class="w"> </span><span class="kn">import</span> <span class="n">RecordManager</span><span class="p">,</span> <span class="n">MinScalarRecord</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">manager1</span> <span class="o">=</span> <span class="n">RecordManager</span><span class="p">({</span><span class="s2">"loss"</span><span class="p">:</span> <span class="n">MinScalarRecord</span><span class="p">(</span><span class="s2">"loss"</span><span class="p">)})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">manager2</span> <span class="o">=</span> <span class="n">RecordManager</span><span class="p">({</span><span class="s2">"loss"</span><span class="p">:</span> <span class="n">MinScalarRecord</span><span class="p">(</span><span class="s2">"loss"</span><span class="p">)})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">manager1</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span><span class="n">manager2</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">manager1</span><span class="o">.</span><span class="n">equal</span><span class="p">(</span><span class="n">RecordManager</span><span class="p">())</span>
+<span class="go">False</span>
+</code></pre></div>
+</details>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
 <h4 id="minrecord.manager.RecordManager.get_best_values" class="doc doc-heading">
             <span class="doc doc-object-name doc-function-name">minrecord.manager.RecordManager.get_best_values</span>
 
 
 <a href="#minrecord.manager.RecordManager.get_best_values" class="headerlink" title="Permanent link">&para;</a></h4>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">get_best_values</span><span class="p">(</span>
-    <span class="n">prefix</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span> <span class="n">suffix</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">=</span> <span class="s2">""</span>
+    <span class="o">*</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span> <span class="n">suffix</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">=</span> <span class="s2">""</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><span title="typing.Any">Any</span></span><span class="p">]</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
 
-        <p>Get the best value of each metric.</p>
-<p>This method ignores the metrics with empty record and the
-non-comparable record.</p>
+        <p>Get the best value of each record.</p>
+<p>This method ignores the empty and non-comparable records.
+See <code>minrecord.get_best_values</code> for the description of the
+arguments.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1522,11 +1686,7 @@ non-comparable record.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The prefix used to create the dict of best values.
-The goal of this prefix is to generate a name which is
-different from the metric name to avoid confusion.
-By default, the returned dict uses the same name as the
-metric.</p>
+                <p>The prefix used to create the keys of the dict.</p>
               </div>
             </td>
             <td>
@@ -1542,11 +1702,7 @@ metric.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The suffix used to create the dict of best values.
-The goal of this suffix is to generate a name which is
-different from the metric name to avoid confusion.
-By default, the returned dict uses the same name as the
-metric.</p>
+                <p>The suffix used to create the keys of the dict.</p>
               </div>
             </td>
             <td>
@@ -1572,7 +1728,7 @@ metric.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The dict with the best value of each metric.</p>
+                <p>The dict with the best value of each record.</p>
               </div>
             </td>
           </tr>
@@ -1592,6 +1748,117 @@ metric.</p>
 <span class="go">{'best/accuracy': 42.0}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">manager</span><span class="o">.</span><span class="n">get_best_values</span><span class="p">(</span><span class="n">suffix</span><span class="o">=</span><span class="s2">"/best"</span><span class="p">)</span>
 <span class="go">{'accuracy/best': 42.0}</span>
+</code></pre></div>
+</details>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="minrecord.manager.RecordManager.get_last_values" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">minrecord.manager.RecordManager.get_last_values</span>
+
+
+<a href="#minrecord.manager.RecordManager.get_last_values" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">get_last_values</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">=</span> <span class="s2">""</span><span class="p">,</span> <span class="n">suffix</span><span class="p">:</span> <span class="n"><span title="str">str</span></span> <span class="o">=</span> <span class="s2">""</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><span title="typing.Any">Any</span></span><span class="p">]</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Get the last value of each record.</p>
+<p>This method ignores the empty records. See
+<code>minrecord.get_last_values</code> for the description of the
+arguments.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>prefix</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The prefix used to create the keys of the dict.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>suffix</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The suffix used to create the keys of the dict.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;&#39;</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="dict">dict</span>[<span title="str">str</span>, <span title="typing.Any">Any</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The dict with the last value of each record.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<details class="example" open>
+  <summary>Example</summary>
+  <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">minrecord</span><span class="w"> </span><span class="kn">import</span> <span class="n">RecordManager</span><span class="p">,</span> <span class="n">MaxScalarRecord</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">manager</span> <span class="o">=</span> <span class="n">RecordManager</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">manager</span><span class="o">.</span><span class="n">add_record</span><span class="p">(</span><span class="n">MaxScalarRecord</span><span class="p">(</span><span class="s2">"accuracy"</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">manager</span><span class="o">.</span><span class="n">get_record</span><span class="p">(</span><span class="s2">"accuracy"</span><span class="p">)</span><span class="o">.</span><span class="n">add_value</span><span class="p">(</span><span class="mf">42.0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">manager</span><span class="o">.</span><span class="n">get_record</span><span class="p">(</span><span class="s2">"accuracy"</span><span class="p">)</span><span class="o">.</span><span class="n">add_value</span><span class="p">(</span><span class="mf">40.0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">manager</span><span class="o">.</span><span class="n">get_last_values</span><span class="p">()</span>
+<span class="go">{'accuracy': 40.0}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">manager</span><span class="o">.</span><span class="n">get_last_values</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">"last/"</span><span class="p">)</span>
+<span class="go">{'last/accuracy': 40.0}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">manager</span><span class="o">.</span><span class="n">get_last_values</span><span class="p">(</span><span class="n">suffix</span><span class="o">=</span><span class="s2">"/last"</span><span class="p">)</span>
+<span class="go">{'accuracy/last': 40.0}</span>
 </code></pre></div>
 </details>
 
@@ -1840,6 +2107,11 @@ object.</p>
     <div class="doc doc-contents ">
 
         <p>Load the state values from a dict.</p>
+<p>The data of a key that is already in the manager is loaded in
+the existing record (<code>load_dict</code>), so the objects that
+other parts of the code hold are updated. The data of a new
+key creates a new record (<code>BaseRecord.from_dict</code>). The
+manager is not modified if one entry is invalid.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -1862,11 +2134,36 @@ object.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A dict with the new state values.</p>
+                <p>A dict with the new state values. It has the
+structure of the output of <code>state_dict</code>.</p>
               </div>
             </td>
             <td>
                 <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="TypeError">TypeError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>if the data of a key is the data of a record
+of another type than the existing record.</p>
+              </div>
             </td>
           </tr>
       </tbody>
