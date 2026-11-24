@@ -5,27 +5,22 @@ import logging
 
 from coola.equality import objects_are_equal
 
-from minrecord import BaseRecord, MinScalarComparator, MinScalarRecord, Record
+import minrecord
+from minrecord import (
+    BaseRecord,
+    MinScalarComparator,
+    MinScalarRecord,
+    Record,
+    RecordManager,
+)
 
 logger: logging.Logger = logging.getLogger(__name__)
 
 
 def check_imports() -> None:
     logger.info("Checking imports...")
-    objects_to_import = [
-        "minrecord.BaseComparator",
-        "minrecord.BaseRecord",
-        "minrecord.MaxScalarComparator",
-        "minrecord.MinScalarComparator",
-        "minrecord.Record",
-        "minrecord.MaxScalarRecord",
-        "minrecord.MinScalarRecord",
-        "minrecord.RecordManager",
-        "minrecord.get_best_values",
-        "minrecord.get_last_values",
-        "minrecord.get_max_size",
-        "minrecord.reset_max_size",
-        "minrecord.set_max_size",
+    objects_to_import = [f"minrecord.{name}" for name in minrecord.__all__]
+    objects_to_import += [
         "minrecord.utils",
         "minrecord.utils.factory.instantiate",
         "minrecord.utils.validation.check_max_size",
@@ -59,10 +54,22 @@ def check_comparable_record() -> None:
     assert MinScalarComparator().is_better(new_value=float("nan"), old_value=1.0) is False
 
 
+def check_manager() -> None:
+    logger.info("Checking RecordManager...")
+    manager = RecordManager({"loss": MinScalarRecord("loss", elements=[(0, 1.0), (1, 0.5)])})
+    manager.add_record(Record("custom"))
+    new_manager = RecordManager()
+    new_manager.load_state_dict(manager.state_dict())
+    assert new_manager.equal(manager)
+    assert new_manager.get_best_values() == {"loss": 0.5}
+    assert RecordManager(default_factory=MinScalarRecord).get_record("acc").name == "acc"
+
+
 def main() -> None:
     check_imports()
     check_record()
     check_comparable_record()
+    check_manager()
 
 
 if __name__ == "__main__":

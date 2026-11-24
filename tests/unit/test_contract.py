@@ -295,17 +295,36 @@ def test_contract_nan_record_is_not_equal_to_a_record_with_a_number() -> None:
         (1.0, NAN, 2.0),
     ],
 )
-def test_contract_nan_sequences_clone_has_same_flag_and_best_step(
+def test_contract_nan_sequences_clone_has_same_flag(
     values: tuple[float, ...], max_size: int
 ) -> None:
     record = MinScalarRecord("loss", max_size=max_size)
-    for step, value in enumerate(values):
-        record.add_value(value, step=step)
+    record.update(list(enumerate(values)))
     clone = BaseRecord.from_dict(json.loads(json.dumps(record.to_dict())))
-    assert (clone.has_improved(), clone.to_dict()["best"][0]) == (
-        record.has_improved(),
-        record.to_dict()["best"][0],
-    )
+    assert clone.has_improved() == record.has_improved()
+
+
+@pytest.mark.parametrize("max_size", [1, 2, 3])
+@pytest.mark.parametrize(
+    "values",
+    [
+        (NAN,),
+        (NAN, NAN),
+        (NAN, 1.0),
+        (1.0, NAN),
+        (2.0, NAN, NAN),
+        (NAN, NAN, 1.0),
+        (NAN, 2.0, 1.0),
+        (1.0, NAN, 2.0),
+    ],
+)
+def test_contract_nan_sequences_clone_has_same_best_step(
+    values: tuple[float, ...], max_size: int
+) -> None:
+    record = MinScalarRecord("loss", max_size=max_size)
+    record.update(list(enumerate(values)))
+    clone = BaseRecord.from_dict(json.loads(json.dumps(record.to_dict())))
+    assert clone.get_best_step() == record.get_best_step()
 
 
 #######################################
