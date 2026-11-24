@@ -320,6 +320,7 @@ record.add_value(1.5)
 record.add_value(1.3)
 print(f"Has improved: {record.has_improved()}")  # True
 print(f"Best value: {record.get_best_value()}")  # 1.3
+print(f"Best step: {record.get_best_step()}")  # 1 if the best value was added with step=1
 ```
 
 ### Inspect recent history

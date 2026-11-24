@@ -109,6 +109,16 @@ def test_base_record_get_best_value() -> None:
         Record("loss").get_best_value()
 
 
+def test_base_record_get_best_step() -> None:
+    with pytest.raises(NotAComparableRecordError, match=r"It is not possible to get the best step"):
+        Record("loss").get_best_step()
+
+
+def test_base_record_get_best_step_message_has_the_name() -> None:
+    with pytest.raises(NotAComparableRecordError, match=r"values in my_loss record"):
+        Record("my_loss").get_best_step()
+
+
 def test_base_record_has_improved() -> None:
     with pytest.raises(
         NotAComparableRecordError,

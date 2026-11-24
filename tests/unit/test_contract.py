@@ -154,6 +154,15 @@ def test_contract_clone_same_has_improved(comparable_record: BaseRecord[Any]) ->
     assert comparable_record.clone().has_improved() == comparable_record.has_improved()
 
 
+def test_contract_clone_same_best_step(comparable_record: BaseRecord[Any]) -> None:
+    assert comparable_record.clone().get_best_step() == comparable_record.get_best_step()
+
+
+def test_contract_json_round_trip_same_best_step(comparable_record: BaseRecord[Any]) -> None:
+    new_record = BaseRecord.from_dict(json.loads(json.dumps(comparable_record.to_dict())))
+    assert new_record.get_best_step() == comparable_record.get_best_step()
+
+
 def test_contract_factory_accepts_to_dict(record: BaseRecord[Any]) -> None:
     assert factory(**record.to_dict()).equal(record)
 

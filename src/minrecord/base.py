@@ -49,7 +49,7 @@ class BaseRecord(ABC, Generic[T]):
     The other methods are derived from them and must not be overridden
     (``clone``, ``equal``, ``update``, ``from_dict`` and ``load_dict``),
     except by a comparable record that overrides ``is_comparable``,
-    ``get_best_value`` and ``has_improved``.
+    ``get_best_value``, ``get_best_step`` and ``has_improved``.
 
     The contract of a record is:
 
@@ -59,7 +59,7 @@ class BaseRecord(ABC, Generic[T]):
             ``BaseRecord.from_dict(record.to_dict()).equal(record)``.
         2. The constructor accepts what ``to_dict`` returns, validates
             its arguments and raises before any object exists.
-        3. ``get_best_value`` and ``has_improved`` raise
+        3. ``get_best_value``, ``get_best_step`` and ``has_improved`` raise
             ``NotAComparableRecordError`` if the record is not
             comparable, and ``EmptyRecordError`` if the record is
             comparable and empty.
@@ -275,6 +275,45 @@ class BaseRecord(ABC, Generic[T]):
         """
         msg = (
             "It is not possible to get the best value because it is not possible to compare "
+            f"the values in {self.name} record"
+        )
+        raise NotAComparableRecordError(msg)
+
+    def get_best_step(self) -> float | None:
+        r"""Get the step of the best value of this record.
+
+        It is the step of the pair ``(step, value)`` that produced
+        the best value, also if this pair is not in the recent values
+        anymore. A value that is equal to the best value is an
+        improvement, so it is the **latest** step among the ties.
+        It is possible to get the best step only if it is a
+        comparable record i.e. it is possible to compare the values
+        in the record.
+
+        Returns:
+            The step of the best value of this record. It is ``None``
+                if the best value was added without a step.
+
+        Raises:
+            NotAComparableRecordError: if it is not a comparable
+                record.
+            EmptyRecordError: if the record is empty
+
+        Example:
+            ```pycon
+            >>> from minrecord import MaxScalarRecord
+            >>> record = MaxScalarRecord("accuracy", max_size=1)
+            >>> record.add_value(value=4, step=0)
+            >>> record.add_value(value=2, step=1)
+            >>> record.get_best_step()
+            0
+            >>> record.get_best_value()
+            4
+
+            ```
+        """
+        msg = (
+            "It is not possible to get the best step because it is not possible to compare "
             f"the values in {self.name} record"
         )
         raise NotAComparableRecordError(msg)

@@ -50,6 +50,7 @@ def check_comparable_record() -> None:
     logger.info("Checking MinScalarRecord...")
     record = MinScalarRecord("loss", max_size=2, elements=[(0, 1.0), (1, 5.0), (2, 6.0)])
     assert record.get_best_value() == 1.0
+    assert record.get_best_step() == 0
     assert record.get_most_recent() == ((1, 5.0), (2, 6.0))
     assert record.clone().equal(record)
     assert BaseRecord.from_dict(record.to_dict()).equal(record)
