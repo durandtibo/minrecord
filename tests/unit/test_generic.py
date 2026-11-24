@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 from coola.equality import objects_are_equal
 from coola.factory import OBJECT_TARGET, factory
@@ -10,7 +12,21 @@ from minrecord import (
     MinScalarRecord,
     NotAComparableRecordError,
     Record,
+    set_max_size,
 )
+from minrecord.config import reset_max_size
+
+if TYPE_CHECKING:
+    from collections.abc import Generator
+
+
+@pytest.fixture
+def _reset_max_size() -> Generator[None, None, None]:
+    """Reset the default maximum size before and after the test."""
+    reset_max_size()
+    yield
+    reset_max_size()
+
 
 ############################
 #     Tests for Record     #
@@ -266,3 +282,27 @@ def test_record_from_dict_empty() -> None:
             "state": {"record": ()},
         }
     ).equal(Record("loss"))
+
+
+##########################################
+#     Tests for the default max_size     #
+##########################################
+
+
+@pytest.mark.usefixtures("_reset_max_size")
+def test_record_init_max_size_default_read_at_creation() -> None:
+    set_max_size(3)
+    assert Record("loss").max_size == 3
+
+
+@pytest.mark.usefixtures("_reset_max_size")
+def test_record_init_max_size_default_not_changed_for_existing_record() -> None:
+    record = Record("loss")
+    set_max_size(3)
+    assert record.max_size == 10
+
+
+@pytest.mark.usefixtures("_reset_max_size")
+def test_record_init_max_size_explicit_overrides_default() -> None:
+    set_max_size(3)
+    assert Record("loss", max_size=7).max_size == 7

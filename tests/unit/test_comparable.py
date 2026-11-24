@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import pytest
 from coola.equality import objects_are_equal
 from coola.factory import OBJECT_TARGET, factory
@@ -12,7 +14,21 @@ from minrecord import (
     MaxScalarRecord,
     MinScalarComparator,
     MinScalarRecord,
+    set_max_size,
 )
+from minrecord.config import reset_max_size
+
+if TYPE_CHECKING:
+    from collections.abc import Generator
+
+
+@pytest.fixture
+def _reset_max_size() -> Generator[None, None, None]:
+    """Reset the default maximum size before and after the test."""
+    reset_max_size()
+    yield
+    reset_max_size()
+
 
 ######################################
 #     Tests for ComparableRecord     #
@@ -464,3 +480,65 @@ def test_min_scalar_record_from_elements() -> None:
             name="loss", elements=[(0, 2), (1, 4), (None, 3)], improved=False, best_value=2
         )
     )
+
+
+##########################################
+#     Tests for the default max_size     #
+##########################################
+
+
+@pytest.mark.usefixtures("_reset_max_size")
+def test_comparable_record_init_max_size_default_read_at_creation() -> None:
+    set_max_size(3)
+    assert ComparableRecord("loss", MaxScalarComparator()).max_size == 3
+
+
+@pytest.mark.usefixtures("_reset_max_size")
+def test_comparable_record_init_max_size_default_not_changed_for_existing_record() -> None:
+    record = ComparableRecord("loss", MaxScalarComparator())
+    set_max_size(3)
+    assert record.max_size == 10
+
+
+@pytest.mark.usefixtures("_reset_max_size")
+def test_comparable_record_init_max_size_explicit_overrides_default() -> None:
+    set_max_size(3)
+    assert ComparableRecord("loss", MaxScalarComparator(), max_size=7).max_size == 7
+
+
+@pytest.mark.usefixtures("_reset_max_size")
+def test_max_scalar_record_init_max_size_default_read_at_creation() -> None:
+    set_max_size(3)
+    assert MaxScalarRecord("loss").max_size == 3
+
+
+@pytest.mark.usefixtures("_reset_max_size")
+def test_max_scalar_record_init_max_size_default_not_changed_for_existing_record() -> None:
+    record = MaxScalarRecord("loss")
+    set_max_size(3)
+    assert record.max_size == 10
+
+
+@pytest.mark.usefixtures("_reset_max_size")
+def test_max_scalar_record_init_max_size_explicit_overrides_default() -> None:
+    set_max_size(3)
+    assert MaxScalarRecord("loss", max_size=7).max_size == 7
+
+
+@pytest.mark.usefixtures("_reset_max_size")
+def test_min_scalar_record_init_max_size_default_read_at_creation() -> None:
+    set_max_size(3)
+    assert MinScalarRecord("loss").max_size == 3
+
+
+@pytest.mark.usefixtures("_reset_max_size")
+def test_min_scalar_record_init_max_size_default_not_changed_for_existing_record() -> None:
+    record = MinScalarRecord("loss")
+    set_max_size(3)
+    assert record.max_size == 10
+
+
+@pytest.mark.usefixtures("_reset_max_size")
+def test_min_scalar_record_init_max_size_explicit_overrides_default() -> None:
+    set_max_size(3)
+    assert MinScalarRecord("loss", max_size=7).max_size == 7
