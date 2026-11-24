@@ -35,10 +35,11 @@
 ## Overview
 
 `minrecord` is a minimalist Python library to record values in a ML workflow.
-In particular, it provides functionalities to track the best value, or the most recent values by
-storing a limiting number of values.
-It is possible to customize the library e.g. it is possible to define a new logic to track the best
-value.
+A record stores the most recent values (a bounded number of `(step, value)` pairs) and, for a
+comparable record, the best value, which is kept even after it leaves the recent values.
+A record manager groups several records, and every record can be saved to and restored from a
+dictionary. The logic that defines the best value is customizable with a comparator.
+`minrecord` only depends on `coola`.
 
 ### Key Features
 
@@ -47,8 +48,10 @@ value.
 - **✅ Improvement Detection**: Easily check if your model is still improving
 - **🎯 Flexible Comparators**: Define custom logic to determine what "better" means
 - **🗂️ Record Manager**: Organize and manage multiple metrics efficiently
-- **💾 Serialization**: Save and load record states for checkpointing
-- **🚀 Minimal Dependencies**: Lightweight with only essential dependencies
+- **💾 Serialization**: Save and load record states (`to_dict`, `from_dict`) for checkpointing
+- **🚀 Minimal Dependencies**: Lightweight, with `coola` as the only dependency
+- **🛡️ Strict by Design**: Invalid inputs are rejected when they are received, and a failed call leaves
+  the record unchanged
 
 Below is an example to show how to track the best scalar value when the best value is the maximum
 value and when the best value is the minimum value.
@@ -77,6 +80,10 @@ value and when the best value is the minimum value.
   main branch of the repo. This documentation may contain a lot of work-in-progress/outdated/missing
   parts.
 
+The [quickstart](https://durandtibo.github.io/minrecord/quickstart/) shows how to use the records and the
+manager, and the [design page](https://durandtibo.github.io/minrecord/design/) explains the guarantees
+and the design choices.
+
 ## Installation
 
 We highly recommend installing
@@ -89,9 +96,8 @@ pip install minrecord
 
 `minrecord` has no optional dependency: only `coola` is installed with it.
 
-Please check the [get started page](https://durandtibo.github.io/minrecord/get_started) to see how
-to
-install only some specific dependencies or other alternatives to install the library.
+Please check the [get started page](https://durandtibo.github.io/minrecord/get_started) to see other
+alternatives to install the library.
 The following is the corresponding `minrecord` versions and tested dependencies.
 
 | `minrecord` | `coola`        | `objectory`              | `python`      |
@@ -107,7 +113,7 @@ The following is the corresponding `minrecord` versions and tested dependencies.
 
 ## Contributing
 
-Please check the instructions in [CONTRIBUTING.md](.github/CONTRIBUTING.md).
+Please check the instructions in [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Suggestions and Communication
 

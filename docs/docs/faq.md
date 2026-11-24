@@ -41,8 +41,8 @@ Python 3.11 and higher are officially supported.
 
 ### Do I need PyTorch or other ML frameworks?
 
-No, `minrecord` has minimal dependencies. It only requires `coola`, which is used for equality
-testing.
+No, `minrecord` has minimal dependencies. It only requires `coola`, which is used for equality, string
+formatting and the creation of objects from a dictionary.
 
 ## Usage Questions
 
@@ -69,7 +69,12 @@ Default is 10, which works well for most ML training scenarios.
 No, `max_size` is fixed at creation. If you need to change it:
 
 1. Create a new record with the desired `max_size`
-2. Optionally transfer values using `update(old_record.get_most_recent())`
+2. Transfer the values using `new_record.update(old_record.get_most_recent())`. The best value is
+   recomputed from the transferred values only: to keep a best value that has left the recent
+   values, pass it with
+   `best=(old_record.get_best_step(), old_record.get_best_value())` (it requires `elements`).
+
+Changing the default with `set_max_size` only affects the records created afterwards.
 
 ### What happens when the record is full?
 
@@ -87,8 +92,8 @@ record = MinScalarRecord("loss", elements=[(0, 1.5), (1, 1.3)])
 
 If the best value is not in the elements anymore (for example when a record is resumed), pass it
 with `best=(step, value)`. `best` must be a pair and it requires at least one element (`ValueError`
-otherwise), because a record has a best value if and only if it has a value. Use `to_dict()` and `BaseRecord.from_dict()` to save and resume a
-record: the best value is included.
+otherwise), because a record has a best value if and only if it has a value. Use `to_dict()` and
+`BaseRecord.from_dict()` to save and resume a record: the best value is included.
 
 ## Comparators & Improvements
 
@@ -128,7 +133,9 @@ record.get_best_value()  # 1.5
 ### Why does has_improved() return True for equal values?
 
 By design, equal values are considered improvements. This is useful when a metric plateaus at the
-optimal value.
+optimal value, and it is required to rebuild a record exactly from `to_dict()` (see
+[Design](design.md#ties-count-as-improvements)). If you only want to act on a strict improvement,
+compare the new value with the previous best value before adding it.
 
 ### Can I create custom comparators?
 
@@ -201,6 +208,19 @@ manager.add_record(Record("custom_metric"))
 
 ## Error Handling
 
+### How do I save and resume a record or a manager?
+
+Use `to_dict()` / `BaseRecord.from_dict()` for a record and `state_dict()` / `load_state_dict()` for a
+manager. The dictionaries can be written to JSON. See the
+[usage guide](usage_guide.md#state-management) and the
+[design choices](design.md#load_dict-replaces-the-whole-state).
+
+### How do I implement early stopping?
+
+Use `get_best_step()`: it is the step of the best value, also when the pair has left the recent
+values. See [Pattern 3](usage_guide.md#pattern-3-early-stopping) of the usage guide. It needs a
+numeric `step`.
+
 ### What is EmptyRecordError?
 
 This error occurs when you try to get a value from an empty record:
@@ -233,13 +253,14 @@ if record.is_comparable():
 
 There's no hard limit. Each record has minimal overhead. With max_size=10:
 
-- Memory per record: about 1 KB + stored values (a `MinScalarRecord` takes 1,000 bytes empty and
-  1,950 bytes with 10 floats)
-- 1000 records with scalars: about 2 MB
+- Memory per record: about 1 KB when empty, and about 3 KB for a `MinScalarRecord` that holds 10
+  `(step, float)` pairs (measured with `tracemalloc` on Python 3.14; it depends on the Python version
+  and on the values)
+- 1000 records with 10 scalars each: about 3 MB
 
 ### Is minrecord thread-safe?
 
-No, records are not thread-safe. If using multiple threads:
+No, records and managers are not thread-safe. If using multiple threads:
 
 - Use separate records per thread, or
 - Implement your own locking mechanism

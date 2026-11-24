@@ -25,11 +25,15 @@ class Record(BaseRecord[T]):
     r"""Implement a generic record to store the recent values.
 
     Internally, this class uses a ``deque`` to keep the most recent
-    values added in the record. Note that this class does not allow
-    to get the best value because it is not possible to define a
-    generic rule to know the best object. Please see
-    ``MinScalarRecord`` and ``MaxScalarRecord`` that can compute the
-    best value for scalars.
+    values added in the record: when the record is full, adding a value
+    drops the oldest one. Note that this class does not allow to get
+    the best value because it is not possible to define a generic rule
+    to know the best object: ``get_best_value``, ``get_best_step`` and
+    ``has_improved`` raise ``NotAComparableRecordError``. Please see
+    ``MinScalarRecord``, ``MaxScalarRecord`` and ``ComparableRecord``
+    that can compute the best value. The record has a length (the
+    number of stored pairs), so an empty record is falsy: use
+    ``is_empty``.
 
     Args:
         name: The name of the record.

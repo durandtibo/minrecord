@@ -2,7 +2,7 @@
 
 :book: This page gives a quick overview on how to use the `minrecord`.
 You should read this page if you want to learn how to use the records.
-This page does not explain the internal behavior of the records.
+This page does not explain the internal behavior of the records: see the [design page](design.md).
 While `minrecord` was designed to work in a ML workflow, you can use it in other contexts if it fits
 your need.
 
@@ -138,6 +138,24 @@ method.
 >>> record.add_value(40)
 >>> record.get_most_recent()
 ((0, 42), (None, 45), (2, 46), (None, 40))
+
+```
+
+The `max_size` argument is optional: if it is not given, the default maximum size is used. It can be
+read with `get_max_size`, changed with `set_max_size` and restored with `reset_max_size`. A change
+only affects the records created after it.
+
+```pycon
+
+>>> from minrecord import Record, get_max_size, reset_max_size, set_max_size
+>>> get_max_size()
+10
+>>> set_max_size(3)
+>>> Record("loss")
+Record(name=loss, max_size=3, size=0)
+>>> reset_max_size()
+>>> Record("loss")
+Record(name=loss, max_size=10, size=0)
 
 ```
 
@@ -309,7 +327,20 @@ True
 
 `from_dict` only builds a record of the expected type: `MinScalarRecord.from_dict` raises
 a `TypeError` for the dict of another type of record. The `load_dict` method loads a dictionary in
-an existing record, in place.
+an existing record, in place. It replaces the whole state of the record, the name and the `max_size`
+included, and it does not change the record if the dictionary is invalid.
+
+```pycon
+
+>>> from minrecord import MinScalarRecord
+>>> record = MinScalarRecord("loss")
+>>> record.load_dict(MinScalarRecord("loss", elements=[(0, 1.5)]).to_dict())
+>>> record.get_best_value()
+1.5
+
+```
+
+`clone` returns an independent copy of a record (the values are shared, not copied).
 
 ## Custom Comparator
 
@@ -323,7 +354,6 @@ A `ComparableRecord` uses a comparator to find the best value. A comparator impl
 >>> class AbsMinComparator(BaseComparator[float]):
 ...     def is_better(self, *, new_value: float, old_value: float) -> bool:
 ...         return abs(new_value) <= abs(old_value)
-...
 >>> record = ComparableRecord("error", AbsMinComparator())
 >>> record.update([(0, -3.0), (1, 2.0), (2, -2.5)])
 >>> record.get_best_value()
@@ -370,6 +400,22 @@ You can update multiple records at once:
 
 ```
 
+`get_record` raises a `KeyError` if no record is registered for the key. Pass a `default_factory`,
+a function of the key that returns a record, to create the missing records on demand:
+
+```pycon
+
+>>> from minrecord import RecordManager, MinScalarRecord
+>>> manager = RecordManager(default_factory=MinScalarRecord)
+>>> manager.has_record("loss")
+False
+>>> manager.get_record("loss")
+MinScalarRecord(name=loss, max_size=10, size=0)
+>>> manager.has_record("loss")
+True
+
+```
+
 The manager provides convenient methods to get all best or last values:
 
 ```pycon
@@ -384,6 +430,23 @@ The manager provides convenient methods to get all best or last values:
 >>> manager.get_record("accuracy").add_value(0.87, step=1)
 >>> manager.get_best_values()
 {'loss': 1.3, 'accuracy': 0.87}
+>>> manager.get_last_values(prefix="last/")
+{'last/loss': 1.3, 'last/accuracy': 0.87}
+
+```
+
+The records of a manager are saved with `state_dict` and restored with `load_state_dict`. The same
+computations are available for any mapping of records with the functions `get_best_values` and
+`get_last_values`.
+
+```pycon
+
+>>> from minrecord import RecordManager, MinScalarRecord
+>>> manager = RecordManager({"loss": MinScalarRecord("loss", elements=[(0, 1.5)])})
+>>> new_manager = RecordManager()
+>>> new_manager.load_state_dict(manager.state_dict())
+>>> new_manager.equal(manager)
+True
 
 ```
 
@@ -392,5 +455,6 @@ The manager provides convenient methods to get all best or last values:
 Now that you understand the basics, you can:
 
 - Read the [Usage Guide](usage_guide.md) for detailed patterns and best practices
+- Read the [Design](design.md) page for the guarantees and the design choices
 - Check the [FAQ](faq.md) for common questions and troubleshooting
 - Browse the [API Reference](refs/root.md) for detailed documentation
