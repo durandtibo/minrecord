@@ -440,7 +440,7 @@ redesign.
 | 5    | #531         | open                      |
 | 6    | #532         | open                      |
 | 7    | #533         | open                      |
-| 8    | PR_NUMBER    | open                      |
+| 8    | #534         | open                      |
 
 Steps 5 and 6 are the redesign; steps 1 to 4 and 7 are independent small changes. Each step updates
 the docs, the `tests/package_checks.py` and the tracking document it touches (`CLAUDE.md`,

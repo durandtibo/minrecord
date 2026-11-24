@@ -14,7 +14,7 @@ Python 3.11 and later. It depends on `coola` (2.x) and has no optional dependenc
   pyright, as the CI does). Fix the issues raised by the type checkers. Ignoring an issue
   (`type: ignore`, `ty: ignore`, a cast that hides the problem) is not fixing it. The only
   accepted suppressions are the ones that avoid a breaking change of the public API, with a
-  comment that says so (see `from_elements` in `minrecord.comparable`).
+  comment that says so. There is none in `src` today.
 - Run the unit tests of the modules you changed (for example
   `.venv/bin/pytest tests/unit/test_manager.py -q`). Some tests fail on `main`; check with
   `git stash` before blaming your change.
