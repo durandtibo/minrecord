@@ -31,6 +31,8 @@ class ComparableRecord(Record[T]):
         elements: The initial elements. Each element is a tuple with
             the step and its associated value.
         max_size: The maximum number of elements to store in the record.
+            If ``None``, the default maximum size (see ``get_max_size``)
+            at the time of the creation of the record is used.
         best_value: The initial best value. If ``None``, the initial
             best value of the ``comparator`` is used.
         improved: Indicate if the last value is the best value or not.
@@ -58,7 +60,7 @@ class ComparableRecord(Record[T]):
         name: str,
         comparator: BaseComparator[T],
         elements: Iterable[tuple[float | None, T]] = (),
-        max_size: int = 10,
+        max_size: int | None = None,
         best_value: T | None = None,
         improved: bool = False,
     ) -> None:
@@ -175,6 +177,8 @@ class MaxScalarRecord(ComparableRecord[float]):
         elements: The initial elements. Each element is a tuple with
             the step and its associated value.
         max_size: The maximum number of elements to store in the record.
+            If ``None``, the default maximum size (see ``get_max_size``)
+            at the time of the creation of the record is used.
         best_value: The initial best value. If ``None``, the initial
             best value of the ``comparator`` is used.
         improved: Indicate if the last value is the best value or not.
@@ -199,7 +203,7 @@ class MaxScalarRecord(ComparableRecord[float]):
         self,
         name: str,
         elements: Iterable[tuple[float | None, float]] = (),
-        max_size: int = 10,
+        max_size: int | None = None,
         best_value: float | None = None,
         improved: bool = False,
     ) -> None:
@@ -263,6 +267,8 @@ class MinScalarRecord(ComparableRecord[float]):
         elements: The initial elements. Each element is a tuple with
             the step and its associated value.
         max_size: The maximum number of elements to store in the record.
+            If ``None``, the default maximum size (see ``get_max_size``)
+            at the time of the creation of the record is used.
         best_value: The initial best value. If ``None``, the initial
             best  value of the ``comparator`` is used.
         improved: Indicate if the last value is the best value or not.
@@ -287,7 +293,7 @@ class MinScalarRecord(ComparableRecord[float]):
         self,
         name: str,
         elements: Iterable[tuple[float | None, float]] = (),
-        max_size: int = 10,
+        max_size: int | None = None,
         best_value: float | None = None,
         improved: bool = False,
     ) -> None:

@@ -33,7 +33,9 @@ class Record(BaseRecord[T]):
         name: The name of the record.
         elements: The initial elements in the record. Each element is a
             tuple with the step and its associated value.
-        max_size: The maximum size of the record.
+        max_size: The maximum size of the record. If ``None``, the
+            default maximum size (see ``get_max_size``) at the time of
+            the creation of the record is used.
 
     Example:
         ```pycon
@@ -53,10 +55,12 @@ class Record(BaseRecord[T]):
         self,
         name: str,
         elements: Iterable[tuple[float | None, T]] = (),
-        max_size: int = get_max_size(),
+        max_size: int | None = None,
     ) -> None:
         super().__init__()
         self._name = name
+        if max_size is None:
+            max_size = get_max_size()
         if max_size <= 0:
             msg = f"Record size must be greater than 0 (received: {max_size})"
             raise ValueError(msg)
