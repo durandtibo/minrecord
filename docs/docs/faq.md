@@ -35,12 +35,6 @@ No! While designed with ML in mind, `minrecord` can be used anywhere you need to
 pip install minrecord
 ```
 
-For all optional dependencies:
-
-```bash
-pip install minrecord[all]
-```
-
 ### What Python versions are supported?
 
 Python 3.11 and higher are officially supported.
@@ -152,8 +146,7 @@ class MyComparator(BaseComparator[float]):
 RecordManager provides:
 
 - **Organized storage**: All records in one place
-- **Batch updates**: Update multiple records at once
-- **Convenience methods**: `get_best_values()`, `get_last_values()`
+- **Convenience methods**: `get_best_values()`
 - **State management**: Save/load all records together
 
 ### Does RecordManager create records automatically?
@@ -262,7 +255,7 @@ for epoch in range(epochs):
 
 ```python
 import wandb
-from minrecord import RecordManager
+from minrecord import RecordManager, get_last_values
 
 wandb.init(project="my-project")
 manager = RecordManager()
@@ -276,7 +269,7 @@ for epoch in range(epochs):
     wandb.log(
         {
             "epoch": epoch,
-            **manager.get_last_values(prefix="train/"),
+            **get_last_values(manager.get_records(), prefix="train/"),
             **manager.get_best_values(prefix="best/"),
         }
     )
@@ -329,7 +322,9 @@ record.update(elements)
 Use `get_last_values()` for all records:
 
 ```python
-last_values = manager.get_last_values()  # All non-empty records
+from minrecord import get_last_values
+
+last_values = get_last_values(manager.get_records())  # All non-empty records
 best_values = manager.get_best_values()  # Only comparable records
 ```
 
@@ -340,7 +335,7 @@ Check that record names match exactly:
 ```python
 manager.add_record(MinScalarRecord("train/loss"))  # Note the "/"
 # Wrong name:
-manager.get_record("train_loss").add_value(1.5, step=0)  # KeyError if not auto-created
+manager.get_record("train_loss").add_value(1.5, step=0)  # Creates a new empty record
 # Correct:
 manager.get_record("train/loss").add_value(1.5, step=0)
 ```
@@ -348,6 +343,5 @@ manager.get_record("train/loss").add_value(1.5, step=0)
 ## Need More Help?
 
 - Check the [Usage Guide](usage_guide.md) for detailed patterns
-- See [Examples](https://github.com/durandtibo/minrecord/tree/main/examples) for complete code
 - Open an [Issue](https://github.com/durandtibo/minrecord/issues) on GitHub
 - Read the [API Reference](refs/root.md) for detailed documentation

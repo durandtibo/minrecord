@@ -16,24 +16,7 @@ pip install minrecord
 uv pip install minrecord
 ```
 
-To make the package as slim as possible, only the packages required to use `minrecord` are installed.
-It is possible to install all the optional dependencies by running the following command:
-
-```shell
-# pip
-pip install 'minrecord[all]'
-
-# uv
-uv pip install 'minrecord[all]'
-```
-
-This command also installed NumPy and PyTorch.
-It is also possible to install the optional packages manually or to select the packages to install.
-In the following example, only NumPy is installed:
-
-```shell
-pip install minrecord numpy
-```
+`minrecord` has no optional dependency: only `coola` is installed with it.
 
 ## Installing from source
 

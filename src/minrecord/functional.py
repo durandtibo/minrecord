@@ -71,19 +71,19 @@ def get_last_values(
 
     Args:
         records: The records and their associated keys.
-        prefix: The prefix used to create the dict of best values.
+        prefix: The prefix used to create the dict of last values.
             The goal of this prefix is to generate a name which is
             different from the record name to avoid confusion.
             By default, the returned dict uses the same name as the
             record.
-        suffix: The suffix used to create the dict of best values.
+        suffix: The suffix used to create the dict of last values.
             The goal of this suffix is to generate a name which is
             different from the record name to avoid confusion.
             By default, the returned dict uses the same name as the
             record.
 
     Returns:
-        The dict with the best value of each record.
+        The dict with the last value of each record.
 
     Example:
         ```pycon
