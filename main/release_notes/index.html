@@ -1241,6 +1241,13 @@ compatibility layer.</p>
   comparator can be written to JSON.</li>
 <li>A comparator that raises in <code>add_value</code> leaves the record unchanged.</li>
 <li><code>RecordManager.load_state_dict</code> does not change the manager if an entry is invalid.</li>
+<li><code>RecordManager.load_state_dict</code> builds each record once to validate the state (it cloned the
+  existing records before), and its merge semantics is documented: a record that the state does not
+  mention is kept.</li>
+<li><code>minrecord.config</code> has no <code>global</code> statement, and <code>src</code> has no <code>noqa</code>.</li>
+<li><code>MaxScalarRecord</code> and <code>MinScalarRecord</code> share a private base class (<code>_ScalarRecord</code>) that builds
+  the comparator from a class attribute, so a new scalar record is a docstring and one line. Their
+  signatures and their <code>_target_</code> (<code>minrecord.comparable.MaxScalarRecord</code>) do not change.</li>
 <li><code>has_improved()</code> of a record that is rebuilt (<code>from_dict</code>, <code>clone</code>) is the one of the original,
   also when its first value is NaN. A NaN equal to the best NaN is a tie.</li>
 <li>A record that holds a NaN is equal to its JSON round trip.</li>

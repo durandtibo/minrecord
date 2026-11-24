@@ -3866,7 +3866,7 @@ old value is replaced by any value (a number, or a NaN as a tie).</p>
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="minrecord.comparable.ComparableRecord" href="../comparable/#minrecord.comparable.ComparableRecord">ComparableRecord</a>[<span title="float">float</span>]</code></p>
+              Bases: <code><span title="minrecord.comparable._ScalarRecord">_ScalarRecord</span></code></p>
 
 
 
@@ -4112,7 +4112,7 @@ old value is replaced by any value (a number, or a NaN as a tie).</p>
 
     <div class="doc doc-contents ">
             <p class="doc doc-class-bases">
-              Bases: <code><a class="autorefs autorefs-internal" title="minrecord.comparable.ComparableRecord" href="../comparable/#minrecord.comparable.ComparableRecord">ComparableRecord</a>[<span title="float">float</span>]</code></p>
+              Bases: <code><span title="minrecord.comparable._ScalarRecord">_ScalarRecord</span></code></p>
 
 
 
@@ -5263,11 +5263,13 @@ object.</p>
     <div class="doc doc-contents ">
 
         <p>Load the state values from a dict.</p>
-<p>The data of a key that is already in the manager is loaded in
-the existing record (<code>load_dict</code>), so the objects that
-other parts of the code hold are updated. The data of a new
-key creates a new record (<code>BaseRecord.from_dict</code>). The
-manager is not modified if one entry is invalid.</p>
+<p>The state is merged into the manager. The data of a key that
+is already in the manager is loaded in the existing record
+(<code>load_dict</code>), so the objects that other parts of the code
+hold are updated. The data of a new key creates a new record
+(<code>BaseRecord.from_dict</code>). A record of the manager that the
+state does not mention is kept. The manager is not modified if
+one entry is invalid.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -5318,7 +5320,8 @@ structure of the output of <code>state_dict</code>.</p>
             <td>
               <div class="doc-md-description">
                 <p>if the data of a key is the data of a record
-of another type than the existing record.</p>
+of another type than the existing record, or if it is
+not the data of a record.</p>
               </div>
             </td>
           </tr>
