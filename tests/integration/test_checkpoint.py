@@ -127,3 +127,44 @@ def test_state_dict_json_round_trip_custom_comparator_objects_are_equal() -> Non
     new_manager = RecordManager()
     new_manager.load_state_dict(json.loads(json.dumps(manager.state_dict())))
     assert objects_are_equal(new_manager, manager)
+
+
+def run_training_with_nan(manager: RecordManager, steps: range) -> None:
+    # The loss diverges at step 3: the value is NaN.
+    for step in steps:
+        loss = float("nan") if step == 3 else abs(6 - step) / 2
+        manager.get_record("loss").add_value(loss, step=step)
+        manager.get_record("accuracy").add_value(step / 10, step=step)
+
+
+def create_nan_manager(steps: range) -> RecordManager:
+    manager = RecordManager()
+    manager.add_record(MinScalarRecord("loss", max_size=3))
+    manager.add_record(MaxScalarRecord("accuracy", max_size=3))
+    run_training_with_nan(manager, steps)
+    return manager
+
+
+def test_state_dict_json_round_trip_nan_objects_are_equal() -> None:
+    manager = create_nan_manager(range(5))
+    new_manager = RecordManager()
+    new_manager.load_state_dict(json.loads(json.dumps(manager.state_dict())))
+    assert objects_are_equal(new_manager, manager)
+
+
+def test_state_dict_json_round_trip_nan_resume_training() -> None:
+    expected = create_nan_manager(range(10))
+    manager = create_nan_manager(range(5))
+    resumed = RecordManager()
+    resumed.load_state_dict(json.loads(json.dumps(manager.state_dict())))
+    run_training_with_nan(resumed, range(5, 10))
+    assert resumed.get_best_values() == expected.get_best_values()
+
+
+def test_state_dict_json_round_trip_nan_resume_training_is_equal() -> None:
+    expected = create_nan_manager(range(10))
+    manager = create_nan_manager(range(5))
+    resumed = RecordManager()
+    resumed.load_state_dict(json.loads(json.dumps(manager.state_dict())))
+    run_training_with_nan(resumed, range(5, 10))
+    assert resumed.equal(expected)

@@ -61,10 +61,10 @@ These properties are guaranteed by the base classes, so every record has them.
 | Bounded memory     | A record keeps at most `max_size` pairs `(step, value)`. The oldest pair is dropped first. Adding a value is O(1).                                                                        |
 | Best is never lost | The best pair `(step, value)` of a comparable record is stored apart from the recent values: it survives the eviction of the pair that produced it, `clone` and `to_dict`/`from_dict`.     |
 | No sentinel        | The best pair is `None` until a value is added. The first value is then the best value and an improvement. No `inf` or `-inf` is stored or returned.                                      |
-| Ties improve       | A value equal to the best value counts as an improvement. It is useful when a metric plateaus at its optimum.                                                                             |
-| NaN never wins     | A NaN value is never better than another value. A NaN best value is replaced by the first number.                                                                                         |
+| Ties improve       | A value equal to the best value counts as an improvement. It is useful when a metric plateaus at its optimum. The comparison is reflexive: `is_better(new_value=x, old_value=x)` is `True` for all `x`, NaN included. |
+| NaN never wins     | A NaN value is never better than a number. A NaN best value is replaced by any value (a number, or another NaN as a tie).                                                                  |
 | One snapshot       | `to_dict()` returns the arguments of the constructor, content included (the recent values as `elements`, the best pair as `best`). `improved` is derived from the values, it is not stored. |
-| Round trip         | `BaseRecord.from_dict(r.to_dict()).equal(r)`, `r.clone().equal(r)`, and `r.load_dict(r2.to_dict())` makes `r` equal to `r2`. A clone is independent: adding values to it does not change `r`. |
+| Round trip         | `BaseRecord.from_dict(r.to_dict()).equal(r)`, `r.clone().equal(r)`, and `r.load_dict(r2.to_dict())` makes `r` equal to `r2`, also after a JSON round trip and when `r` holds a NaN (`equal` treats NaN as equal to NaN). The clone has the same `has_improved()` and the same best pair. A clone is independent: adding values to it does not change `r`. |
 | Atomic             | An operation that raises (a comparator that fails, an invalid dict given to `load_dict` or to the manager `load_state_dict`) leaves the record, or the manager, as it was.                 |
 | Typed errors       | `EmptyRecordError` for a value asked from an empty record, `NotAComparableRecordError` for a best value asked from a record that cannot compare, `ValueError` for an invalid `max_size`.  |
 | No hidden global   | The default `max_size` is read when a record is **created**. It is the only global setting (`get_max_size`, `set_max_size`, `reset_max_size`).                                             |
@@ -168,7 +168,10 @@ record.add_value((precision, recall))
 ```
 
 A comparator only implements `is_better`. The first value of a record is the best value, so the
-comparator does not need an initial value. If the comparator has some arguments, override `to_dict`
+comparator does not need an initial value. The comparison must be reflexive:
+`is_better(new_value=x, old_value=x)` returns `True` for every `x` (a plateau is an improvement), as
+a record that is rebuilt from `to_dict` replays its last value against a best value that is that
+value. Use `>=` or `<=`, not `>` or `<`. If the comparator has some arguments, override `to_dict`
 so the record can be saved and loaded: `{**super().to_dict(), "tolerance": self._tolerance}`.
 
 ## Performance Considerations

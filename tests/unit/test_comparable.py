@@ -379,6 +379,39 @@ def test_comparable_record_nan_after_number_has_not_improved() -> None:
     assert not create_max_record(elements=[(0, 1.0), (1, NAN)]).has_improved()
 
 
+def test_comparable_record_nan_after_nan_has_improved() -> None:
+    assert create_max_record(elements=[(0, NAN), (1, NAN)]).has_improved()
+
+
+def test_comparable_record_nan_after_nan_replaces_best_pair() -> None:
+    assert create_max_record(elements=[(0, NAN), (1, NAN)]).to_dict()["best"][0] == 1
+
+
+def test_comparable_record_first_nan_has_improved() -> None:
+    assert create_max_record(elements=[(0, NAN)]).has_improved()
+
+
+def test_comparable_record_first_nan_clone_has_improved() -> None:
+    assert create_max_record(elements=[(0, NAN)]).clone().has_improved()
+
+
+def test_comparable_record_nan_equal_true() -> None:
+    assert create_max_record(elements=[(0, 1.0), (1, NAN)]).equal(
+        create_max_record(elements=[(0, 1.0), (1, NAN)])
+    )
+
+
+def test_comparable_record_nan_equal_false_nan_and_number() -> None:
+    assert not create_max_record(elements=[(0, 1.0), (1, NAN)]).equal(
+        create_max_record(elements=[(0, 1.0), (1, 2.0)])
+    )
+
+
+def test_comparable_record_nan_equal_json_round_trip() -> None:
+    record = create_max_record(elements=[(0, 1.0), (1, NAN)])
+    assert BaseRecord.from_dict(json.loads(json.dumps(record.to_dict()))).equal(record)
+
+
 def test_comparable_record_first_nan_is_the_best_value() -> None:
     assert isnan(create_max_record(elements=[(0, NAN)]).get_best_value())
 

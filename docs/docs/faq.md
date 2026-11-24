@@ -110,9 +110,10 @@ record.has_improved()  # False (1.4 > 1.3)
 
 ### What happens with NaN values?
 
-A NaN value is never better than another value, so it never becomes the best value when a number
-exists. A NaN best value is replaced by the first number. The first value of a record is always the
-best value, even if it is NaN.
+A NaN value is never better than a number, so it never becomes the best value when a number
+exists. A NaN best value is replaced by any value: the first number, or another NaN (a tie). The
+first value of a record is always the best value, even if it is NaN. Two records that hold the same
+NaN values are equal (`equal` treats NaN as equal to NaN), also after a JSON round trip.
 
 ```python
 record = MinScalarRecord("loss")
@@ -132,7 +133,9 @@ optimal value.
 
 Yes! Implement `BaseComparator`, it has only one abstract method. The first value of a record is
 always the best value, so a comparator does not need an initial value. A new value that is equal to
-the old value should be better, so a plateau counts as an improvement:
+the old value must be better (the comparison is reflexive: `is_better(new_value=x, old_value=x)` is
+`True` for every `x`), so a plateau counts as an improvement and a record can be rebuilt from its
+`to_dict` output:
 
 ```python
 from minrecord.comparator import BaseComparator

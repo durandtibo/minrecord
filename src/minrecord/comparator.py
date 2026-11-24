@@ -27,6 +27,10 @@ class BaseComparator(ABC, Generic[T]):
     override ``to_dict`` too, so the comparator can be re-created and
     compared.
 
+    The comparison must be reflexive: ``is_better(new_value=x,
+    old_value=x)`` returns ``True`` for every value ``x``. A record
+    relies on it to rebuild itself from ``to_dict``.
+
     Example:
         ```pycon
         >>> from minrecord import MinScalarComparator
@@ -42,7 +46,10 @@ class BaseComparator(ABC, Generic[T]):
         r"""Indicate if the new value is better than the old value.
 
         A new value that is equal to the old value is better, so a
-        record counts a plateau as an improvement.
+        record counts a plateau as an improvement. This rule is a
+        contract: ``is_better(new_value=x, old_value=x)`` returns
+        ``True`` for every value ``x``, because ``BaseRecord.from_dict``
+        replays the last value against a best value that is that value.
 
         Args:
             new_value: The new value to compare.
@@ -116,8 +123,8 @@ class MaxScalarComparator(BaseComparator[float]):
     r"""Implement a max comparator for scalar value.
 
     This comparator can be used to find the maximum value between two
-    scalar values. A NaN value is never better than another value, and
-    a NaN old value is replaced by any number.
+    scalar values. A NaN value is never better than a number, and a NaN
+    old value is replaced by any value (a number, or a NaN as a tie).
 
     Example:
         ```pycon
@@ -129,20 +136,22 @@ class MaxScalarComparator(BaseComparator[float]):
         False
         >>> comparator.is_better(old_value=float("nan"), new_value=0.4)
         True
+        >>> comparator.is_better(old_value=float("nan"), new_value=float("nan"))
+        True
 
         ```
     """
 
     def is_better(self, *, new_value: float, old_value: float) -> bool:
-        return not isnan(new_value) and (isnan(old_value) or new_value >= old_value)
+        return isnan(old_value) or (not isnan(new_value) and new_value >= old_value)
 
 
 class MinScalarComparator(BaseComparator[float]):
     r"""Implementation of a min comparator for scalar value.
 
     This comparator can be used to find the minimum value between two
-    scalar values. A NaN value is never better than another value, and
-    a NaN old value is replaced by any number.
+    scalar values. A NaN value is never better than a number, and a NaN
+    old value is replaced by any value (a number, or a NaN as a tie).
 
     Example:
         ```pycon
@@ -154,12 +163,14 @@ class MinScalarComparator(BaseComparator[float]):
         False
         >>> comparator.is_better(old_value=float("nan"), new_value=0.4)
         True
+        >>> comparator.is_better(old_value=float("nan"), new_value=float("nan"))
+        True
 
         ```
     """
 
     def is_better(self, *, new_value: float, old_value: float) -> bool:
-        return not isnan(new_value) and (isnan(old_value) or new_value <= old_value)
+        return isnan(old_value) or (not isnan(new_value) and new_value <= old_value)
 
 
 get_default_registry().register(BaseComparator, EqualEqualityTester(), exist_ok=True)
