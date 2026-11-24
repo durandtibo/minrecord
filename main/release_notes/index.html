@@ -1199,6 +1199,9 @@ compatibility layer.</p>
 <li><code>best</code> must be a <code>tuple</code> or a <code>list</code> of length 2. A <code>set</code> or a <code>str</code> of two items was accepted as a
   pair and now raises <code>ValueError</code>.</li>
 <li><code>BaseComparator.equal</code> treats NaN as equal to NaN, as the records do.</li>
+<li>The equality of the records, the comparators and the managers is the equality of their snapshot
+  (<code>to_dict</code>, <code>state_dict</code>). A NaN is equal to a NaN also with <code>objects_are_equal(...,
+  equal_nan=False)</code>: this is the one deliberate difference with <code>coola</code>, and it is documented.</li>
 <li><code>BaseComparator</code> has a <code>repr</code> built from <code>to_dict</code> (<code>ToleranceComparator(tolerance=0.1)</code>), so
   <code>str(record)</code> no longer contains a memory address.</li>
 <li><code>equal</code> requires the same type.</li>
@@ -1227,6 +1230,13 @@ compatibility layer.</p>
 <li><code>exist_ok</code> (<code>RecordManager.add_record</code>), and <code>prefix</code> and <code>suffix</code> (<code>RecordManager.get_best_values</code>,
   <code>get_best_values</code>, <code>get_last_values</code>) are keyword-only.</li>
 <li><code>RecordManager(records)</code> copies the dict.</li>
+<li><code>RecordManager.get_record(key)</code> raises <code>KeyError</code> for a key that nobody registered. It created an
+  empty <code>Record</code> (never a comparable one), so a typo in a metric name silently lost the best value.
+  The new keyword-only argument <code>default_factory</code> (a function of the key that returns a record, as
+  for <code>collections.defaultdict</code>) restores the creation, for example
+  <code>RecordManager(default_factory=Record)</code> or <code>RecordManager(default_factory=MinScalarRecord)</code>. The
+  factory is not part of the state: <code>state_dict</code>, <code>equal</code> and <code>load_state_dict</code> do not use it.
+  <code>minrecord.manager</code> no longer imports <code>Record</code>.</li>
 </ul>
 <p>Configuration and utilities:</p>
 <ul>
@@ -1264,9 +1274,11 @@ compatibility layer.</p>
   comparator can be written to JSON.</li>
 <li>A comparator that raises in <code>add_value</code> leaves the record unchanged.</li>
 <li><code>RecordManager.load_state_dict</code> does not change the manager if an entry is invalid.</li>
-<li><code>RecordManager.load_state_dict</code> builds each record once to validate the state (it cloned the
-  existing records before), and its merge semantics is documented: a record that the state does not
-  mention is kept.</li>
+<li><code>RecordManager.load_state_dict</code> validates the state by building each record with
+  <code>BaseRecord.from_dict</code> (it cloned the existing records before). The data of a key that is already
+  in the manager is then loaded with <code>load_dict</code>, so an existing key is built twice, once to validate
+  and once to load. Its merge semantics is documented: a record that the state does not mention is
+  kept.</li>
 <li><code>minrecord.config</code> has no <code>global</code> statement, and <code>src</code> has no <code>noqa</code>.</li>
 <li><code>MaxScalarRecord</code> and <code>MinScalarRecord</code> share a private base class (<code>_ScalarRecord</code>) that builds
   the comparator from a class attribute, so a new scalar record is a docstring and one line. Their

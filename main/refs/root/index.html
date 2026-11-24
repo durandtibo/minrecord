@@ -2196,7 +2196,10 @@ relies on it to rebuild itself from <code>to_dict</code>.</p>
 
         <p>Indicate if two comparators are equal or not.</p>
 <p>Two comparators are equal if they have the same type and the
-same <code>to_dict</code> output. A NaN value is equal to a NaN value.</p>
+same <code>to_dict</code> output: the equality of a comparator is the
+equality of its snapshot. A NaN value is equal to a NaN value,
+also when <code>objects_are_equal</code> is called with
+<code>equal_nan=False</code>.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -2480,8 +2483,8 @@ following members:</p>
 </code></pre></div>
 <p>The other methods are derived from them. <code>clone</code>, <code>equal</code>,
 <code>update</code>, <code>from_dict</code> and <code>load_dict</code> are <code>@final</code>, so a
-type checker rejects an override. A comparable record overrides that overrides <code>is_comparable</code>,
-<code>get_best_value</code>, <code>get_best_step</code> and <code>has_improved</code>.</p>
+type checker rejects an override. A comparable record overrides <code>is_comparable</code>, <code>get_best_value</code>,
+<code>get_best_step</code> and <code>has_improved</code>.</p>
 <p>The contract of a record is:</p>
 <div class="highlight"><pre><span></span><code>1. ``to_dict`` returns exactly the arguments of the constructor
     that rebuild the record, including its content, and the
@@ -2707,9 +2710,11 @@ the original record. The values are shared, not copied.</p>
 
         <p>Indicate if two records are equal or not.</p>
 <p>Two records are equal if they have the same type and the same
-<code>to_dict</code> output. A NaN value is equal to a NaN value, so a
-record that holds a NaN is equal to its copy after a JSON round
-trip.</p>
+<code>to_dict</code> output: the equality of a record is the equality
+of its snapshot. A NaN value is equal to a NaN value, also
+when <code>objects_are_equal</code> is called with <code>equal_nan=False</code>,
+so a record that holds a NaN is equal to its copy after a JSON
+round trip.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -4698,6 +4703,26 @@ not change it.</p>
                   <code>None</code>
             </td>
           </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>default_factory</code>
+            </td>
+            <td>
+                  <code><span title="collections.abc.Callable">Callable</span>[[<span title="str">str</span>], <a class="autorefs autorefs-internal" title="minrecord.base.BaseRecord" href="../base/#minrecord.base.BaseRecord">BaseRecord</a>[<span title="typing.Any">Any</span>]] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The function that creates the record of a
+key that is not registered. It is called with the key and
+must return a record. If <code>None</code>, <code>get_record</code> raises
+<code>KeyError</code> for an unknown key. The factory is not part
+of the state of the manager (<code>state_dict</code>, <code>equal</code>).</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
       </tbody>
     </table>
 
@@ -4709,8 +4734,9 @@ not change it.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">manager</span><span class="o">.</span><span class="n">add_record</span><span class="p">(</span><span class="n">MinScalarRecord</span><span class="p">(</span><span class="s2">"loss"</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">manager</span><span class="o">.</span><span class="n">get_record</span><span class="p">(</span><span class="s2">"loss"</span><span class="p">)</span>
 <span class="go">MinScalarRecord(name=loss, max_size=10, size=0)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">manager</span> <span class="o">=</span> <span class="n">RecordManager</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">MinScalarRecord</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">manager</span><span class="o">.</span><span class="n">get_record</span><span class="p">(</span><span class="s2">"new_record"</span><span class="p">)</span>
-<span class="go">Record(name=new_record, max_size=10, size=0)</span>
+<span class="go">MinScalarRecord(name=new_record, max_size=10, size=0)</span>
 </code></pre></div>
 </details>
 
@@ -4882,8 +4908,11 @@ key and <code>exist_ok=False</code>.</p>
 
         <p>Indicate if two managers are equal or not.</p>
 <p>Two managers are equal if they have the same type and the same
-records (same keys and equal records). A NaN value is equal to
-a NaN value, as for <code>BaseRecord.equal</code>.</p>
+records (same keys and equal <code>to_dict</code> output): the equality
+of a manager is the equality of its <code>state_dict</code>. A NaN value
+is equal to a NaN value, also when <code>objects_are_equal</code> is
+called with <code>equal_nan=False</code>, as for <code>BaseRecord.equal</code>.
+The <code>default_factory</code> is not compared.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -5239,9 +5268,35 @@ arguments.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The record if it exists, otherwise it returns an empty
-record. The created empty record is a <code>Record</code>
-object.</p>
+                <p>The record registered for the key. If there is none and
+the manager has a <code>default_factory</code>, the record is
+created with <code>default_factory(key)</code>, registered and
+returned. The next call returns the same object.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="KeyError">KeyError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>if no record is registered for the key and the
+manager has no <code>default_factory</code>. The manager is not
+modified (also if the factory raises).</p>
               </div>
             </td>
           </tr>
@@ -5257,7 +5312,12 @@ object.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">manager</span><span class="o">.</span><span class="n">get_record</span><span class="p">(</span><span class="s2">"loss"</span><span class="p">)</span>
 <span class="go">MinScalarRecord(name=loss, max_size=10, size=0)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">manager</span><span class="o">.</span><span class="n">get_record</span><span class="p">(</span><span class="s2">"new_record"</span><span class="p">)</span>
-<span class="go">Record(name=new_record, max_size=10, size=0)</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="w">    </span><span class="o">...</span>
+<span class="gr">KeyError</span>: <span class="n">"No record is registered for the key 'new_record'. Known keys: ['loss']"</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">manager</span> <span class="o">=</span> <span class="n">RecordManager</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">MinScalarRecord</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">manager</span><span class="o">.</span><span class="n">get_record</span><span class="p">(</span><span class="s2">"new_record"</span><span class="p">)</span>
+<span class="go">MinScalarRecord(name=new_record, max_size=10, size=0)</span>
 </code></pre></div>
 </details>
 
@@ -5425,6 +5485,12 @@ hold are updated. The data of a new key creates a new record
 (<code>BaseRecord.from_dict</code>). A record of the manager that the
 state does not mention is kept. The manager is not modified if
 one entry is invalid.</p>
+<p>The data of every entry is first validated by building a
+record with <code>BaseRecord.from_dict</code>. The data of a key that
+is already in the manager is then loaded with <code>load_dict</code>,
+which builds the record again, so an existing key is built
+twice. The cost is one more constructor call for a window of
+at most <code>max_size</code> pairs.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>

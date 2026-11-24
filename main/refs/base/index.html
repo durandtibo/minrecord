@@ -1551,8 +1551,8 @@ following members:</p>
 </code></pre></div>
 <p>The other methods are derived from them. <code>clone</code>, <code>equal</code>,
 <code>update</code>, <code>from_dict</code> and <code>load_dict</code> are <code>@final</code>, so a
-type checker rejects an override. A comparable record overrides that overrides <code>is_comparable</code>,
-<code>get_best_value</code>, <code>get_best_step</code> and <code>has_improved</code>.</p>
+type checker rejects an override. A comparable record overrides <code>is_comparable</code>, <code>get_best_value</code>,
+<code>get_best_step</code> and <code>has_improved</code>.</p>
 <p>The contract of a record is:</p>
 <div class="highlight"><pre><span></span><code>1. ``to_dict`` returns exactly the arguments of the constructor
     that rebuild the record, including its content, and the
@@ -1778,9 +1778,11 @@ the original record. The values are shared, not copied.</p>
 
         <p>Indicate if two records are equal or not.</p>
 <p>Two records are equal if they have the same type and the same
-<code>to_dict</code> output. A NaN value is equal to a NaN value, so a
-record that holds a NaN is equal to its copy after a JSON round
-trip.</p>
+<code>to_dict</code> output: the equality of a record is the equality
+of its snapshot. A NaN value is equal to a NaN value, also
+when <code>objects_are_equal</code> is called with <code>equal_nan=False</code>,
+so a record that holds a NaN is equal to its copy after a JSON
+round trip.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>

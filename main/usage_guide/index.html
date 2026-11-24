@@ -1663,15 +1663,15 @@ with comparison logic:</p>
 </tr>
 <tr>
 <td>Best is never lost</td>
-<td>The best pair <code>(step, value)</code> of a comparable record is stored apart from the recent values: it survives the eviction of the pair that produced it, <code>clone</code> and <code>to_dict</code>/<code>from_dict</code>.</td>
+<td>The best pair <code>(step, value)</code> of a comparable record is stored apart from the window: it survives the eviction of the pair that produced it, <code>clone</code> and <code>to_dict</code>/<code>from_dict</code>.</td>
 </tr>
 <tr>
-<td>No sentinel</td>
-<td>The best pair is <code>None</code> until a value is added. The first value is then the best value and an improvement. No <code>inf</code> or <code>-inf</code> is stored or returned.</td>
+<td>No confusable sentinel</td>
+<td>The absence of a best value is the best pair <code>None</code>. It is never a value that a record can hold, and <code>inf</code>/<code>-inf</code> are never stored as a stand-in.</td>
 </tr>
 <tr>
 <td>Ties improve</td>
-<td>A value equal to the best value counts as an improvement. It is useful when a metric plateaus at its optimum. The comparison is reflexive: <code>is_better(new_value=x, old_value=x)</code> is <code>True</code> for all <code>x</code>, NaN included.</td>
+<td>A value equal to the best value counts as an improvement. The comparison is <strong>reflexive</strong>: <code>is_better(new_value=x, old_value=x)</code> is <code>True</code> for all <code>x</code>, NaN included.</td>
 </tr>
 <tr>
 <td>NaN never wins</td>
@@ -1679,47 +1679,63 @@ with comparison logic:</p>
 </tr>
 <tr>
 <td>One snapshot</td>
-<td><code>to_dict()</code> returns the arguments of the constructor, content included (the recent values as <code>elements</code>, the best pair as <code>best</code>). <code>improved</code> is derived from the values, it is not stored.</td>
+<td><code>to_dict()</code> returns the arguments of the constructor, content included (window as <code>elements</code>, best as <code>best</code>). <code>improved</code> is derived from the values, never stored.</td>
 </tr>
 <tr>
-<td>Round trip</td>
-<td><code>BaseRecord.from_dict(r.to_dict()).equal(r)</code>, <code>r.clone().equal(r)</code>, and <code>r.load_dict(r2.to_dict())</code> makes <code>r</code> equal to <code>r2</code>, also after a JSON round trip and when <code>r</code> holds a NaN (<code>equal</code> treats NaN as equal to NaN). The clone has the same <code>has_improved()</code> and the same best pair. A clone is independent: adding values to it does not change <code>r</code>.</td>
+<td>Round trip is exact</td>
+<td>For every record <code>r</code>, also after a JSON round trip and when it holds NaN: <code>from_dict(to_dict()).equal(r)</code>, <code>r.clone().equal(r)</code>, the clone has the same <code>has_improved()</code> and the same best pair. A clone is independent.</td>
 </tr>
 <tr>
 <td>Consistent state</td>
-<td>A comparable record has a best pair if and only if it has a value. <code>best</code> must be a pair <code>(step, value)</code> (a <code>tuple</code> or a <code>list</code> of length 2), and it requires <code>elements</code>: <code>MinScalarRecord("loss", best=(0, 1.0))</code> raises <code>ValueError</code>.</td>
+<td>A comparable record has a best pair if and only if it has a value. <code>best</code> is a pair (a <code>tuple</code> or a <code>list</code> of length 2) and requires <code>elements</code>.</td>
 </tr>
 <tr>
 <td>Safe to load</td>
-<td><code>from_dict</code> and the comparator dict only build objects of the expected type (a record, a comparator): a dict that names any other importable callable raises <code>TypeError</code> before it is called, and so does anything that is not a dict. <code>MinScalarRecord.from_dict(d)</code> only accepts the dict of a <code>MinScalarRecord</code>.</td>
+<td><code>from_dict</code>, <code>load_dict</code>, <code>load_state_dict</code> and the comparator dict only build objects of the expected type, and anything that is not a dict is a <code>TypeError</code>. A <code>_target_</code> inside a stored value is data: it is never instantiated.</td>
 </tr>
 <tr>
 <td>Fails early</td>
-<td>A value that the comparator cannot compare (<code>None</code>, a string, ...) is rejected by the <code>add_value</code> that receives it, and never stored: the first value is compared with itself. A record is never left in a state where every later <code>add_value</code> raises. A <code>max_size</code> that a deque cannot hold and a <code>name</code> that is not a <code>str</code> are rejected by the call that receives them.</td>
+<td>An input that cannot work is rejected <strong>by the call that receives it</strong> and never stored: a value that the comparator cannot compare, a <code>max_size</code> that a deque cannot hold, a <code>name</code> that is not a <code>str</code>, a manager key that nobody registered. The package never creates a record that the caller did not ask for.</td>
 </tr>
 <tr>
 <td>Atomic</td>
-<td><code>add_value</code>, <code>load_dict</code> and the manager <code>load_state_dict</code> leave the record, or the manager, as it was if they raise. <code>update</code> is a loop of <code>add_value</code>: the elements before the failing one are kept (use <code>clone().update(...)</code> to keep the original).</td>
+<td><code>add_value</code>, <code>load_dict</code> and the manager <code>load_state_dict</code> leave the record, or the manager, as it was if they raise. <code>update</code> is a loop of <code>add_value</code>: the elements before the failing one are kept.</td>
 </tr>
 <tr>
 <td>Typed errors</td>
-<td><code>EmptyRecordError</code> for a value asked from an empty record (<code>get_last_value</code>, <code>get_best_value</code>, <code>get_best_step</code>, <code>has_improved</code>), <code>NotAComparableRecordError</code> for a best value asked from a record that cannot compare, <code>ValueError</code> for an invalid <code>max_size</code>, <code>TypeError</code> for a <code>name</code> that is not a <code>str</code> and for a dict or a comparator of the wrong type.</td>
-</tr>
-<tr>
-<td>No hidden global</td>
-<td>The default <code>max_size</code> is read when a record is <strong>created</strong>. It is the only global setting (<code>get_max_size</code>, <code>set_max_size</code>, <code>reset_max_size</code>), and it only accepts values that a record can use.</td>
+<td><code>EmptyRecordError</code> for a value asked from an empty record, <code>NotAComparableRecordError</code> for a best value, a best step or an improvement asked from a record that cannot compare, <code>ValueError</code> for an invalid <code>max_size</code> or <code>best</code>, <code>TypeError</code> for a <code>name</code>, a dict or a comparator of the wrong type, <code>KeyError</code> for an unknown manager key.</td>
 </tr>
 <tr>
 <td>Contract is enforced</td>
-<td><code>clone</code>, <code>equal</code>, <code>update</code>, <code>from_dict</code> and <code>load_dict</code> are <code>@final</code>: a type checker rejects an override.</td>
+<td>The methods that must not be overridden (<code>clone</code>, <code>equal</code>, <code>update</code>, <code>from_dict</code>, <code>load_dict</code>) are <code>@final</code>.</td>
 </tr>
 <tr>
-<td>Readable text</td>
-<td><code>repr</code> and <code>str</code> of a record and of a comparator are deterministic and show the arguments, without a memory address: <code>MinScalarComparator()</code>, <code>ToleranceComparator(tolerance=0.1)</code>.</td>
+<td>Readable and stable text</td>
+<td><code>repr</code>/<code>str</code> of a record and of a comparator are deterministic and show the arguments (no memory address).</td>
+</tr>
+<tr>
+<td>No hidden global</td>
+<td>The default <code>max_size</code> is read when a record is <strong>created</strong>. It is the only global setting (<code>get_max_size</code>, <code>set_max_size</code>, <code>reset_max_size</code>) and it only accepts values that a record can use.</td>
+</tr>
+<tr>
+<td>Equality is snapshot equality</td>
+<td><code>equal</code> is the equality of the <code>to_dict</code> output of two records (same type) and of the <code>state_dict</code> of two managers. A NaN is equal to a NaN, also for <code>objects_are_equal(..., equal_nan=False)</code>: this is the one deliberate difference with <code>coola</code>.</td>
 </tr>
 <tr>
 <td>Extensible</td>
-<td>A new record type implements the 6 abstract members of <code>BaseRecord</code>. A new notion of "better" implements the one method <code>BaseComparator.is_better</code>. No registry is needed.</td>
+<td>A new record type implements the 6 abstract members of <code>BaseRecord</code>, keeps its whole state in <code>vars(self)</code> and accepts what its <code>to_dict</code> returns. A new notion of "better" implements the one method <code>BaseComparator.is_better</code>. No registry is needed.</td>
+</tr>
+<tr>
+<td>Consistent with <code>coola</code></td>
+<td>Records, comparators and managers work with <code>objects_are_equal</code>; <code>to_dict</code> works with <code>coola.factory.factory</code>; the string forms use <code>coola.formatting</code>.</td>
+</tr>
+<tr>
+<td>Keyword-only options</td>
+<td>Every option after the identifying arguments (<code>name</code>, <code>comparator</code>, <code>records</code>) is keyword-only.</td>
+</tr>
+<tr>
+<td>Minimal</td>
+<td>One dependency (<code>coola</code>), no optional dependency, no I/O, no logging, no thread, no global state beyond <code>max_size</code>.</td>
 </tr>
 </tbody>
 </table>
@@ -1729,12 +1745,18 @@ with comparison logic:</p>
   lock.</li>
 <li><strong>Values are stored by reference.</strong> <code>add_value</code> does not copy the value, and <code>to_dict</code> and <code>clone</code>
   share the value objects between the copies. Store scalars or immutable objects.</li>
-<li><strong>Order of the <code>step</code> values.</strong> <code>step</code> is a label, it is not checked to increase.</li>
+<li><strong>Order of the <code>step</code> values.</strong> <code>step</code> is a label: it is not checked to increase, nor to be a
+  number. Early stopping with <code>get_best_step</code> needs a numeric step.</li>
 <li><strong>Truthiness.</strong> <code>Record</code> and <code>RecordManager</code> define <code>__len__</code>, so an empty one is falsy: write
   <code>record.is_empty()</code>, not <code>if record:</code>.</li>
 <li><strong><code>load_dict</code> replaces the whole state.</strong> The name and the <code>max_size</code> of the record are replaced
   too: a record named <code>a</code> that loads the dict of a record named <code>b</code> is named <code>b</code>. Check the name
   before if it must stay.</li>
+<li><strong>Untrusted dicts beyond the type.</strong> <code>from_dict</code> imports the module that <code>_target_</code> names. It
+  never calls anything but a record class, but a dict from an untrusted source can still make the
+  process import a module.</li>
+<li><strong><code>copy.copy(record)</code> is not a clone.</strong> A shallow copy shares the window, so <code>add_value</code> on the
+  copy changes the original. <code>clone()</code> and <code>copy.deepcopy</code> are independent: use <code>clone()</code>.</li>
 </ul>
 <h2 id="common-patterns">Common Patterns<a class="headerlink" href="#common-patterns" title="Permanent link">&para;</a></h2>
 <h3 id="pattern-1-basic-training-loop">Pattern 1: Basic Training Loop<a class="headerlink" href="#pattern-1-basic-training-loop" title="Permanent link">&para;</a></h3>
@@ -1860,10 +1882,10 @@ so the record can be saved and loaded: <code>{**super().to_dict(), "tolerance": 
 </code></pre></div>
 <h3 id="logging-integration">Logging Integration<a class="headerlink" href="#logging-integration" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">wandb</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">minrecord</span><span class="w"> </span><span class="kn">import</span> <span class="n">RecordManager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">minrecord</span><span class="w"> </span><span class="kn">import</span> <span class="n">Record</span><span class="p">,</span> <span class="n">RecordManager</span>
 
-<span class="n">manager</span> <span class="o">=</span> <span class="n">RecordManager</span><span class="p">()</span>
-<span class="c1"># ... add records ...</span>
+<span class="c1"># A record is created for every new metric name.</span>
+<span class="n">manager</span> <span class="o">=</span> <span class="n">RecordManager</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">Record</span><span class="p">)</span>
 
 <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">epochs</span><span class="p">):</span>
     <span class="c1"># Training...</span>

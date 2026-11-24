@@ -2123,10 +2123,20 @@ the old value must be better (the comparison is reflexive: <code>is_better(new_v
 <li><strong>State management</strong>: Save/load all records together</li>
 </ul>
 <h3 id="does-recordmanager-create-records-automatically">Does RecordManager create records automatically?<a class="headerlink" href="#does-recordmanager-create-records-automatically" title="Permanent link">&para;</a></h3>
-<p>Yes, <code>get_record()</code> creates a default <code>Record</code> if the name doesn't exist:</p>
-<div class="highlight"><pre><span></span><code><span class="n">manager</span> <span class="o">=</span> <span class="n">RecordManager</span><span class="p">()</span>
-<span class="n">record</span> <span class="o">=</span> <span class="n">manager</span><span class="o">.</span><span class="n">get_record</span><span class="p">(</span><span class="s2">"new_metric"</span><span class="p">)</span>  <span class="c1"># Auto-created</span>
+<p>No, not by default. <code>get_record()</code> raises a <code>KeyError</code> for a key that nobody registered, so a typo
+in a metric name is reported instead of storing the values in a record that nobody reads. To create
+the missing records on demand, pass a <code>default_factory</code> (as for <code>collections.defaultdict</code>). It is
+called with the key and returns the record:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">minrecord</span><span class="w"> </span><span class="kn">import</span> <span class="n">MinScalarRecord</span><span class="p">,</span> <span class="n">Record</span><span class="p">,</span> <span class="n">RecordManager</span>
+
+<span class="n">manager</span> <span class="o">=</span> <span class="n">RecordManager</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">Record</span><span class="p">)</span>
+<span class="n">record</span> <span class="o">=</span> <span class="n">manager</span><span class="o">.</span><span class="n">get_record</span><span class="p">(</span><span class="s2">"new_metric"</span><span class="p">)</span>  <span class="c1"># A Record named "new_metric"</span>
+
+<span class="c1"># A best value for every new metric:</span>
+<span class="n">manager</span> <span class="o">=</span> <span class="n">RecordManager</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">MinScalarRecord</span><span class="p">)</span>
 </code></pre></div>
+<p>The <code>default_factory</code> is not part of the state: <code>state_dict()</code>, <code>equal()</code> and <code>load_state_dict()</code> do
+not use it.</p>
 <p>To check if a record exists first:</p>
 <div class="highlight"><pre><span></span><code><span class="k">if</span> <span class="n">manager</span><span class="o">.</span><span class="n">has_record</span><span class="p">(</span><span class="s2">"my_metric"</span><span class="p">):</span>
     <span class="n">record</span> <span class="o">=</span> <span class="n">manager</span><span class="o">.</span><span class="n">get_record</span><span class="p">(</span><span class="s2">"my_metric"</span><span class="p">)</span>
@@ -2161,8 +2171,9 @@ the old value must be better (the comparison is reflexive: <code>is_better(new_v
 <h3 id="how-many-records-can-i-have">How many records can I have?<a class="headerlink" href="#how-many-records-can-i-have" title="Permanent link">&para;</a></h3>
 <p>There's no hard limit. Each record has minimal overhead. With max_size=10:</p>
 <ul>
-<li>Memory per record: ~200-500 bytes + stored values</li>
-<li>1000 records with scalars: ~1-2 MB</li>
+<li>Memory per record: about 1 KB + stored values (a <code>MinScalarRecord</code> takes 1,000 bytes empty and
+  1,950 bytes with 10 floats)</li>
+<li>1000 records with scalars: about 2 MB</li>
 </ul>
 <h3 id="is-minrecord-thread-safe">Is minrecord thread-safe?<a class="headerlink" href="#is-minrecord-thread-safe" title="Permanent link">&para;</a></h3>
 <p>No, records are not thread-safe. If using multiple threads:</p>
@@ -2179,10 +2190,10 @@ the old value must be better (the comparison is reflexive: <code>is_better(new_v
 <h2 id="integration-questions">Integration Questions<a class="headerlink" href="#integration-questions" title="Permanent link">&para;</a></h2>
 <h3 id="how-do-i-integrate-with-tensorboard">How do I integrate with TensorBoard?<a class="headerlink" href="#how-do-i-integrate-with-tensorboard" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">torch.utils.tensorboard</span><span class="w"> </span><span class="kn">import</span> <span class="n">SummaryWriter</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">minrecord</span><span class="w"> </span><span class="kn">import</span> <span class="n">RecordManager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">minrecord</span><span class="w"> </span><span class="kn">import</span> <span class="n">Record</span><span class="p">,</span> <span class="n">RecordManager</span>
 
 <span class="n">writer</span> <span class="o">=</span> <span class="n">SummaryWriter</span><span class="p">()</span>
-<span class="n">manager</span> <span class="o">=</span> <span class="n">RecordManager</span><span class="p">()</span>
+<span class="n">manager</span> <span class="o">=</span> <span class="n">RecordManager</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">Record</span><span class="p">)</span>
 
 <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">epochs</span><span class="p">):</span>
     <span class="c1"># Training...</span>
@@ -2198,10 +2209,10 @@ the old value must be better (the comparison is reflexive: <code>is_better(new_v
 </code></pre></div>
 <h3 id="how-do-i-integrate-with-weights-biases-wandb">How do I integrate with Weights &amp; Biases (wandb)?<a class="headerlink" href="#how-do-i-integrate-with-weights-biases-wandb" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">wandb</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">minrecord</span><span class="w"> </span><span class="kn">import</span> <span class="n">RecordManager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">minrecord</span><span class="w"> </span><span class="kn">import</span> <span class="n">Record</span><span class="p">,</span> <span class="n">RecordManager</span>
 
 <span class="n">wandb</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">project</span><span class="o">=</span><span class="s2">"my-project"</span><span class="p">)</span>
-<span class="n">manager</span> <span class="o">=</span> <span class="n">RecordManager</span><span class="p">()</span>
+<span class="n">manager</span> <span class="o">=</span> <span class="n">RecordManager</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">Record</span><span class="p">)</span>
 
 <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">epochs</span><span class="p">):</span>
     <span class="c1"># Training...</span>
@@ -2257,13 +2268,15 @@ create the record from its values:</p>
 <span class="n">best_values</span> <span class="o">=</span> <span class="n">manager</span><span class="o">.</span><span class="n">get_best_values</span><span class="p">()</span>  <span class="c1"># Only comparable records</span>
 </code></pre></div>
 <h3 id="record-not-found-errors">Record not found errors<a class="headerlink" href="#record-not-found-errors" title="Permanent link">&para;</a></h3>
-<p>Check that record names match exactly:</p>
+<p><code>get_record()</code> raises a <code>KeyError</code> that lists the known keys when no record is registered for the key.
+Check that record names match exactly:</p>
 <div class="highlight"><pre><span></span><code><span class="n">manager</span><span class="o">.</span><span class="n">add_record</span><span class="p">(</span><span class="n">MinScalarRecord</span><span class="p">(</span><span class="s2">"train/loss"</span><span class="p">))</span>  <span class="c1"># Note the "/"</span>
 <span class="c1"># Wrong name:</span>
-<span class="n">manager</span><span class="o">.</span><span class="n">get_record</span><span class="p">(</span><span class="s2">"train_loss"</span><span class="p">)</span><span class="o">.</span><span class="n">add_value</span><span class="p">(</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># Creates a new empty record</span>
+<span class="n">manager</span><span class="o">.</span><span class="n">get_record</span><span class="p">(</span><span class="s2">"train_loss"</span><span class="p">)</span><span class="o">.</span><span class="n">add_value</span><span class="p">(</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># KeyError: No record is registered ...</span>
 <span class="c1"># Correct:</span>
 <span class="n">manager</span><span class="o">.</span><span class="n">get_record</span><span class="p">(</span><span class="s2">"train/loss"</span><span class="p">)</span><span class="o">.</span><span class="n">add_value</span><span class="p">(</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 </code></pre></div>
+<p>If you want the records to be created on demand, use <code>RecordManager(default_factory=...)</code>.</p>
 <h2 id="need-more-help">Need More Help?<a class="headerlink" href="#need-more-help" title="Permanent link">&para;</a></h2>
 <ul>
 <li>Check the <a href="../usage_guide/">Usage Guide</a> for detailed patterns</li>
