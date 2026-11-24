@@ -14,8 +14,8 @@ from minrecord import (
 
 @pytest.fixture
 def records() -> dict[str, BaseRecord]:
-    record1 = MinScalarRecord.from_elements("loss", elements=[(None, 1.9), (None, 1.2)])
-    record2 = MaxScalarRecord.from_elements("accuracy", elements=[(None, 42), (None, 35)])
+    record1 = MinScalarRecord("loss", elements=[(None, 1.9), (None, 1.2)])
+    record2 = MaxScalarRecord("accuracy", elements=[(None, 42), (None, 35)])
     record3 = Record("epoch", elements=[(None, 0), (None, 1)])
     record4 = MaxScalarRecord("f1")
     return {

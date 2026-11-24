@@ -218,17 +218,26 @@ class RecordManager:
             >>> from minrecord import RecordManager, Record
             >>> manager = RecordManager()
             >>> manager.add_record(Record("value"))
-            >>> manager.load_state_dict({"value": {"state": {"record": ((0, 1), (1, 0.5), (2, 0.25))}}})
+            >>> manager.load_state_dict(
+            ...     {
+            ...         "value": {
+            ...             "_target_": "minrecord.generic.Record",
+            ...             "name": "value",
+            ...             "max_size": 10,
+            ...             "elements": ((0, 1), (1, 0.5), (2, 0.25)),
+            ...         }
+            ...     }
+            ... )
             >>> manager.get_record("value").get_last_value()
             0.25
 
             ```
         """
-        for key, state in state_dict.items():
+        for key, data in state_dict.items():
             if self.has_record(key):
-                self._records[key].load_state_dict(state["state"])
+                self._records[key].load_dict(data)
             else:
-                self._records[key] = BaseRecord.from_dict(state)
+                self._records[key] = BaseRecord.from_dict(data)
 
     def state_dict(self) -> dict[str, Any]:
         r"""Return a dictionary containing state values of all the

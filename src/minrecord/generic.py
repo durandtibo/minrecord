@@ -7,8 +7,9 @@ __all__ = ["Record"]
 from collections import deque
 from typing import TYPE_CHECKING, Any, TypeVar
 
-from coola.equality import objects_are_equal
+from coola.factory import OBJECT_TARGET
 from coola.formatting.structure import str_indent, str_mapping
+from coola.utils.introspection import get_qualified_class_name
 
 from minrecord.base import BaseRecord, EmptyRecordError
 from minrecord.config import get_max_size
@@ -33,10 +34,15 @@ class Record(BaseRecord[T]):
     Args:
         name: The name of the record.
         elements: The initial elements in the record. Each element is a
-            tuple with the step and its associated value.
+            tuple with the step and its associated value. The elements
+            are added with ``add_value``, so only the last
+            ``max_size`` elements are kept.
         max_size: The maximum size of the record. If ``None``, the
             default maximum size (see ``get_max_size``) at the time of
             the creation of the record is used.
+
+    Raises:
+        ValueError: if ``max_size`` is not a positive integer.
 
     Example:
         ```pycon
@@ -55,13 +61,14 @@ class Record(BaseRecord[T]):
     def __init__(
         self,
         name: str,
+        *,
         elements: Iterable[tuple[float | None, T]] = (),
         max_size: int | None = None,
     ) -> None:
-        super().__init__()
         self._name = name
         self._max_size = check_max_size(get_max_size() if max_size is None else max_size)
-        self._record = deque(elements, maxlen=self._max_size)
+        self._record: deque[tuple[float | None, T]] = deque(maxlen=self._max_size)
+        self.update(elements)
 
     def __len__(self) -> int:
         return len(self._record)
@@ -92,14 +99,6 @@ class Record(BaseRecord[T]):
     def add_value(self, value: T, step: float | None = None) -> None:
         self._record.append((step, value))
 
-    def clone(self) -> Record[T]:
-        return self.__class__(name=self.name, elements=self._record, max_size=self.max_size)
-
-    def equal(self, other: Any) -> bool:
-        if not isinstance(other, Record):
-            return False
-        return objects_are_equal(self.to_dict(), other.to_dict())
-
     def get_last_value(self) -> T:
         if self.is_empty():
             msg = f"'{self.name}' record is empty."
@@ -109,23 +108,13 @@ class Record(BaseRecord[T]):
     def get_most_recent(self) -> tuple[tuple[float | None, T], ...]:
         return tuple(self._record)
 
-    def is_comparable(self) -> bool:
-        return False
-
     def is_empty(self) -> bool:
         return not self._record
 
-    def update(self, elements: Iterable[tuple[float | None, T]]) -> None:
-        for step, value in elements:
-            self.add_value(value, step)
-
-    def config_dict(self) -> dict[str, Any]:
-        config = super().config_dict()
-        config["max_size"] = self.max_size
-        return config
-
-    def load_state_dict(self, state_dict: dict[str, Any]) -> None:
-        self._record = deque(state_dict["record"], maxlen=self.max_size)
-
-    def state_dict(self) -> dict[str, Any]:
-        return {"record": self.get_most_recent()}
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            OBJECT_TARGET: get_qualified_class_name(type(self)),
+            "name": self._name,
+            "max_size": self._max_size,
+            "elements": tuple(self._record),
+        }
