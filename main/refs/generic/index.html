@@ -954,6 +954,72 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#minrecord.generic.Record.name" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        name
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.generic.Record.add_value" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        add_value
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.generic.Record.get_last_value" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_last_value
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.generic.Record.get_most_recent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_most_recent
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.generic.Record.is_empty" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        is_empty
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.generic.Record.to_dict" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        to_dict
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1118,6 +1184,72 @@
     <span class="md-ellipsis">
       
         max_size
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.generic.Record.name" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        name
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.generic.Record.add_value" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        add_value
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.generic.Record.get_last_value" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_last_value
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.generic.Record.get_most_recent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_most_recent
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.generic.Record.is_empty" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        is_empty
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.generic.Record.to_dict" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        to_dict
       
     </span>
   </a>
@@ -1377,8 +1509,360 @@ larger than <code>sys.maxsize</code>, or if an element is not a
 
 </div>
 
+<div class="doc doc-object doc-attribute">
 
 
+
+<h4 id="minrecord.generic.Record.name" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">minrecord.generic.Record.name</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+<a href="#minrecord.generic.Record.name" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">name</span><span class="p">:</span> <span class="n"><span title="str">str</span></span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>The name of the record.</p>
+
+    </div>
+
+</div>
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="minrecord.generic.Record.add_value" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">minrecord.generic.Record.add_value</span>
+
+
+<a href="#minrecord.generic.Record.add_value" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">add_value</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n"><span title="minrecord.generic.T">T</span></span><span class="p">,</span> <span class="n">step</span><span class="p">:</span> <span class="n"><span title="float">float</span></span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Add a new value to the record.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>value</code>
+            </td>
+            <td>
+                  <code><span title="minrecord.base.T">T</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The value to add to the record.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>step</code>
+            </td>
+            <td>
+                  <code><span title="float">float</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The step value to record. <code>None</code> means there is no
+step to track. The type of a step is <code>float | None</code>:
+it is not checked at run time, so a label works but a
+type checker rejects it, and <code>get_best_step</code> (early
+stopping) needs a number.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<details class="example" open>
+  <summary>Example</summary>
+  <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">minrecord</span><span class="w"> </span><span class="kn">import</span> <span class="n">Record</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span> <span class="o">=</span> <span class="n">Record</span><span class="p">(</span><span class="s2">"loss"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">add_value</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">add_value</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mi">42</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span>
+<span class="go">Record(name=loss, max_size=10, size=2)</span>
+</code></pre></div>
+</details>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="minrecord.generic.Record.get_last_value" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">minrecord.generic.Record.get_last_value</span>
+
+
+<a href="#minrecord.generic.Record.get_last_value" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">get_last_value</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n"><span title="minrecord.generic.T">T</span></span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Get the last value.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="minrecord.base.T">T</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The last value added in the record.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="minrecord.base.EmptyRecordError" href="../base/#minrecord.base.EmptyRecordError">EmptyRecordError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>if the record is empty.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<details class="example" open>
+  <summary>Example</summary>
+  <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">minrecord</span><span class="w"> </span><span class="kn">import</span> <span class="n">Record</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span> <span class="o">=</span> <span class="n">Record</span><span class="p">(</span><span class="s2">"loss"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">add_value</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">add_value</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mf">1.2</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">get_last_value</span><span class="p">()</span>
+<span class="go">1.2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">add_value</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">get_last_value</span><span class="p">()</span>
+<span class="go">0.8</span>
+</code></pre></div>
+</details>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="minrecord.generic.Record.get_most_recent" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">minrecord.generic.Record.get_most_recent</span>
+
+
+<a href="#minrecord.generic.Record.get_most_recent" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">get_most_recent</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n"><span title="tuple">tuple</span></span><span class="p">[</span><span class="n"><span title="tuple">tuple</span></span><span class="p">[</span><span class="n"><span title="float">float</span></span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n"><span title="minrecord.generic.T">T</span></span><span class="p">],</span> <span class="o">...</span><span class="p">]</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Get the tuple of recent values and their associated steps.</p>
+<p>The last value in the tuple is the last value added to the
+record. The length of the recent record depends on the
+concrete implementation.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="tuple">tuple</span>[<span title="tuple">tuple</span>[<span title="float">float</span> | None, <span title="minrecord.base.T">T</span>], ...]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A tuple of the recent values in the record.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<details class="example" open>
+  <summary>Example</summary>
+  <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">minrecord</span><span class="w"> </span><span class="kn">import</span> <span class="n">Record</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span> <span class="o">=</span> <span class="n">Record</span><span class="p">(</span><span class="s2">"loss"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">add_value</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">add_value</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mf">1.2</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">add_value</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">get_most_recent</span><span class="p">()</span>
+<span class="go">((None, 2), (1, 1.2), (2, 0.8))</span>
+</code></pre></div>
+</details>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="minrecord.generic.Record.is_empty" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">minrecord.generic.Record.is_empty</span>
+
+
+<a href="#minrecord.generic.Record.is_empty" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">is_empty</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n"><span title="bool">bool</span></span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Indicate if the record is empty or not.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><code>True</code> if the record is empty, otherwise <code>False</code>.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<details class="example" open>
+  <summary>Example</summary>
+  <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">minrecord</span><span class="w"> </span><span class="kn">import</span> <span class="n">Record</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span> <span class="o">=</span> <span class="n">Record</span><span class="p">(</span><span class="s2">"loss"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">record</span><span class="o">.</span><span class="n">is_empty</span><span class="p">()</span>
+<span class="go">True</span>
+</code></pre></div>
+</details>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="minrecord.generic.Record.to_dict" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">minrecord.generic.Record.to_dict</span>
+
+
+<a href="#minrecord.generic.Record.to_dict" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">to_dict</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n"><span title="dict">dict</span></span><span class="p">[</span><span class="n"><span title="str">str</span></span><span class="p">,</span> <span class="n"><span title="typing.Any">Any</span></span><span class="p">]</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Export the current record to a dictionary.</p>
+<p>The dictionary contains the full name of the class (key
+<code>_target_</code>) and the arguments of the constructor that
+re-create the record with the same content. It can be used as
+input of <code>from_dict</code> or <code>load_dict</code>, or as the arguments of
+<code>coola.factory.factory</code>.</p>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="dict">dict</span>[<span title="str">str</span>, <span title="typing.Any">Any</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A dictionary with the arguments of the constructor.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<details class="example" open>
+  <summary>Example</summary>
+  <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">minrecord</span><span class="w"> </span><span class="kn">import</span> <span class="n">Record</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Record</span><span class="p">(</span><span class="s2">"loss"</span><span class="p">,</span> <span class="n">elements</span><span class="o">=</span><span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">)],</span> <span class="n">max_size</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+<span class="go">{'_target_': 'minrecord.generic.Record', 'name': 'loss', 'max_size': 3, 'elements': ((0, 1.5),)}</span>
+</code></pre></div>
+</details>
+
+    </div>
+
+</div>
 
 
 

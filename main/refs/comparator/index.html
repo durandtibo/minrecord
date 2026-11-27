@@ -891,6 +891,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="MaxScalarComparator">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.comparator.MaxScalarComparator.is_better" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        is_better
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
           <li class="md-nav__item">
@@ -901,6 +918,23 @@
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="MinScalarComparator">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.comparator.MinScalarComparator.is_better" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        is_better
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -1176,6 +1210,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="MaxScalarComparator">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.comparator.MaxScalarComparator.is_better" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        is_better
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
           <li class="md-nav__item">
@@ -1186,6 +1237,23 @@
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="MinScalarComparator">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#minrecord.comparator.MinScalarComparator.is_better" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        is_better
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -1538,6 +1606,113 @@ old value is replaced by any value (a number, or a NaN as a tie).</p>
 
 
 
+<div class="doc doc-object doc-function">
+
+
+<h4 id="minrecord.comparator.MaxScalarComparator.is_better" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">minrecord.comparator.MaxScalarComparator.is_better</span>
+
+
+<a href="#minrecord.comparator.MaxScalarComparator.is_better" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">is_better</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">new_value</span><span class="p">:</span> <span class="n"><span title="float">float</span></span><span class="p">,</span> <span class="n">old_value</span><span class="p">:</span> <span class="n"><span title="float">float</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="bool">bool</span></span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Indicate if the new value is better than the old value.</p>
+<p>A new value that is equal to the old value is better, so a
+record counts a plateau as an improvement. This rule is a
+contract: <code>is_better(new_value=x, old_value=x)</code> returns
+<code>True</code> for every value <code>x</code>, because <code>BaseRecord.from_dict</code>
+replays the last value against a best value that is that value.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>new_value</code>
+            </td>
+            <td>
+                  <code><span title="minrecord.comparator.T">T</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The new value to compare.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>old_value</code>
+            </td>
+            <td>
+                  <code><span title="minrecord.comparator.T">T</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The old value to compare.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><code>True</code> if the new value is better than the old value,
+otherwise <code>False</code>.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<details class="example" open>
+  <summary>Example</summary>
+  <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">minrecord</span><span class="w"> </span><span class="kn">import</span> <span class="n">MinScalarComparator</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">comparator</span> <span class="o">=</span> <span class="n">MinScalarComparator</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">comparator</span><span class="o">.</span><span class="n">is_better</span><span class="p">(</span><span class="n">old_value</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">new_value</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">comparator</span><span class="o">.</span><span class="n">is_better</span><span class="p">(</span><span class="n">old_value</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">new_value</span><span class="o">=</span><span class="mf">0.4</span><span class="p">)</span>
+<span class="go">True</span>
+</code></pre></div>
+</details>
+
+    </div>
+
+</div>
+
 
 
   </div>
@@ -1603,6 +1778,113 @@ old value is replaced by any value (a number, or a NaN as a tie).</p>
 
 
 
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="minrecord.comparator.MinScalarComparator.is_better" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">minrecord.comparator.MinScalarComparator.is_better</span>
+
+
+<a href="#minrecord.comparator.MinScalarComparator.is_better" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">is_better</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">new_value</span><span class="p">:</span> <span class="n"><span title="float">float</span></span><span class="p">,</span> <span class="n">old_value</span><span class="p">:</span> <span class="n"><span title="float">float</span></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n"><span title="bool">bool</span></span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Indicate if the new value is better than the old value.</p>
+<p>A new value that is equal to the old value is better, so a
+record counts a plateau as an improvement. This rule is a
+contract: <code>is_better(new_value=x, old_value=x)</code> returns
+<code>True</code> for every value <code>x</code>, because <code>BaseRecord.from_dict</code>
+replays the last value against a best value that is that value.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>new_value</code>
+            </td>
+            <td>
+                  <code><span title="minrecord.comparator.T">T</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The new value to compare.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>old_value</code>
+            </td>
+            <td>
+                  <code><span title="minrecord.comparator.T">T</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The old value to compare.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><code>True</code> if the new value is better than the old value,
+otherwise <code>False</code>.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<details class="example" open>
+  <summary>Example</summary>
+  <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">minrecord</span><span class="w"> </span><span class="kn">import</span> <span class="n">MinScalarComparator</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">comparator</span> <span class="o">=</span> <span class="n">MinScalarComparator</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">comparator</span><span class="o">.</span><span class="n">is_better</span><span class="p">(</span><span class="n">old_value</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">new_value</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">comparator</span><span class="o">.</span><span class="n">is_better</span><span class="p">(</span><span class="n">old_value</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">new_value</span><span class="o">=</span><span class="mf">0.4</span><span class="p">)</span>
+<span class="go">True</span>
+</code></pre></div>
+</details>
+
+    </div>
+
+</div>
 
 
 
