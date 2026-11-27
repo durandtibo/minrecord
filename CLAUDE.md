@@ -99,7 +99,8 @@ Python 3.11 and later. It depends on `coola` (2.x) and has no optional dependenc
 - Unit tests mirror the source tree (`tests/unit/test_<module>.py`, and
   `tests/unit/<package>/test_<module>.py` for a subpackage such as `utils`). Helpers shared by the
   unit tests are in `tests/unit/helpers.py`. Integration tests are in `tests/integration/`, with
-  the same layout.
+  the same layout. The tests of the scripts of `dev/` are in `tests/unit/dev/` and
+  `tests/integration/dev/`, which are not part of the source distribution.
 - Do not use local imports inside tests (for example `import numpy` in a test body). Import
   at the top of the module; guard the import of an optional library with `pytest.importorskip` or a
   skip mark.
