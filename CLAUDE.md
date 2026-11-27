@@ -16,11 +16,15 @@ Python 3.11 and later. It depends on `coola` (2.x) and has no optional dependenc
   accepted suppressions are the ones that avoid a breaking change of the public API, with a
   comment that says so. There is none in `src` today.
 - Run the unit tests of the modules you changed (for example
-  `.venv/bin/pytest tests/unit/test_manager.py -q`). Some tests fail on `main`; check with
-  `git stash` before blaming your change.
+  `.venv/bin/pytest tests/unit/test_manager.py -q`). The tests pass on `main`; if one fails,
+  check with `git stash` whether it fails without your change.
 - The common tasks are defined with `invoke-tasklib` (see `tasks.py` and `invoke.yaml`). Run
   `.venv/bin/inv --list` to list them, for example `.venv/bin/inv test.unit` or
   `.venv/bin/inv check`. The CI calls the same tasks.
+- The modules of `minrecord` form layers, declared in `[tool.importlinter]` in `pyproject.toml`: a
+  module only imports the modules of the layers below its own. Check it with
+  `.venv/bin/lint-imports` (a pre-commit hook, on Python 3.14 and later) and add every new module
+  to a layer.
 
 ## Workflow
 
@@ -57,12 +61,16 @@ Python 3.11 and later. It depends on `coola` (2.x) and has no optional dependenc
 - Follow the current style of the repository in everything you add (source, tests, docs, commit
   messages, PR descriptions). Look at a few neighbouring files first, and do not introduce a new
   convention or reformat code you do not otherwise change.
-- Every module starts with a `r"""..."""` docstring, then `from __future__ import annotations`,
-  then `__all__`. Export every public object from the `__all__` of its module, and from the
-  `__all__` of `minrecord/__init__.py` if it is part of the public API.
+- Every module starts with a `r"""..."""` docstring. Except for a package `__init__.py` that only
+  has the docstring, it is followed by `from __future__ import annotations`, then `__all__`.
+  Export every public object from the `__all__` of its module, and from the `__all__` of
+  `minrecord/__init__.py` if it is part of the public API.
 - Shared helpers belong in `minrecord.utils` as public functions (no leading underscore) with
   their own tests, not as private functions imported across modules.
 - Do not duplicate what `coola` already provides (equality, summaries, ...): use it.
+- Validate an argument at the boundary with the functions of `minrecord.utils.validation`
+  (`check_key`, `check_max_size`, `check_name`, `check_pair`) instead of repeating the check. Do
+  not add a validator that is a single comparison used in one place.
 - Build the message of an exception in a `msg` variable, then raise it
   (`msg = "..."` followed by `raise ValueError(msg)`), as the existing code does (ruff `EM`).
   Use the most specific exception type; define a dedicated exception class when the caller needs
@@ -139,8 +147,8 @@ Python 3.11 and later. It depends on `coola` (2.x) and has no optional dependenc
   the patched stand-in, which may not match the real collaborator (signature, return type,
   behaviour). A passing patched unit test does not mean the feature works. Every patched behaviour
   needs an integration test in `tests/integration/` that exercises the real thing without patching
-  (for example the detection of a missing optional library, in `tests/integration/utils/`). The
-  two kinds of test have different purposes; do not drop one because the other exists.
+  (for example `tests/integration/utils/test_factory.py` instantiates objects from real import
+  paths). The two kinds of test have different purposes; do not drop one because the other exists.
 - `tests/package_checks.py` is run against the built package (`ci-build.yaml`) and the installed
   PyPI package (`nightly-test-*`). Add the new public objects to it.
 
@@ -185,10 +193,10 @@ and keep it up to date when you add, rename or remove a workflow.
 - The file name starts with a prefix that gives the role of the workflow:
   - `ci-`: quality and test checks of the repository source. Most are reusable workflows
     (`workflow_call`, plus `workflow_dispatch` to run one alone) called from `ci.yaml`.
-    `ci-verify-workflows.yaml` (every PR that changes the workflows) is standalone and not called
-    from `ci.yaml`.
+    `ci-verify-workflows.yaml` (every PR and push to `main`) is standalone and not called from
+    `ci.yaml`.
   - `lib-`: reusable helpers that compute an output for other workflows (test matrix, package
-    dependencies, extras, versions).
+    metadata, dependencies, extras, versions).
   - `nightly-`: scheduled tests of the _published_ PyPI package, not of the source.
     `nightly-package.yaml` is the entry point; the other `nightly-test-*` are called by it.
   - `bot-`: scheduled automation that opens pull requests (dependency updates, pinning
