@@ -150,7 +150,7 @@ Python 3.11 and later. It depends on `coola` (2.x) and has no optional dependenc
   needs an integration test in `tests/integration/` that exercises the real thing without patching
   (for example `tests/integration/utils/test_factory.py` instantiates objects from real import
   paths). The two kinds of test have different purposes; do not drop one because the other exists.
-- `tests/package_checks.py` is run against the built package (`ci-build.yaml`) and the installed
+- `tests/package/checks.py` is run against the built package (`ci-build.yaml`) and the installed
   PyPI package (`nightly-test-*`). Add the new public objects to it.
 
 ### Test assertions
@@ -203,7 +203,8 @@ and keep it up to date when you add, rename or remove a workflow.
   - `bot-`: scheduled automation that opens pull requests (dependency updates, pinning
     actions, formatting, ...) with the `ci-bot` GitHub App token.
   - `release-`: publishing to PyPI and the documentation, triggered by version tags
-    (`v*.*.*`) or manually; they run `ci.yaml` before publishing.
+    (`v*.*.*`) or manually; they do not run `ci.yaml`, so check that CI passes on the
+    commit before tagging.
   - `security-`: dependency review of PRs, scheduled dependency audit and scorecard.
 - `ci.yaml` is the single entry point of the checks (pull request, push to `main`, nightly).
   It calls `lib-get-test-matrix.yaml` once and passes the matrix (`test-matrix` input) to the
