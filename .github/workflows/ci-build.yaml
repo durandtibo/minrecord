@@ -1,6 +1,7 @@
 # Build and package validation workflow.
 # Tests that the package can be built correctly as both source distribution and wheel.
 # Validates package metadata, dependencies, and that the package is properly typed.
+# On the sdist cells of build-all, runs the tests from the unpacked source distribution.
 
 name: Build Tests
 on:
@@ -62,7 +63,7 @@ jobs:
 
           set -euo pipefail
           echo "🔍 Running package checks..."
-          python tests/package_checks.py
+          python tests/package/checks.py
 
           echo "✅ Package checks passed"
 
@@ -84,7 +85,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # ratchet:actions/checkout@v7
       - name: Install uv and set the python version
-        uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # ratchet:astral-sh/setup-uv@v10.3.3
+        uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # ratchet:astral-sh/setup-uv@v10.4.0
         with:
           python-version: ${{ matrix.python-version }}
           activate-environment: true
@@ -101,6 +102,23 @@ jobs:
 
           set -euo pipefail
           echo "🔍 Running package checks..."
-          python tests/package_checks.py
+          python tests/package/checks.py
 
           echo "✅ Package checks passed"
+
+      # The sdist ships the tests: they must run from the unpacked archive, which has no file of
+      # the repository outside of it. Only the required dependencies are installed, so the tests of
+      # the optional ones are skipped. --python is explicit because UV_PYTHON, set by setup-uv,
+      # takes precedence over VIRTUAL_ENV.
+      - name: Test the source distribution
+        if: matrix.dist-type == 'sdist'
+        shell: bash
+        run: |
+          set -euo pipefail
+          uv build --sdist --out-dir "$RUNNER_TEMP/dist"
+          mkdir "$RUNNER_TEMP/sdist"
+          tar -xzf "$RUNNER_TEMP"/dist/*.tar.gz -C "$RUNNER_TEMP/sdist" --strip-components=1
+          cd "$RUNNER_TEMP/sdist"
+          uv venv "$RUNNER_TEMP/sdist-venv"
+          uv pip install --python "$RUNNER_TEMP/sdist-venv" . pytest pytest-timeout ruff
+          "$RUNNER_TEMP/sdist-venv/bin/python" -m pytest tests/unit tests/integration

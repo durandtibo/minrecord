@@ -8,7 +8,7 @@ of snapshot equality, and the tests that follow `CLAUDE.md`. So the architecture
 reviews described **is** the current code, and this review does not change it.
 
 It re-reads every module of `src` (11 files, 1,942 lines, 326 statements), the 23 Markdown files,
-the tests (466 test functions, 781 cases, 13 files) and `tests/package_checks.py`. It checks each
+the tests (466 test functions, 781 cases, 13 files) and `tests/package/checks.py`. It checks each
 promise of `docs/docs/design.md` (the **Guarantees** table), `index.md`, `usage_guide.md` and
 `faq.md` with a probe, and it reads the code of `coola` 2.0.0a5 (the only dependency) to see what
 `minrecord` still does by hand. What is left is small and has two causes:
@@ -411,7 +411,7 @@ for ties that left the window, for a NaN in the window and for a comparator with
 
 One branch and one pull request per step (`CLAUDE.md`). The steps are independent of each other
 (no stack is needed). Every step updates the docs, the release notes (`0.4.0`, unreleased),
-`tests/package_checks.py` when a public object changes, and the status line of this file with the
+`tests/package/checks.py` when a public object changes, and the status line of this file with the
 PR number.
 
 | Step | Change                                                                                                                                                                                                                                                                                                                                                                                             | Findings   | Breaking                           |
@@ -480,7 +480,7 @@ Step 2:
 - **Integration** (`tests/integration/test_checkpoint.py`, no patching): a JSON round trip of a
   record and of a manager is `objects_are_equal(..., equal_nan=True)`, and `objects_are_allclose`
   of a record after a `float32` precision loss of one value is `True` with a tolerance.
-- **Package checks** (`tests/package_checks.py`): `objects_are_equal` replaces the three `.equal(`
+- **Package checks** (`tests/package/checks.py`): `objects_are_equal` replaces the three `.equal(`
   calls, `minrecord.utils.equality.SnapshotEqualityTester` and `check_key` and `check_pair` are
   listed.
 
